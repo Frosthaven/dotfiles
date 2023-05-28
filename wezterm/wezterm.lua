@@ -60,7 +60,7 @@ config.font = wezterm.font 'JetBrainsMono NF'
 config.bold_brightens_ansi_colors = true
 config.front_end = "WebGpu"
 config.freetype_render_target = "HorizontalLcd"
-config.cell_width = 1.1
+config.cell_width = 1
 
 -- EVENTS **********************************************************************
 -- *****************************************************************************
