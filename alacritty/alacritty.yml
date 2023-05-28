@@ -21,8 +21,8 @@ window:
     columns: 86
     lines: 20
   padding:
-    x: 20
-    y: 20
+    x: 30
+    y: 30
   dynamic_padding: true
   decorations: full
   opacity: 0.99
