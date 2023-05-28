@@ -22,7 +22,7 @@ Remove-Item -Path "$env:UserProfile\.config\nvim" -Recurse -Force;
 Remove-Item -Path "$env:UserProfile\.config\starship" -Recurse -Force;
 Remove-Item -Path "$env:UserProfile\.config\wezterm" -Recurse -Force;
 New-Item -ItemType Junction -Path "$env:UserProfile\.config\alacritty" -Target "$env:UserProfile\dotfiles\alacritty";
-New-Item -ItemType Junction -Path "$env:UserProfile\.config\nvim" -Target "$env:UserProfile\dotfiles\nvim";
+New-Item -ItemType Junction -Path "$env:UserProfile\AppData\local\nvim" -Target "$env:UserProfile\dotfiles\nvim";
 New-Item -ItemType Junction -Path "$env:UserProfile\.config\starship" -Target "$env:UserProfile\dotfiles\starship";
 New-Item -ItemType Junction -Path "$env:UserProfile\.config\wezterm" -Target "$env:UserProfile\dotfiles\wezterm";
 ```
