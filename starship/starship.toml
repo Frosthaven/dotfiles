@@ -1,8 +1,8 @@
-command_timeout = 1000
+command_timeout = 300
 
 [cmd_duration]
 min_time = 500
-format = " 祥[$duration](bold yellow)"
+format = "  [$duration](bold yellow)"
 
 [username]
 show_always=false
@@ -30,7 +30,7 @@ format = "[ $version]($style) "
 detect_folders = ["dist","public"]
 
 [lua]
-format = "[]($style) "
+format = "[]($style) "
 
 [rust]
 symbol = " "

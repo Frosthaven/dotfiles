@@ -49,7 +49,7 @@ else
   }
  config.window_background_opacity = 0.98
   -- font
-  platform_config.font_size = 10
+  platform_config.font_size = 15
   platform_config.line_height = 1
 end
 

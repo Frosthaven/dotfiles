@@ -33,8 +33,8 @@ rm -rf ~/.config/alacritty
 rm -rf ~/.config/nvim
 rm -rf ~/.config/starship
 rm -rf ~/.config/wezterm
-ln ~/dotfiles/alacritty ~/.config/alacritty
-ln ~/dotfiles/nvim ~/.config/nvim
-ln ~/dotfiles/starship ~/.config/starship
-ln ~/dotfiles/wezterm ~/.config/wezterm
+ln -s ~/dotfiles/alacritty ~/.config/alacritty
+ln -s ~/dotfiles/nvim ~/.config/nvim
+ln -s ~/dotfiles/starship ~/.config/starship
+ln -s ~/dotfiles/wezterm ~/.config/wezterm
 ```
