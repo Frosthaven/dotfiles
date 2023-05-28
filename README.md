@@ -4,14 +4,6 @@ This is my personal configuration bundle, which requires setting up symlinks to 
 
 ## Installation
 
-#### Windows
-```powershell
-```sh
-# this will clone the repo into your user directory
-git clone https://github.com/Frosthaven/dotfiles.git ~/dotfiles
-```
-
-#### Linux / MacOS
 ```sh
 # this will clone the repo into your user directory
 git clone https://github.com/Frosthaven/dotfiles.git ~/dotfiles
