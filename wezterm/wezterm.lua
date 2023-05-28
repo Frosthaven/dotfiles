@@ -37,7 +37,7 @@ if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
   platform_config.window_background_opacity = 0
   platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
   -- font
-  platform_config.font_size = 10.5
+  platform_config.font_size = 11
   platform_config.line_height = 1.1
   -- misc
   platform_config.default_prog = { 'C:/Program Files/Powershell/7/pwsh.exe', '-nologo', '-l' }
@@ -45,7 +45,7 @@ else
   -- Unix/Linux/Mac
   -- framing
   platform_config.window_frame = {
-    font_size = 12
+    font_size = 10
   }
  config.window_background_opacity = 0.98
   -- font
@@ -59,6 +59,8 @@ end
 config.font = wezterm.font 'JetBrainsMono NF'
 config.bold_brightens_ansi_colors = true
 config.front_end = "WebGpu"
+config.freetype_render_target = "HorizontalLcd"
+config.cell_width = 1
 
 -- EVENTS **********************************************************************
 -- *****************************************************************************
