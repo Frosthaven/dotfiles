@@ -29,28 +29,34 @@ end
 
 -- platform specifics
 if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
-  -- windows *******************************************************************
-  -- framing
-  platform_config.window_frame = {
-    font_size = 12
-  }
-  platform_config.window_background_opacity = 0
-  platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
-  -- font
-  platform_config.font_size = 10
-  platform_config.line_height = 1
-  -- misc
-  platform_config.default_prog = { 'C:/Program Files/Powershell/7/pwsh.exe', '-nologo', '-l' }
+    -- windows *****************************************************************
+    -- framing
+    platform_config.window_frame = {
+        font_size = 12
+    }
+    platform_config.window_background_opacity = 0
+    platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
+    -- font
+    platform_config.font_size = 10
+    platform_config.line_height = 1
+    -- misc
+    platform_config.default_prog = { 'C:/Program Files/Powershell/7/pwsh.exe', '-nologo', '-l' }
 else
-  -- Unix/Linux/Mac
-  -- framing
-  platform_config.window_frame = {
-    font_size = 10
-  }
- config.window_background_opacity = 0.98
-  -- font
-  platform_config.font_size = 15
-  platform_config.line_height = 1
+    -- mac & linux *************************************************************
+    -- framing
+    platform_config.window_frame = {
+    font_size = 12
+    }
+    platform_config.window_background_opacity = 0.98
+    -- font
+    platform_config.font_size = 15
+    platform_config.line_height = 1
+
+    -- hide the titlebar but keep the window controls
+    platform_config.window_decorations = "TITLE | RESIZE"
+    -- also show the close button
+    platform_config.window_close_confirmation = "NeverPrompt"
+    platform_config.window_background_opacity = 0.98
 end
 
 -- FONT SETUP ******************************************************************
