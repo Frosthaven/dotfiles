@@ -1,0 +1,81 @@
+command_timeout = 2000
+
+[cmd_duration]
+min_time = 500
+format = "  [$duration](bold yellow)"
+
+[username]
+show_always=false
+style_user="fg:green bold"
+
+[hostname]
+style="fg:purple bold"
+
+[directory]
+read_only = "  "
+style="fg:blue bold"
+
+[package]
+symbol = " "
+disabled = true
+
+[git_branch]
+symbol = " "
+
+[nodejs]
+format = "[ $version]($style) "
+
+[php]
+format = "[ $version]($style) "
+detect_folders = ["dist","public"]
+
+[lua]
+format = "[]($style) "
+
+[rust]
+symbol = " "
+
+[aws]
+symbol = " "
+
+[buf]
+symbol = " "
+
+[conda]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[docker_context]
+symbol = " "
+
+[elixir]
+symbol = " "
+
+[elm]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[haskell]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[java]
+symbol = " "
+
+[julia]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[nim]
+symbol = " "
+
+[nix_shell]
+symbol = " "
