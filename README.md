@@ -1,6 +1,7 @@
 # dotfiles
 
-My personal dotfiles, managed by [chezmoi](https://github.com/twpayne/chezmoi).
+My personal dotfiles, managed by [chezmoi](https://github.com/twpayne/chezmoi)
+for Windows interoperability.
 
 ## chezmoi quick reference
 
