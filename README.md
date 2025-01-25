@@ -16,4 +16,3 @@ chezmoi edit ~/.config/nvim/init.vim
 chezmoi diff
 chezmoi -v apply
 ```
-

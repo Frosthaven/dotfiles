@@ -1,0 +1,75 @@
+# them based on catpuccin
+
+[colors.primary]
+background = "#1e1e2e"
+foreground = "#b8c0e0"
+
+[colors.bright]
+black = "#4c507a"
+blue = "#8aadf4"
+cyan = "#91d7e3"
+green = "#a6da95"
+magenta = "#c6a0f6"
+red = "#ee99a0"
+white = "#cad3f5"
+yellow = "#eed49f"
+
+[colors.normal]
+black = "#3f4263"
+blue = "#7c9bdb"
+cyan = "#81c0ca"
+green = "#93c184"
+magenta = "#b190dd"
+red = "#ed8796"
+white = "#b8c0e0"
+yellow = "#f5a97f"
+
+[colors.selection]
+text = "#24273a"
+background = "#fffacd"
+
+[selection]
+save_to_clipboard = true
+
+[cursor.style]
+blinking = "on"
+shape = "beam"
+
+[env]
+TERM = "xterm-256color"
+WINIT_X11_SCALE_FACTOR = "1"
+
+[font]
+builtin_box_drawing = false
+size = 11
+
+[font.glyph_offset]
+x = 0
+y = -2
+
+[font.normal]
+family = "JetbrainsMono Nerd Font"
+style = "Bold"
+
+[font.offset]
+x = 0
+y = -2
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[window]
+decorations = "full"
+dynamic_padding = true
+opacity = 0.95
+title = "Alacritty"
+blur = true
+
+[window.dimensions]
+columns = 90
+lines = 26
+
+[window.padding]
+x = 30
+y = 30
