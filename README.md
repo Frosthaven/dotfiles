@@ -3,7 +3,7 @@
 My personal dotfiles, managed by [chezmoi](https://github.com/twpayne/chezmoi)
 for Windows interoperability.
 
-## chezmoi quick reference
+## Quick Reference
 
 chezmoi saves state in `~/.local/share/chezmoi` on all platforms.
 
@@ -17,3 +17,8 @@ chezmoi edit ~/.config/nvim/init.vim
 chezmoi diff
 chezmoi -v apply
 ```
+
+## Inspirations
+
+- Neovim configuration: [Neovim as a PHP and Javascript IDE](https://laracasts.com/series/neovim-as-a-php-ide)
+ala
