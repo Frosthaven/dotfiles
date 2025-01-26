@@ -5,7 +5,7 @@ x = 30
 y = 30
 
 [colors.primary]
-background = "#1e1e2e"
+background = "#181825"
 foreground = "#b8c0e0"
 
 [colors.bright]
@@ -45,7 +45,7 @@ WINIT_X11_SCALE_FACTOR = "1"
 
 [font]
 builtin_box_drawing = true
-size = 11
+size = 10
 
 [font.glyph_offset]
 x = 0
@@ -56,7 +56,7 @@ family = "JetbrainsMono Nerd Font"
 style = "Bold"
 
 [font.offset]
-x = 0
+x = 2
 y = 0
 
 [scrolling]
