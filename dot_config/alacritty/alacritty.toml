@@ -2,7 +2,7 @@
 
 [window.padding]
 x = 30
-y = 30
+y = 0
 
 [colors.primary]
 background = "#181825"

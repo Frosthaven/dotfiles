@@ -9,7 +9,7 @@
 
 --]]
 
-local function setAlacrittyTOMLPadding(xPadding, yPadding)
+local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
     local homeDirectory = os.getenv('HOME')
     local tomlPath = homeDirectory .. '/.config/alacritty/alacritty.toml'
 
@@ -53,11 +53,11 @@ local function setAlacrittyTOMLPadding(xPadding, yPadding)
 end
 
 function IncreasePadding()
-    setAlacrittyTOMLPadding(30, 30)
+    setAlacrittyTOMLPaddingXY(30, 0)
 end
 
 function DecreasePadding()
-  setAlacrittyTOMLPadding(0, 0)
+  setAlacrittyTOMLPaddingXY(0, 0)
 end
 
 vim.cmd[[
