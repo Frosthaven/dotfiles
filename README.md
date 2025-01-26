@@ -12,8 +12,6 @@ command syntax:
 ```shell
 chezmoi cd
 chezmoi init
-chezmoi add ~/AppData/Local/nvim
-chezmoi edit ~/.config/nvim/init.vim
 chezmoi diff
 chezmoi -v apply
 ```
