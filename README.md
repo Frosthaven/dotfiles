@@ -21,4 +21,4 @@ chezmoi -v apply
 ## Inspirations
 
 - Neovim configuration: [Neovim as a PHP and Javascript IDE](https://laracasts.com/series/neovim-as-a-php-ide)
-ala
+
