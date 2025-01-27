@@ -159,6 +159,9 @@ require('lazy').setup({
   --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
+  { -- github copilot
+    'github/copilot.vim',
+  },
   { -- Adds forced terminal transparency
     'tribela/transparent.nvim',
     event = 'VimEnter',
