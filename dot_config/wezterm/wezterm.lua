@@ -171,7 +171,8 @@ config.colors = {
 		"#aaadb1",
 	},
 
-	background = "#282C34",
+	background = "#1a1b26",
+	-- background = "#282C34",
 	-- foreground = '#ffffff',
 	tab_bar = {
 		background = "#21252b",
