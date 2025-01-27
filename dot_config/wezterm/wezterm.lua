@@ -37,7 +37,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	platform_config.window_background_opacity = 1
 	platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
 	-- font
-	platform_config.font_size = 11
+	platform_config.font_size = 10
 	platform_config.line_height = 1
 	-- misc
 	platform_config.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
