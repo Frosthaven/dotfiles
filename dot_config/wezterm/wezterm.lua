@@ -45,10 +45,10 @@ else
 	-- mac & linux *************************************************************
 	-- framing
 	platform_config.window_frame = {
-		font_size = 12,
+		font_size = 15,
 	}
 	-- font
-	platform_config.font_size = 16
+	platform_config.font_size = 15
 	platform_config.line_height = 1
 
 	-- hide the titlebar but keep the window controls
