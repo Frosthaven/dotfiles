@@ -99,8 +99,23 @@ end)
 
 -- keymaps
 config.keys = {
-	{ key = "w", mods = "CTRL", action = act.EmitEvent("trigger-padding-toggle") },
+	-- { key = "w", mods = "CTRL", action = act.EmitEvent("trigger-padding-toggle") },
 	-- { key = 'V', mods = 'CTRL', action = act.PasteFrom 'Clipboard' },
+	{
+		key = "t",
+		mods = "SHIFT|ALT",
+		action = act.SpawnTab("CurrentPaneDomain"),
+	},
+	{
+		key = "w",
+		mods = "SHIFT|ALT",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
+	{
+		key = "w",
+		mods = "CMD",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
 }
 
 -- THEMING *********************************************************************
