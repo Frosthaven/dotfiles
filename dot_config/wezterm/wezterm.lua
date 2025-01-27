@@ -47,16 +47,21 @@ else
 	platform_config.window_frame = {
 		font_size = 12,
 	}
-	platform_config.window_background_opacity = 0.98
 	-- font
-	platform_config.font_size = 15
+	platform_config.font_size = 16
 	platform_config.line_height = 1
 
 	-- hide the titlebar but keep the window controls
 	platform_config.window_decorations = "TITLE | RESIZE"
 	-- also show the close button
 	platform_config.window_close_confirmation = "NeverPrompt"
-	platform_config.window_background_opacity = 0.98
+	platform_config.window_background_opacity = 0.95
+
+	if wezterm.target_triple == "x86_64-apple-darwin" or wezterm.target_triple == "aarch64-apple-darwin" then
+		-- mac only ****************************************************
+		platform_config.window_background_opacity = 0.88
+		platform_config.macos_window_background_blur = 50
+	end
 end
 
 -- FONT SETUP ******************************************************************
