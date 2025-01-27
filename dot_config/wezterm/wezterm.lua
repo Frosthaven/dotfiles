@@ -72,21 +72,24 @@ config.cell_width = 0.9
 -- *****************************************************************************
 
 wezterm.on("user-var-changed", function(window, pane, name, value)
-	wezterm.log_info("var", name, value)
-	if name == "PADDING" and value == "on" then
+	if name == "PADDING" and value == "off" then
 		local overrides = window:get_config_overrides() or {}
-		if not overrides.window_padding then
-			overrides.window_padding = {
-				left = "0cell",
-				right = "0cell",
-				top = "0cell",
-				bottom = "0cell",
-			}
-		else
-			overrides.window_padding = nil
-		end
+		overrides.window_padding = {
+			left = "0cell",
+			right = "0cell",
+			top = "0cell",
+			bottom = "0cell",
+		}
 		window:set_config_overrides(overrides)
-	elseif name == "PADDING" and value ~= "on" then
+	elseif name == "PADDING" and value == "on" then
+		local overrides = window:get_config_overrides() or {}
+		overrides.window_padding = {
+			left = "4cell",
+			right = "4cell",
+			top = "1cell",
+			bottom = "1cell",
+		}
+		window:set_config_overrides(overrides)
 		overrides.window_padding = nil
 	end
 end)
