@@ -254,6 +254,9 @@ require('lazy').setup({
       },
     },
   },
+  { -- base64 encoding
+    'taybart/b64.nvim',
+  },
   { -- Integrate chezmoi
     'xvzc/chezmoi.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -1032,7 +1035,6 @@ local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
   -- get the user's local
   local file, err = io.open(tomlPath, 'r')
   if not file then
-    print('Error opening file: ' .. err)
     return
   end
   local lines = {}
@@ -1058,7 +1060,6 @@ local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
 
   file, err = io.open(tomlPath, 'w')
   if not file then
-    print('Error opening file: ' .. err)
     return
   end
 
@@ -1068,16 +1069,30 @@ local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
   file:close()
 end
 
+local function setWeztermPaddingOn()
+  local encoded = require('b64').enc 'off'
+  local commandToSend = '\033]1337;SetUserVar=PADDING=' .. encoded .. '\007'
+  io.write(string.format(commandToSend))
+end
+
+local function setWeztermPaddingOff()
+  local encoded = require('b64').enc 'off'
+  local commandToSend = '\033]1337;SetUserVar=PADDING=' .. encoded .. '\007'
+  io.write(string.format(commandToSend))
+end
+
 function IncreasePadding()
+  -- broken setWeztermPaddingOn()
   setAlacrittyTOMLPaddingXY(30, 30)
 end
 
 function DecreasePadding()
+  -- broken setWeztermPaddingOff()
   setAlacrittyTOMLPaddingXY(0, 0)
 end
 
 vim.cmd [[
-  augroup ChangeAlacrittyPadding
+  augroup ChangeParentTerminal
    au!
    au VimEnter * lua DecreasePadding()
    au VimLeavePre * lua IncreasePadding()
