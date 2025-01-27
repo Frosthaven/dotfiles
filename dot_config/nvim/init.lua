@@ -880,7 +880,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
+  -- require 'kickstart.plugins.neo-tree',
 
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
@@ -925,28 +925,27 @@ require('lazy').setup({
     hijack netrw for local files
 --]]
 
-vim.api.nvim_create_autocmd('BufNewFile', {
-  group = vim.api.nvim_create_augroup('RemoteFile', { clear = true }),
-  callback = function()
-    local f = vim.fn.expand '%:p'
-    for _, v in ipairs { 'sftp', 'scp', 'ssh', 'dav', 'fetch', 'ftp', 'http', 'rcp', 'rsync' } do
-      local p = v .. '://'
-      if string.sub(f, 1, #p) == p then
-        vim.cmd [[
-          unlet g:loaded_netrw
-          unlet g:loaded_netrwPlugin
-          runtime! plugin/netrwPlugin.vim
-          silent Explore %
-        ]]
-        vim.api.nvim_clear_autocmds { group = 'RemoteFile' }
-        break
-      end
-    end
-  end,
-})
-
+-- vim.api.nvim_create_autocmd('BufNewFile', {
+-- group = vim.api.nvim_create_augroup('RemoteFile', { clear = true }),
+-- callback = function()
+--   local f = vim.fn.expand '%:p'
+--   for _, v in ipairs { 'sftp', 'scp', 'ssh', 'dav', 'fetch', 'ftp', 'http', 'rcp', 'rsync' } do
+--     local p = v .. '://'
+--     if string.sub(f, 1, #p) == p then
+--       vim.cmd [[
+--         unlet g:loaded_netrw
+--         unlet g:loaded_netrwPlugin
+--         runtime! plugin/netrwPlugin.vim
+--         silent Explore %
+--       ]]
+--       vim.api.nvim_clear_autocmds { group = 'RemoteFile' }
+--       break
+--     end
+--   end
+-- end,
+-- })
 --[[
-    chezkoi setup and hotkey
+  chezkoi setup and hotkey
 --]]
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   pattern = { os.getenv 'HOME' .. '/.local/share/chezmoi/*' },
