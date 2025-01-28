@@ -86,6 +86,19 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- tiny terminal
+-- if on windows, use powershell
+if vim.fn.has 'win32' or vim.fn.has 'win64' then
+  vim.o.shell = 'powershell.exe -nologo'
+end
+vim.keymap.set('n', '<leader>tt', function()
+  vim.cmd.vnew()
+  vim.cmd.term()
+  vim.cmd.wincmd 'J'
+  vim.api.nvim_win_set_height(0, 10)
+  vim.cmd [[startinsert]]
+end, { desc = '[T]iny [T]erminal' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -110,20 +123,6 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
-
--- setup small terminal
--- if on windows, use powershell
-if vim.fn.has 'win32' or vim.fn.has 'win64' then
-  vim.o.shell = 'powershell.exe -nologo'
-end
-
-vim.keymap.set('n', '<leader>tt', function()
-  vim.cmd.vnew()
-  vim.cmd.term()
-  vim.cmd.wincmd 'J'
-  vim.api.nvim_win_set_height(0, 10)
-  vim.cmd [[startinsert]]
-end, { desc = '[T]iny [T]erminal' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`

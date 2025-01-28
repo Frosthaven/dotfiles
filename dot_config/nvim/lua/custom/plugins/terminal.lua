@@ -5,8 +5,8 @@ return {
       --create_commands = false
     },
     config = function()
+      -- auto padding for wezterm and alacritty
       local wezterm = require 'wezterm'
-
       local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
         local homeDirectory = os.getenv 'HOME'
         local tomlPath = homeDirectory .. '/.config/alacritty/alacritty.toml'
