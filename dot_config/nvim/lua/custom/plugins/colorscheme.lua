@@ -9,7 +9,7 @@ return {
   {
     'folke/tokyonight.nvim',
     lazy = false,
-    enabled = false,
+    enabled = true,
     priority = 1000,
     opts = { style = 'storm' },
     init = function()
@@ -20,7 +20,7 @@ return {
   {
     'rose-pine/neovim',
     lazy = false,
-    enabled = true,
+    enabled = false,
     name = 'rose-pine',
     config = function()
       require('rose-pine').setup {
