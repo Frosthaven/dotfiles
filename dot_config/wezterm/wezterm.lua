@@ -27,15 +27,47 @@ end
 -- PLATFORM CONFIG *************************************************************
 -- *****************************************************************************
 
+config.font = wezterm.font("JetBrainsMono NF")
+
 -- platform specifics
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	-- windows *****************************************************************
 	-- framing
+	local enableTransparency = true
+	local defaultRendering = {
+		webgpu_front_end = "WebGpu",
+		window_background_opacity = 1,
+		win32_system_backdrop = "Disable",
+	}
+	-- enable Vulkan OpenGL and transparency if available on a discrete gpu
+	-- note: for nvidia, must set gdi rendering for wezterm to compatibility
+	-- mode under "manage 3d settings -> per application -> wezterm.exe"
+	if enableTransparency then
+		local foundVulkan = false
+		for _, gpu in ipairs(wezterm.gui.enumerate_gpus()) do
+			if gpu.backend == "Vulkan" and gpu.device_type == "DiscreteGpu" then
+				foundVulkan = true
+				platform_config.webgpu_preferred_adapter = gpu
+				platform_config.front_end = "OpenGL"
+				platform_config.window_background_opacity = 0.75
+				platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
+				break
+			end
+		end
+		if not foundVulkan then
+			platform_config.front_end = defaultRendering.webgpu_front_end
+			platform_config.window_background_opacity = defaultRendering.window_background_opacity
+			platform_config.win32_system_backdrop = defaultRendering.win32_system_backdrop
+		end
+	else
+		platform_config.front_end = defaultRendering.webgpu_front_end
+		platform_config.window_background_opacity = defaultRendering.window_background_opacity
+		platform_config.win32_system_backdrop = defaultRendering.win32_system_backdrop
+	end
+
 	platform_config.window_frame = {
 		font_size = 10,
 	}
-	platform_config.window_background_opacity = 1
-	platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
 	-- font
 	platform_config.font_size = 10
 	platform_config.line_height = 1
@@ -44,6 +76,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 else
 	-- mac & linux *************************************************************
 	-- framing
+	platform_config.front_end = "WebGPU"
 	platform_config.window_frame = {
 		font_size = 15,
 	}
@@ -67,9 +100,7 @@ end
 -- FONT SETUP ******************************************************************
 -- *****************************************************************************
 
-config.font = wezterm.font("JetBrainsMono NF")
 config.bold_brightens_ansi_colors = true
-config.front_end = "WebGpu"
 config.freetype_render_target = "HorizontalLcd"
 config.cell_width = 0.9
 
@@ -128,7 +159,7 @@ config.keys = {
 
 -- window framing
 config.window_frame = {
-	font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold" }),
+	font = wezterm.font({ family = "JetBrainsMono NF", weight = "Bold" }),
 	active_titlebar_bg = "#21252b",
 	inactive_titlebar_bg = "#21252b",
 }
@@ -194,7 +225,7 @@ config.colors = {
 		"#aaadb1",
 	},
 
-	background = "#1a1b26",
+	background = "#1e1e2e",
 	-- background = "#282C34",
 	-- foreground = '#ffffff',
 	tab_bar = {
