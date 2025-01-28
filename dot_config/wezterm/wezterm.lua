@@ -49,8 +49,8 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 				foundVulkan = true
 				platform_config.webgpu_preferred_adapter = gpu
 				platform_config.front_end = "OpenGL"
-				platform_config.window_background_opacity = 0.7
-				platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
+				platform_config.window_background_opacity = 0.85
+				platform_config.win32_system_backdrop = "Acrylic" -- Disable, Acrylic, Mica, Tabbed
 				break
 			end
 		end
