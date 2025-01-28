@@ -111,11 +111,10 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
 
-
 -- setup small terminal
 -- if on windows, use powershell
-if (vim.fn.has('win32') or vim.fn.has('win64')) then
-    vim.o.shell = 'powershell'
+if vim.fn.has 'win32' or vim.fn.has 'win64' then
+  vim.o.shell = 'powershell'
 end
 
 vim.keymap.set('n', '<leader>tt', function()
