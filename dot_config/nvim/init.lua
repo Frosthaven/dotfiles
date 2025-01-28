@@ -114,7 +114,7 @@ vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous qu
 -- setup small terminal
 -- if on windows, use powershell
 if vim.fn.has 'win32' or vim.fn.has 'win64' then
-  vim.o.shell = 'powershell'
+  vim.o.shell = 'powershell.exe -nologo'
 end
 
 vim.keymap.set('n', '<leader>tt', function()
