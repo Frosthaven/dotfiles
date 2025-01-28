@@ -162,45 +162,11 @@ require('lazy').setup({
     event = 'VimEnter',
     config = true,
   },
-  { -- Adds mini.files for editing the filesystem
-    'echasnovski/mini.files',
-    version = false,
-  },
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-    },
-  },
   {
     'willothy/wezterm.nvim',
     opts = {
       --create_commands = false
     },
-  },
-  { -- Integrate chezmoi
-    'xvzc/chezmoi.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      require('chezmoi').setup {
-        -- your configurations
-        edit = {
-          watch = true,
-          force = true,
-        },
-        notification = {
-          on_open = true,
-          on_apply = true,
-          on_watch = false,
-        },
-      }
-    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -349,14 +315,11 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'ui-select')
 
       -- See `:help telescope.builtin`
-      local telescope = require 'telescope'
-      telescope.load_extension 'chezmoi'
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[S]earch [B]uffers' })
-      vim.keymap.set('n', '<leader>sc', telescope.extensions.chezmoi.find_files, { desc = '[S]earch [C]hezmoi' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       -- commented out in favor of live multi-grep
@@ -892,7 +855,6 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -931,109 +893,6 @@ require('lazy').setup({
 })
 
 -- Custom Code
-
--- [[
--- enable mini.files
--- ]]
-
-require('mini.files').setup {
-  -- Customization of shown content
-  content = {
-    -- Predicate for which file system entries to show
-    filter = nil,
-    -- What prefix to show to the left of file system entry
-    prefix = nil,
-    -- In which order to show file system entries
-    sort = nil,
-  },
-
-  -- Module mappings created only inside explorer.
-  -- Use `''` (empty string) to not create one.
-  mappings = {
-    close = 'q',
-    go_in = 'l',
-    go_in_plus = '<right>',
-    go_out = 'h',
-    go_out_plus = '<left>',
-    mark_goto = "'",
-    mark_set = 'm',
-    reset = '<BS>',
-    reveal_cwd = '@',
-    show_help = 'g?',
-    synchronize = '=',
-    trim_left = '<',
-    trim_right = '>',
-  },
-
-  -- General options
-  options = {
-    -- Whether to delete permanently or move into module-specific trash
-    permanent_delete = true,
-    -- Whether to use for editing directories
-    use_as_default_explorer = true,
-  },
-
-  -- Customization of explorer windows
-  windows = {
-    -- Maximum number of windows to show side by side
-    max_number = math.huge,
-    -- Whether to show preview of file/directory under cursor
-    preview = true,
-    -- Width of focused window
-    width_focus = 50,
-    -- Width of non-focused window
-    width_nofocus = 15,
-    -- Width of preview window
-    width_preview = 25,
-  },
-}
-
-vim.keymap.set('n', '-', function()
-  local MiniFiles = require 'mini.files'
-  local _ = MiniFiles.close() or MiniFiles.open(vim.api.nvim_buf_get_name(0), false)
-  vim.defer_fn(function()
-    MiniFiles.reveal_cwd()
-  end, 30)
-end, { desc = 'Open file browser' })
---[[
-    hijack netrw for local files
---]]
-
--- vim.api.nvim_create_autocmd('BufNewFile', {
--- group = vim.api.nvim_create_augroup('RemoteFile', { clear = true }),
--- callback = function()
---   local f = vim.fn.expand '%:p'
---   for _, v in ipairs { 'sftp', 'scp', 'ssh', 'dav', 'fetch', 'ftp', 'http', 'rcp', 'rsync' } do
---     local p = v .. '://'
---     if string.sub(f, 1, #p) == p then
---       vim.cmd [[
---         unlet g:loaded_netrw
---         unlet g:loaded_netrwPlugin
---         runtime! plugin/netrwPlugin.vim
---         silent Explore %
---       ]]
---       vim.api.nvim_clear_autocmds { group = 'RemoteFile' }
---       break
---     end
---   end
--- end,
--- })
---[[
-  chezkoi setup and hotkey
---]]
-vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-  pattern = { os.getenv 'HOME' .. '/.local/share/chezmoi/*' },
-  callback = function(ev)
-    local bufnr = ev.buf
-    local edit_watch = function()
-      require('chezmoi.commands.__edit').watch(bufnr)
-    end
-    vim.schedule(edit_watch)
-  end,
-})
-
--- @todo
-
 --[[
 
     - file path is  '~/.config/alacritty/alacritty.toml'
