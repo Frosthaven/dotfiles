@@ -49,7 +49,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 				foundVulkan = true
 				platform_config.webgpu_preferred_adapter = gpu
 				platform_config.front_end = "OpenGL"
-				platform_config.window_background_opacity = 0.7
+				platform_config.window_background_opacity = 0.8
 				platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
 				break
 			end
@@ -165,7 +165,7 @@ config.window_frame = {
 }
 config.window_padding = {
 	left = "4cell", -- 4
-	right = "4cell", -- 4
+	right = "4cell", --
 	top = "1cell", -- 1
 	bottom = "1cell", -- 1
 }
@@ -225,7 +225,7 @@ config.colors = {
 		"#aaadb1",
 	},
 
-	background = "#1e1e2e",
+	background = "#181825",
 	-- background = "#282C34",
 	-- foreground = '#ffffff',
 	tab_bar = {
