@@ -69,7 +69,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 		font_size = 10,
 	}
 	-- font
-	platform_config.font_size = 10
+	platform_config.font_size = 10.5
 	platform_config.line_height = 1.15
 	-- misc
 	platform_config.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
