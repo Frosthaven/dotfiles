@@ -76,7 +76,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 else
 	-- mac & linux *************************************************************
 	-- framing
-	platform_config.front_end = "WebGPU"
+	platform_config.front_end = "WebGpu"
 	platform_config.window_frame = {
 		font_size = 15,
 	}
