@@ -49,7 +49,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 				foundVulkan = true
 				platform_config.webgpu_preferred_adapter = gpu
 				platform_config.front_end = "OpenGL"
-				platform_config.window_background_opacity = 0.8
+				platform_config.window_background_opacity = 0.7
 				platform_config.win32_system_backdrop = "Mica" -- Disable, Acrylic, Mica, Tabbed
 				break
 			end
@@ -70,7 +70,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	}
 	-- font
 	platform_config.font_size = 10
-	platform_config.line_height = 1
+	platform_config.line_height = 1.15
 	-- misc
 	platform_config.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
 else
@@ -82,7 +82,7 @@ else
 	}
 	-- font
 	platform_config.font_size = 15
-	platform_config.line_height = 1
+	platform_config.line_height = 1.15
 
 	-- hide the titlebar but keep the window controls
 	platform_config.window_decorations = "TITLE | RESIZE"
@@ -102,7 +102,7 @@ end
 
 config.bold_brightens_ansi_colors = true
 config.freetype_render_target = "HorizontalLcd"
-config.cell_width = 0.9
+config.cell_width = 1
 
 -- EVENTS **********************************************************************
 -- *****************************************************************************
@@ -159,7 +159,7 @@ config.keys = {
 
 -- window framing
 config.window_frame = {
-	font = wezterm.font({ family = "JetBrainsMono NF", weight = "Bold" }),
+	font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold" }),
 	active_titlebar_bg = "#21252b",
 	inactive_titlebar_bg = "#21252b",
 }
@@ -225,7 +225,8 @@ config.colors = {
 		"#aaadb1",
 	},
 
-	background = "#181825",
+	background = "#191724", --rose-pine moon
+	-- background = "#1a1b26", --tokyonight storm
 	-- background = "#282C34",
 	-- foreground = '#ffffff',
 	tab_bar = {
