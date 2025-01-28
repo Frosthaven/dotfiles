@@ -163,12 +163,6 @@ require('lazy').setup({
     event = 'VimEnter',
     config = true,
   },
-  {
-    'willothy/wezterm.nvim',
-    opts = {
-      --create_commands = false
-    },
-  },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -902,67 +896,6 @@ require('lazy').setup({
     y = 30
 
 --]]
-
-local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
-  local homeDirectory = os.getenv 'HOME'
-  local tomlPath = homeDirectory .. '/.config/alacritty/alacritty.toml'
-
-  -- get the user's local
-  local file, err = io.open(tomlPath, 'r')
-  if not file then
-    return
-  end
-  local lines = {}
-  local inWindowPaddingSection = false
-  for line in file:lines() do
-    if line:find '%[window%.padding%]' then
-      inWindowPaddingSection = true
-    elseif line:find '%[.*%]' then
-      inWindowPaddingSection = false
-    end
-
-    if inWindowPaddingSection then
-      if line:find 'x = ' then
-        line = 'x = ' .. xPadding
-      elseif line:find 'y = ' then
-        line = 'y = ' .. yPadding
-      end
-    end
-
-    table.insert(lines, line)
-  end
-  file:close()
-
-  file, err = io.open(tomlPath, 'w')
-  if not file then
-    return
-  end
-
-  for _, line in ipairs(lines) do
-    file:write(line .. '\n')
-  end
-  file:close()
-end
-
-local wezterm = require 'wezterm'
-
-function IncreasePadding()
-  wezterm.set_user_var('PADDING', 'on')
-  setAlacrittyTOMLPaddingXY(30, 30)
-end
-
-function DecreasePadding()
-  wezterm.set_user_var('PADDING', 'off')
-  setAlacrittyTOMLPaddingXY(0, 0)
-end
-
-vim.cmd [[
-  augroup ChangeParentTerminal
-   au!
-   au VimEnter * lua DecreasePadding()
-   au VimLeavePre * lua IncreasePadding()
-  augroup END
-]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
