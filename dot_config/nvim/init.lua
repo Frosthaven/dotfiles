@@ -88,7 +88,8 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- tiny terminal
 -- if on windows, use powershell
-if vim.fn.has 'win32' or vim.fn.has 'win64' then
+local is_windows = vim.fn.has 'win64' == 1 or vim.fn.has 'win32' == 1 or vim.fn.has 'win16' == 1
+if is_windows then
   vim.o.shell = 'powershell.exe -nologo'
 end
 vim.keymap.set('n', '<leader>tt', function()
