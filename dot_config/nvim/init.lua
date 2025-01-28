@@ -112,12 +112,12 @@ vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickf
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
 
 -- setup small terminal
-vim.keymap.set('n', '<leader>st', function()
+vim.keymap.set('n', '<leader>tt', function()
   vim.cmd.vnew()
   vim.cmd.term()
   vim.cmd.wincmd 'J'
   vim.api.nvim_win_set_height(0, 10)
-end, { desc = '[S]mall [T]erminal' })
+end, { desc = '[T]iny [T]erminal' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
