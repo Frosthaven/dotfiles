@@ -128,7 +128,7 @@ config.keys = {
 
 -- window framing
 config.window_frame = {
-	font = wezterm.font({ family = "JetBrainsMono NF", weight = "Bold" }),
+	font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold" }),
 	active_titlebar_bg = "#21252b",
 	inactive_titlebar_bg = "#21252b",
 }
