@@ -33,9 +33,9 @@ return {
         mappings = {
           close = 'q',
           go_in = 'l',
-          go_in_plus = 'L',
+          go_in_plus = '<right>',
           go_out = 'h',
-          go_out_plus = 'H',
+          go_out_plus = '<left>',
           mark_goto = "'",
           mark_set = 'm',
           reset = '<BS>',
