@@ -52,7 +52,7 @@ return {
         opts = {},
         config = function()
             require('virt-column').setup {
-                char = '·',
+                char = '│',
                 virtcolumn = '80,120',
                 highlight = 'COMMENT',
             }
