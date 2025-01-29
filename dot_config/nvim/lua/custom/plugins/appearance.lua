@@ -47,6 +47,19 @@ return {
     },
 
     {
+        'lukas-reineke/virt-column.nvim',
+        enabled = true,
+        opts = {},
+        config = function()
+            require('virt-column').setup {
+                char = '·',
+                virtcolumn = '80,120',
+                highlight = 'COMMENT',
+            }
+        end,
+    },
+
+    {
         'folke/tokyonight.nvim',
         lazy = false,
         enabled = true,
