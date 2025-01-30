@@ -1,1 +1,13 @@
 README.md
+
+{{ if ne .chezmoi.os "windows" }}
+**/*_windows.*
+{{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+**/*_darwin.*
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+**/*_linux.*
+{{ end }}
