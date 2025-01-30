@@ -67,6 +67,7 @@ return {
             pcall(require('telescope').load_extension, 'ui-select')
 
             -- See `:help telescope.builtin`
+            -- See also https://github.com/nvim-telescope/telescope.nvim?tab=readme-ov-file#default-mappings
             local builtin = require 'telescope.builtin'
             vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
             vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
