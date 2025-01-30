@@ -12,12 +12,12 @@ M.setup = function()
             default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" },
         },
         macos = {
+            font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
             font_size = 15, -- compensation for display scaling
+            window_background_opacity = 0.9,
             macos_window_background_blur = 50, -- 0-100
         },
         common = {
-            set_environment_variables = {},
-
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             font_size = 10.5,
             line_height = 1.1,
@@ -38,6 +38,8 @@ M.setup = function()
                 top = "1cell",
                 bottom = "1cell",
             },
+
+            set_environment_variables = {},
         },
     }
 
