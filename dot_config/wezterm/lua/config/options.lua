@@ -18,9 +18,9 @@ M.setup = function()
         common = {
             set_environment_variables = {},
 
-            font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold" }),
+            font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             font_size = 10.5,
-            line_height = 1.15,
+            line_height = 1.1,
             window_background_opacity = 0.85,
 
             window_decorations = "TITLE | RESIZE",
@@ -29,8 +29,8 @@ M.setup = function()
             webgpu_preferred_adapter = helpers.getIdealGPU(),
             bold_brightens_ansi_colors = true,
             freetype_load_target = "Normal", -- Normal/Light/Mono/HorizontalLcd
-            freetype_render_target = "HorizontalLcd", -- Normal/Light/Mono/HorizontalLcd
-            cell_width = 1,
+            freetype_render_target = "Normal", -- Normal/Light/Mono/HorizontalLcd
+            cell_width = 1.1,
 
             window_padding = {
                 left = "4cell",
