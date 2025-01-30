@@ -29,7 +29,7 @@ M.setup = function()
             webgpu_preferred_adapter = helpers.getIdealGPU(),
             bold_brightens_ansi_colors = true,
             freetype_load_target = "Normal", -- Normal/Light/Mono/HorizontalLcd
-            freetype_render_target = "Normal", -- Normal/Light/Mono/HorizontalLcd
+            freetype_render_target = "HorizontalLcd", -- Normal/Light/Mono/HorizontalLcd
             cell_width = 1.1,
 
             window_padding = {
