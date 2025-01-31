@@ -1,5 +1,5 @@
 local wezterm = require("wezterm")
-local helpers = require("lua/config/helpers")
+local helpers = require("lua/module/helpers")
 
 local M = {}
 
