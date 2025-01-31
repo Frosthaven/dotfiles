@@ -30,7 +30,6 @@ M.setup = function()
         vim.cmd.term()
         vim.cmd.wincmd 'J'
         vim.api.nvim_win_set_height(0, 10)
-        vim.cmd [[startinsert]]
     end, { desc = '[T]iny [T]erminal' })
 
     -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
