@@ -49,22 +49,44 @@ return {
             end
 
             function IncreasePadding()
-                wezterm.set_user_var('PADDING', 'on')
-                setAlacrittyTOMLPaddingXY(30, 30)
+                -- wezterm.set_user_var('PADDING', 'on')
+                -- wezterm.set_user_var('FOCUS', 'on')
+                -- setAlacrittyTOMLPaddingXY(30, 30)
             end
 
             function DecreasePadding()
-                wezterm.set_user_var('PADDING', 'off')
-                setAlacrittyTOMLPaddingXY(0, 0)
+                --wezterm.set_user_var('PADDING', 'off')
+                -- wezterm.set_user_var('FOCUS', 'off')
+                -- setAlacrittyTOMLPaddingXY(0, 0)
+            end
+
+            local pid = vim.fn.getpid()
+
+            function FocusGained()
+                -- get the current process id of nvim
+                wezterm.set_user_var('FOCUS', 'on:' .. pid)
+            end
+
+            function FocusLost()
+                wezterm.set_user_var('FOCUS', 'off:' .. pid)
             end
 
             vim.cmd [[
-        augroup ChangeParentTerminal
-          au!
-          au VimEnter * lua DecreasePadding()
-          au VimLeavePre * lua IncreasePadding()
-        augroup END
-      ]]
+                augroup FocusChangeGroup
+                  au!
+                  au FocusGained * lua FocusGained()
+                  au FocusLost * lua FocusLost()
+                augroup END
+
+            ]]
+
+            vim.cmd [[
+                augroup ChangeParentTerminal
+                  au!
+                  au VimEnter * lua DecreasePadding()
+                  au VimLeavePre * lua IncreasePadding()
+                augroup END
+            ]]
         end,
     },
 }

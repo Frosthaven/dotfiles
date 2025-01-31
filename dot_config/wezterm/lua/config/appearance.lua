@@ -66,7 +66,7 @@ M.setup = function(config)
         },
 
         -- background = "#191724", --rose-pine moon
-        background = "#1a1b26", --tokyonight storm
+        -- background = "#1a1b26", --tokyonight storm
         -- background = "#282C34",
         -- foreground = '#ffffff',
         tab_bar = {
