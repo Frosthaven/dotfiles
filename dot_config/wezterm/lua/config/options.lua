@@ -20,7 +20,7 @@ M.setup = function()
         common = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             font_size = 10.5,
-            line_height = 1.1,
+            line_height = 1.3,
             window_background_opacity = 0.85,
 
             window_decorations = "TITLE | RESIZE",
@@ -35,8 +35,8 @@ M.setup = function()
             window_padding = {
                 left = "4cell",
                 right = "4cell",
-                top = "1cell",
-                bottom = "1cell",
+                top = "0.25cell",
+                bottom = "0cell",
             },
 
             set_environment_variables = {},
