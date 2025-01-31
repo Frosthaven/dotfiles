@@ -16,16 +16,15 @@ M.setup = function(config)
             elseif status == "off" then
                 FocusedNeovimProcesses[tonumber(pid)] = nil
             end
+            -- if wezterm is focused, then we can trigger manually trigger the
+            -- event, which will update the padding. If weztern is not focused,
+            -- we want to prevent this from firing, as it will cause padding shifts
+            -- when users click away from the wezterm window
+            if not window:is_focused() then
+                return
+            end
+            extraEvents.emit("pane-changed", window, pane)
         end
-
-        -- if wezterm is focused, then we can trigger manually trigger the
-        -- event, which will update the padding. If weztern is not focused,
-        -- we want to prevent this from firing, as it will cause padding shifts
-        -- when users click away from the wezterm window
-        if not window:is_focused() then
-            return
-        end
-        extraEvents.emit("pane-changed", window, pane)
     end)
 
     extraEvents.on("pane-changed", function(window, pane)

@@ -7,6 +7,41 @@ return {
         config = function()
             -- auto padding for wezterm and alacritty
             local wezterm = require 'wezterm'
+
+            local pid = vim.fn.getpid()
+
+            function PackageVariables(table)
+                -- converts a table into a json string
+                return vim.json.encode(table)
+            end
+
+            function FocusGained()
+                wezterm.set_user_var('FOCUS', 'on:' .. pid)
+            end
+
+            function FocusLost()
+                wezterm.set_user_var('FOCUS', 'off:' .. pid)
+            end
+
+            function DispatchWezTermEvent(name)
+                wezterm.set_user_var('NVIM_EVENT', name)
+            end
+
+            vim.cmd [[
+                augroup FocusChangeGroup
+                  au!
+                  au FocusGained * lua FocusGained()
+                  au FocusLost * lua FocusLost()
+                  au VimLeavePre * lua FocusLost()
+                  au VimEnter * lua FocusGained()
+
+                  au FocusGained * lua DispatchWezTermEvent(vim.json.encode({name = 'FocusGained', pid = vim.fn.getpid()}))
+                  au FocusLost * lua DispatchWezTermEvent(vim.json.encode({name = 'FocusLost', pid = vim.fn.getpid()}))
+                  au VimEnter * lua DispatchWezTermEvent(vim.json.encode({name = 'VimEnter', pid = vim.fn.getpid()}))
+                  au VimLeavePre * lua DispatchWezTermEvent(vim.json.encode({name = 'VimLeavePre', pid = vim.fn.getpid()}))
+                augroup END
+            ]]
+
             --[[
             local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
                 local homeDirectory = os.getenv 'HOME'
@@ -60,27 +95,8 @@ return {
                 -- wezterm.set_user_var('FOCUS', 'off')
                 -- setAlacrittyTOMLPaddingXY(0, 0)
             end
---]]
-            local pid = vim.fn.getpid()
+            --]]
 
-            function FocusGained()
-                -- get the current process id of nvim
-                wezterm.set_user_var('FOCUS', 'on:' .. pid)
-            end
-
-            function FocusLost()
-                wezterm.set_user_var('FOCUS', 'off:' .. pid)
-            end
-
-            vim.cmd [[
-                augroup FocusChangeGroup
-                  au!
-                  au FocusGained * lua FocusGained()
-                  au FocusLost * lua FocusLost()
-                  au VimLeavePre * lua FocusLost()
-                  au VimEnter * lua FocusGained()
-                augroup END
-            ]]
             --[[
             vim.cmd [[
                 augroup ChangeParentTerminal
