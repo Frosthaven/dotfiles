@@ -72,23 +72,13 @@ return {
                 wezterm.set_user_var('FOCUS', 'off:' .. pid)
             end
 
-            function ForceFocusLost()
-                wezterm.set_user_var('FOCUS', 'off:' .. pid)
-                wezterm.set_user_var('PADDING', 'on:' .. pid)
-            end
-
-            function ForceFocusGained()
-                wezterm.set_user_var('FOCUS', 'on:' .. pid)
-                wezterm.set_user_var('PADDING', 'off:' .. pid)
-            end
-
             vim.cmd [[
                 augroup FocusChangeGroup
                   au!
                   au FocusGained * lua FocusGained()
                   au FocusLost * lua FocusLost()
-                  au VimLeavePre * lua ForceFocusLost()
-                  au VimEnter * lua ForceFocusGained()
+                  au VimLeavePre * lua FocusLost()
+                  au VimEnter * lua FocusGained()
                 augroup END
             ]]
             --[[
