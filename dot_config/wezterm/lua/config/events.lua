@@ -1,5 +1,5 @@
 local wezterm = require("wezterm")
-local event = require("lua/module/event")
+local extraEvents = require("lua/module/extra-events")
 
 local M = {}
 local isPadded = false
@@ -18,15 +18,17 @@ M.setup = function(config)
             end
         end
 
-        -- if wezterm is focused, then we can trigger the event, otherwise
-        -- we just clicked out of wezterm, so we don't need to trigger it
+        -- if wezterm is focused, then we can trigger manually trigger the
+        -- event, which will update the padding. If weztern is not focused,
+        -- we want to prevent this from firing, as it will cause padding shifts
+        -- when users click away from the wezterm window
         if not window:is_focused() then
             return
         end
-        event.emit("pane-changed", window, pane)
+        extraEvents.emit("pane-changed", window, pane)
     end)
 
-    event.on("pane-changed", function(window, pane)
+    extraEvents.on("pane-changed", function(window, pane)
         wezterm.sleep_ms(200) -- time for panes to settle
         local overrides = window:get_config_overrides() or {}
 
