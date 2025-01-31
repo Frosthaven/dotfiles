@@ -17,6 +17,12 @@ M.setup = function(config)
                 FocusedNeovimProcesses[tonumber(pid)] = nil
             end
         end
+
+        -- if wezterm is focused, then we can trigger the event, otherwise
+        -- we just clicked out of wezterm, so we don't need to trigger it
+        if not window:is_focused() then
+            return
+        end
         event.emit("pane-changed", window, pane)
     end)
 
