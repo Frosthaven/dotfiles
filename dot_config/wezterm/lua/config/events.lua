@@ -17,10 +17,38 @@ M.setup = function(config)
                 FocusedNeovimProcesses[tonumber(pid)] = nil
             end
         end
+        if name == "PADDING" then
+            -- the value is in the format 'status:pid'. lets get both
+            -- first split the value into status and pid
+            local status, pid = value:match("([^:]+):([^:]+)")
+            if status == "on" then
+                FocusedNeovimProcesses[tonumber(pid)] = nil
+                isPadded = true
+                local overrides = window:get_config_overrides() or {}
+                overrides.window_padding = {
+                    left = config.window_padding.left,
+                    right = config.window_padding.right,
+                    top = config.window_padding.top,
+                    bottom = config.window_padding.bottom,
+                }
+                window:set_config_overrides(overrides)
+            elseif status == "off" then
+                FocusedNeovimProcesses[tonumber(pid)] = true
+                isPadded = false
+                local overrides = window:get_config_overrides() or {}
+                overrides.window_padding = {
+                    left = "0cell",
+                    right = "0cell",
+                    top = "0cell",
+                    bottom = "0cell",
+                }
+                window:set_config_overrides(overrides)
+            end
+        end
     end)
 
     event.on("pane-changed", function(window, pane)
-        wezterm.sleep_ms(100) -- time for panes to settle
+        wezterm.sleep_ms(200) -- time for panes to settle
         local overrides = window:get_config_overrides() or {}
 
         if next(FocusedNeovimProcesses) ~= nil then

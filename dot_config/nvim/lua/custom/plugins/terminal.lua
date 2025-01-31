@@ -7,6 +7,7 @@ return {
         config = function()
             -- auto padding for wezterm and alacritty
             local wezterm = require 'wezterm'
+            --[[
             local function setAlacrittyTOMLPaddingXY(xPadding, yPadding)
                 local homeDirectory = os.getenv 'HOME'
                 local tomlPath = homeDirectory .. '/.config/alacritty/alacritty.toml'
@@ -59,7 +60,7 @@ return {
                 -- wezterm.set_user_var('FOCUS', 'off')
                 -- setAlacrittyTOMLPaddingXY(0, 0)
             end
-
+--]]
             local pid = vim.fn.getpid()
 
             function FocusGained()
@@ -71,15 +72,26 @@ return {
                 wezterm.set_user_var('FOCUS', 'off:' .. pid)
             end
 
+            function ForceFocusLost()
+                wezterm.set_user_var('FOCUS', 'off:' .. pid)
+                wezterm.set_user_var('PADDING', 'on:' .. pid)
+            end
+
+            function ForceFocusGained()
+                wezterm.set_user_var('FOCUS', 'on:' .. pid)
+                wezterm.set_user_var('PADDING', 'off:' .. pid)
+            end
+
             vim.cmd [[
                 augroup FocusChangeGroup
                   au!
                   au FocusGained * lua FocusGained()
                   au FocusLost * lua FocusLost()
+                  au VimLeavePre * lua ForceFocusLost()
+                  au VimEnter * lua ForceFocusGained()
                 augroup END
-
             ]]
-
+            --[[
             vim.cmd [[
                 augroup ChangeParentTerminal
                   au!
@@ -87,6 +99,7 @@ return {
                   au VimLeavePre * lua IncreasePadding()
                 augroup END
             ]]
+            --]]
         end,
     },
 }
