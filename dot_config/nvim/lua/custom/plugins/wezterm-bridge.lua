@@ -10,11 +10,6 @@ return {
 
             local pid = vim.fn.getpid()
 
-            function PackageVariables(table)
-                -- converts a table into a json string
-                return vim.json.encode(table)
-            end
-
             function FocusGained()
                 wezterm.set_user_var('FOCUS', 'on:' .. pid)
             end
