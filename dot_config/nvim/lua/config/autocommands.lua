@@ -15,14 +15,14 @@ M.setup = function()
         end,
     })
 
-    -- Style terminal windows
+    -- Style newly created terminal windows
     vim.api.nvim_create_autocmd('TermOpen', {
         group = vim.api.nvim_create_augroup('custom-term-open', { clear = true }),
         callback = function()
             vim.opt_local.number = false
             vim.opt_local.relativenumber = false
             -- vim.opt_local.signcolumn = 'no'
-            -- vim.opt_local.cursorline = false
+            vim.opt_local.cursorline = false
             vim.cmd.startinsert()
         end,
     })
