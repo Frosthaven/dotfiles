@@ -27,28 +27,6 @@ return {
                 },
                 n_lines = 500,
             }
-            require('mini.tabline').setup {
-                -- Whether to show file icons (requires 'mini.icons')
-                show_icons = true,
-
-                -- Function which formats the tab label
-                -- By default surrounds with space and possibly prepends with icon
-                -- we will show tab number to the left of the title
-                -- lets make this show the tab number, icon, file name, and edit status
-                format = function(buf_id, label)
-                    local suffix = vim.bo[buf_id].modified and '● ' or ''
-                    local tab_index = ' ' .. vim.fn.tabpagenr()
-                    return tab_index .. MiniTabline.default_format(buf_id, label) .. suffix
-                end,
-
-                -- Whether to set Vim's settings for tabline (make it always shown and
-                -- allow hidden buffers)
-                set_vim_settings = true,
-
-                -- Where to show tabpage section in case of multiple vim tabpages.
-                -- One of 'left', 'right', 'none'.
-                tabpage_section = 'none',
-            }
 
             require('mini.files').setup {
                 -- Customization of shown content
