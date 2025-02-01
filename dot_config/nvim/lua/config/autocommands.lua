@@ -24,6 +24,10 @@ M.setup = function()
             -- vim.opt_local.signcolumn = 'no'
             vim.opt_local.cursorline = false
             vim.cmd.startinsert()
+
+            -- Set title for terminal windows
+            vim.opt.title = true
+            vim.opt.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
         end,
     })
 
