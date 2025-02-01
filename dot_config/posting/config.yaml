@@ -1,0 +1,8 @@
+theme: galaxy
+layout: vertical
+response:
+    prettify_json: true
+heading:
+    visible: true
+    show_host: false
+
