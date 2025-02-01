@@ -14,14 +14,13 @@ M.setup = function()
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
             font_size = 15, -- compensation for display scaling
-            window_background_opacity = 0.9,
             macos_window_background_blur = 50, -- 0-100
         },
         common = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             font_size = 10.5,
             line_height = 1.3,
-            window_background_opacity = 0.85,
+            window_background_opacity = 0.9,
 
             window_decorations = "TITLE | RESIZE",
             window_close_confirmation = "NeverPrompt",

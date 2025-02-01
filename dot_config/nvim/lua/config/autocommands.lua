@@ -26,6 +26,35 @@ M.setup = function()
             vim.cmd.startinsert()
         end,
     })
+
+    -- Add transparency whenever colorscheme changes
+    vim.api.nvim_create_autocmd('ColorScheme', {
+        group = vim.api.nvim_create_augroup('custom-colorschemes', { clear = true }),
+        callback = function()
+            vim.cmd.hi 'Comment gui=none'
+            vim.cmd.hi 'Normal guibg=NONE'
+            vim.cmd.hi 'NormalNC guibg=NONE'
+            vim.cmd.hi 'CursorLine guibg=NONE'
+            vim.cmd.hi 'MiniFilesCursorLine guibg=NONE'
+            vim.cmd.hi 'StatusLine guibg=NONE'
+            vim.cmd.hi 'StatusLineNC guibg=NONE'
+            vim.cmd.hi 'SignColumn guibg=NONE'
+            vim.cmd.hi 'SignColumnSB guibg=NONE'
+            vim.cmd.hi 'MiniFilesNormal guibg=NONE'
+            vim.cmd.hi 'MiniFilesBorder guibg=NONE'
+            vim.cmd.hi 'MiniStatusLineFileName guibg=NONE'
+            vim.cmd.hi 'MiniStatusLineInactive guibg=NONE'
+            vim.cmd.hi 'TelescopeBorder guibg=NONE'
+            vim.cmd.hi 'TelescopePromptBorder guibg=NONE'
+            vim.cmd.hi 'TelescopeResultsBorder guibg=NONE'
+            vim.cmd.hi 'TelescopePreviewBorder guibg=NONE'
+            vim.cmd.hi 'TelescopeResultsTitle guibg=NONE'
+            vim.cmd.hi 'TelescopePreviewTitle guibg=NONE'
+            vim.cmd.hi 'TelescopePromptTitle guibg=NONE'
+            vim.cmd.hi 'TelescopeTitle guibg=NONE'
+            vim.cmd.hi 'TelescopeNormal guibg=NONE'
+        end,
+    })
 end
 
 return M

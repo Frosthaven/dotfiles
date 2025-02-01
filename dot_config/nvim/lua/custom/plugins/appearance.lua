@@ -1,51 +1,4 @@
 return {
-    { -- Forced background transparency
-        'xiyaowong/transparent.nvim',
-        lazy = false,
-        enabled = true,
-        config = function()
-            require('transparent').setup {
-                -- table: default groups
-                groups = {
-                    'Normal',
-                    'NormalNC',
-                    'Comment',
-                    'Constant',
-                    'Special',
-                    'Identifier',
-                    'Statement',
-                    'PreProc',
-                    'Type',
-                    'Underlined',
-                    'Todo',
-                    'String',
-                    'Function',
-                    'Conditional',
-                    'Repeat',
-                    'Operator',
-                    'Structure',
-                    'LineNr',
-                    'NonText',
-                    'SignColumn',
-                    'CursorLine',
-                    'CursorLineNr',
-                    'StatusLine',
-                    'StatusLineNC',
-                    'EndOfBuffer',
-                },
-                -- table: additional groups that should be cleared
-                extra_groups = {
-                    'TelescopeNormal',
-                },
-                -- table: groups you don't want to clear
-                exclude_groups = {},
-                -- function: code to be executed after highlight groups are cleared
-                -- Also the user event "TransparentClear" will be triggered
-                on_clear = function() end,
-            }
-        end,
-    },
-
     {
         'lukas-reineke/virt-column.nvim',
         enabled = true,
@@ -58,7 +11,6 @@ return {
             }
         end,
     },
-
     {
         'folke/tokyonight.nvim',
         lazy = false,
@@ -67,7 +19,6 @@ return {
         opts = { style = 'storm' },
         init = function()
             vim.cmd.colorscheme 'tokyonight'
-            vim.cmd.hi 'Comment gui=none'
         end,
     },
     {
@@ -80,7 +31,6 @@ return {
                 variant = 'moon',
             }
             vim.cmd.colorscheme 'rose-pine'
-            vim.cmd.hi 'Comment gui=none'
         end,
     },
 }
