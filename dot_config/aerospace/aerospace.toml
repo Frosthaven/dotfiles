@@ -156,6 +156,11 @@ f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling
 backspace = ['close-all-windows-but-current', 'mode main']
 
 alt-cmd-ctrl-shift-h = ['join-with left', 'mode main']
+alt-cmd-ctrl-shift-left = ['join-with left', 'mode main']
 alt-cmd-ctrl-shift-j = ['join-with down', 'mode main']
+alt-cmd-ctrl-shift-down = ['join-with down', 'mode main']
 alt-cmd-ctrl-shift-k = ['join-with up', 'mode main']
+alt-cmd-ctrl-shift-up = ['join-with up', 'mode main']
 alt-cmd-ctrl-shift-l = ['join-with right', 'mode main']
+alt-cmd-ctrl-shift-right = ['join-with right', 'mode main']
+
