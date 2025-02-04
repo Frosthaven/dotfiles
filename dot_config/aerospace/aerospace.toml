@@ -13,8 +13,58 @@ after-login-command = []
 # 'after-startup-command' is run after 'after-login-command'
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
-  'exec-and-forget borders'
+    "exec-and-forget borders",
+    "open -a /Applications/Zen Browser.app",       # 1
+    "open -a /Applications/WezTerm.app",           # 1
+
+    "open -a /Applications/Slack.app",             # 2
+    "open -a /Applications/ForkLift.app",          # 2
+    "open -a /Applications/Discord.app",           # 2
+
+    "open -a /Applications/Microsoft Outlook.app", # 3
 ]
+
+# zen browser
+[[on-window-detected]]
+    if.app-id = 'app.zen-browser.zen'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 1']
+
+# wezterm
+[[on-window-detected]]
+    if.app-id = 'com.github.wez.wezterm'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 1']
+
+# slack
+[[on-window-detected]]
+    if.app-id  = 'com.tinyspeck.slackmacgap'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 2']
+
+# forklift
+[[on-window-detected]]
+    if.app-id  = 'com.binarynights.ForkLift-3'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 2']
+
+# discord
+[[on-window-detected]]
+    if.app-id  = 'com.hnc.Discord'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 2']
+
+# outlook
+[[on-window-detected]]
+    if.app-id  = 'com.microsoft.Outlook'
+    check-further-callbacks = true
+    if.during-aerospace-startup = true
+    run = ['layout tiling', 'move-node-to-workspace 3']
 
 # Start AeroSpace at login
 start-at-login = true
