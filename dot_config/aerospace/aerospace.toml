@@ -79,10 +79,10 @@ outer.right       = 20
 # window panes **********************************
 
 # vim-style
-cmd-h     = 'focus left'
-cmd-j     = 'focus down'
-cmd-k     = 'focus up'
-cmd-l     = 'focus right'
+#cmd-h     = 'focus left'
+#cmd-j     = 'focus down'
+#cmd-k     = 'focus up'
+#cmd-l     = 'focus right'
 # arrow-style
 cmd-left  = 'focus left'
 cmd-down  = 'focus down'
@@ -104,10 +104,10 @@ cmd-4 = 'workspace 4'
 # window panes **********************************
 
 # vim-style
-cmd-shift-h     = 'move left'
-cmd-shift-j     = 'move down'
-cmd-shift-k     = 'move up'
-cmd-shift-l     = 'move right'
+#cmd-shift-h     = 'move left'
+#cmd-shift-j     = 'move down'
+#cmd-shift-k     = 'move up'
+#cmd-shift-l     = 'move right'
 # arrow-style
 cmd-shift-left  = 'move left'
 cmd-shift-down  = 'move down'
@@ -125,10 +125,10 @@ cmd-shift-4 = 'move-node-to-workspace 4'
 # *****************************************************************************
 
 # vim-style
-cmd-ctrl-h     = ['join-with left',  'mode main']
-cmd-ctrl-j     = ['join-with down',  'mode main']
-cmd-ctrl-k     = ['join-with up',    'mode main']
-cmd-ctrl-l     = ['join-with right', 'mode main']
+# cmd-ctrl-h     = ['join-with left',  'mode main']
+# cmd-ctrl-j     = ['join-with down',  'mode main']
+# cmd-ctrl-k     = ['join-with up',    'mode main']
+# cmd-ctrl-l     = ['join-with right', 'mode main']
 # arrow-style
 cmd-ctrl-left  = ['join-with left',  'mode main']
 cmd-ctrl-down  = ['join-with down',  'mode main']
