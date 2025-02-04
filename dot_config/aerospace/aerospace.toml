@@ -17,13 +17,13 @@ after-startup-command = [ # called when aerospace launches
     "exec-and-forget sleep 3 && open -a /Applications/WezTerm.app",
     "exec-and-forget sleep 3 && open -a /Applications/ForkLift.app",
     "exec-and-forget sleep 3 && open -a /Applications/Discord.app",
-    "exec-and-forget sleep 9 && open -a /Applications/Obsidian.app",
+    "exec-and-forget sleep 4 && open -a /Applications/Obsidian.app",
 
     # automatically move windows around
-    "exec-and-forget sleep 6 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
+    "exec-and-forget sleep 7 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
 
     # automatically focus windows
-    "exec-and-forget sleep 6 && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
+    "exec-and-forget sleep 7 && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
 
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
