@@ -21,7 +21,7 @@ after-login-command = [
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
     "exec-and-forget borders",
-    "exec-and-forget open -n '/Applications/AutoRaise.app'"
+    #    "exec-and-forget open -a '/Applications/AutoRaise.app'"
 ]
 
 # Start AeroSpace at login
