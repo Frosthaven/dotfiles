@@ -17,7 +17,7 @@ after-startup-command = [ # called when aerospace launches
     "exec-and-forget sleep 3 && open -a /Applications/WezTerm.app",
     "exec-and-forget sleep 3 && open -a /Applications/ForkLift.app",
     "exec-and-forget sleep 3 && open -a /Applications/Discord.app",
-    "exec-and-forget sleep 4 && open -a /Applications/Obsidian.app",
+    "exec-and-forget sleep 12 && open -a /Applications/Obsidian.app",
 
     # automatically move windows around
     "exec-and-forget sleep 7 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
