@@ -20,7 +20,7 @@ after-startup-command = [ # called when aerospace launches
     "exec-and-forget sleep 6 && open -a /Applications/Obsidian.app",
 
     # automatically move windows around
-    "exec-and-forget sleep 6 && aerospace move right --window-id $(aerospace list-windows --all | grep -i Slack | awk '{print $1}')",
+    "exec-and-forget sleep 6 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
 
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
