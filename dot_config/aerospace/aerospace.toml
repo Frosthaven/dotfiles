@@ -22,6 +22,9 @@ after-startup-command = [ # called when aerospace launches
     # automatically move windows around
     "exec-and-forget sleep 6 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
 
+    # automatically focus windows
+    "exec-and-forget sleep 6 && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
+
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
     #    "exec-and-forget open -a '/Applications/AutoRaise.app'"
