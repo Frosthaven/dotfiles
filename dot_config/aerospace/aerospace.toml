@@ -45,6 +45,8 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 on-focus-changed = "move-mouse window-lazy-center"
 
+automatically-unhide-macos-hidden-apps = true
+
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
 # Possible values:
 # - Constant:     gaps.outer.top = 8
@@ -53,12 +55,12 @@ on-focus-changed = "move-mouse window-lazy-center"
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 10
-inner.vertical =   10
-outer.left =       10
-outer.bottom =     10
-outer.top =        10
-outer.right =      10
+inner.horizontal = 14
+inner.vertical =   14
+outer.left =       14
+outer.bottom =     14
+outer.top =        14
+outer.right =      14
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -132,6 +134,8 @@ alt-cmd-ctrl-shift-1 = 'move-node-to-workspace 1'
 alt-cmd-ctrl-shift-2 = 'move-node-to-workspace 2'
 alt-cmd-ctrl-shift-3 = 'move-node-to-workspace 3'
 alt-cmd-ctrl-shift-4 = 'move-node-to-workspace 4'
+
+alt-cmd-ctrl-f = 'fullscreen'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 alt-tab = 'workspace-back-and-forth'
