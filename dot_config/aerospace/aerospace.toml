@@ -14,14 +14,14 @@ after-login-command = []
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
     "exec-and-forget borders",
-    "open -a /Applications/Zen Browser.app",       # 1
-    "open -a /Applications/WezTerm.app",           # 1
+    "exec-and-forget open -n /Applications/Zen Browser.app",       # 1
+    "exec-and-forget open -n /Applications/WezTerm.app",           # 1
 
-    "open -a /Applications/Slack.app",             # 2
-    "open -a /Applications/ForkLift.app",          # 2
-    "open -a /Applications/Discord.app",           # 2
+    "exec-and-forget open -n /Applications/Slack.app",             # 2
+    "exec-and-forget open -n /Applications/ForkLift.app",          # 2
+    "exec-and-forget open -n /Applications/Discord.app",           # 2
 
-    "open -a /Applications/Microsoft Outlook.app", # 3
+    "exec-and-forget open -n /Applications/Microsoft Outlook.app", # 3
 ]
 
 # zen browser
