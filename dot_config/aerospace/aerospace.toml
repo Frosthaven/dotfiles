@@ -4,15 +4,25 @@
 
 start-at-login = true
 after-login-command = [ # called when user logs into system
-    # "exec-and-forget open -n '/Applications/Zen Browser.app'",
-    # "exec-and-forget open -n /Applications/WezTerm.app",
-    # "exec-and-forget open -n /Applications/Slack.app",
-    # "exec-and-forget open -n /Applications/ForkLift.app",
-    # "exec-and-forget open -n /Applications/Discord.app",
-    # "exec-and-forget open -n '/Applications/Microsoft Outlook.app'"
 ]
 after-startup-command = [ # called when aerospace launches
     "exec-and-forget borders",
+
+    # we use sleep to ensure the windows load order paints each workspace left
+    # to right
+    "exec-and-forget sleep 0 && open -a '/Applications/Microsoft Outlook.app'",
+    "exec-and-forget sleep 0 && open -a '/Applications/Zen Browser.app'",
+    "exec-and-forget sleep 0 && open -a '/Applications/Slack.app'",
+    "exec-and-forget sleep 3 && open -a /Applications/WezTerm.app",
+    "exec-and-forget sleep 3 && open -a /Applications/ForkLift.app",
+    "exec-and-forget sleep 3 && open -a /Applications/Discord.app",
+    "exec-and-forget sleep 6 && open -a /Applications/Obsidian.app",
+
+    # automatically move windows around
+    "exec-and-forget sleep 7 && aerospace move right --window-id $(aerospace list-windows --all | grep -i Slack | awk '{print $1}')",
+
+    # disabled due to weird center-window snapping that would yank the mouse
+    # to a previous window pane
     #    "exec-and-forget open -a '/Applications/AutoRaise.app'"
 ]
 
@@ -177,4 +187,62 @@ backspace = ['close-all-windows-but-current', 'mode main']
 2 = ['secondary',      'main']
 3 = ['g246hl',         'main']
 4 = ['g246hl',         'main']
+
+# AUTOMATIC APP WORKSPACE ASSIGNMENT ******************************************
+# *****************************************************************************
+
+# workspace 1 ***********************************
+
+# zen browser
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 1']
+
+# wezterm
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 1']
+
+# workspace 2 ***********************************
+
+# slack
+[[on-window-detected]]
+if.app-id  = 'com.tinyspeck.slackmacgap'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 2']
+
+# obsidian
+[[on-window-detected]]
+if.app-id  = 'md.obsidian'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 2']
+
+# discord
+[[on-window-detected]]
+if.app-id  = 'com.hnc.Discord'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 2']
+
+# workspace 3 ***********************************
+
+# outlook
+[[on-window-detected]]
+if.app-id  = 'com.microsoft.Outlook'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 3']
+
+# forklift
+[[on-window-detected]]
+if.app-id  = 'com.binarynights.ForkLift'
+#if.during-aerospace-startup = true
+#check-further-callbacks = true
+run = ['move-node-to-workspace 3']
 
