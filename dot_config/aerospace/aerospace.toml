@@ -9,21 +9,14 @@ after-login-command = [ # called when user logs into system
 after-startup-command = [ # called when aerospace launches
     "exec-and-forget borders",
 
-    # we use sleep to ensure the windows load order paints each workspace left
-    # to right
-    "exec-and-forget sleep 0 && open -a '/Applications/Microsoft Outlook.app'",
-    "exec-and-forget sleep 0 && open -a '/Applications/Zen Browser.app'",
-    "exec-and-forget sleep 0 && open -a '/Applications/Slack.app'",
-    "exec-and-forget sleep 3 && open -a /Applications/WezTerm.app",
-    "exec-and-forget sleep 3 && open -a /Applications/ForkLift.app",
-    "exec-and-forget sleep 3 && open -a /Applications/Discord.app",
-    "exec-and-forget sleep 12 && open -a /Applications/Obsidian.app",
+    # workspace 1 composition
+    "exec-and-forget open -a '/Applications/Zen Browser.app' && sleep 6 && open -a '/Applications/WezTerm.app'",
 
-    # automatically move windows around
-    "exec-and-forget sleep 7 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}')",
+    # wokspace 2 composition
+    "exec-and-forget sleep 5 && open -a '/Applications/Slack.app' && sleep 1 && open -a '/Applications/Discord.app' && sleep 7 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}') && sleep 1 && open -a /Applications/Obsidian.app && sleep 3 && aerospace move right --window-id $(aerospace list-windows --all | grep -i Obsidian | awk '{print $1}') && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
 
-    # automatically focus windows
-    "exec-and-forget sleep 7 && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
+    # workspace 3 composition
+    "exec-and-forget open -a '/Applications/Microsoft Outlook.app' && sleep 6 && open -a /Applications/ForkLift.app",
 
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
