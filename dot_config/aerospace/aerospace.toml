@@ -9,6 +9,11 @@ after-login-command = [ # called when user logs into system
 after-startup-command = [ # called when aerospace launches
     "exec-and-forget borders",
 
+    # @todo: create helper functions that can:
+    # - open an app
+    # - wait for it to open
+    # - adjust it (callbacks) using aerospace CLI
+
     # workspace 1 composition
     "exec-and-forget open -a '/Applications/Zen Browser.app' && sleep 6 && open -a '/Applications/WezTerm.app'",
 
