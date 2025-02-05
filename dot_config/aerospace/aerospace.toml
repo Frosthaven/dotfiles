@@ -11,13 +11,13 @@ after-startup-command = [ # called when aerospace launches
     "exec-and-forget borders",
 
     # workspace 1 composition
-    "exec-and-forget aeroplace '1' '/Applications/Zen Browser.app'; aeroplace '1' '/Applications/WezTerm.app'",
+    "exec-and-forget aeroplace -w 1 -a '/Applications/Zen Browser.app'; aeroplace -w 1 -a '/Applications/WezTerm.app'",
 
     # wokspace 2 composition
-    "exec-and-forget aeroplace '2' '/Applications/Slack.app' ''; aerospace move left --window-id $(aeroplace '2' '/Applications/Discord.app' '- Discord'); aerospace move right --window-id $(aeroplace '2' '/Applications/Obsidian.app' 'Obsidian')",
+    "exec-and-forget aeroplace -w 2 -a '/Applications/Slack.app'; aerospace move left --window-id $(aeroplace -w 2 -a '/Applications/Discord.app' -t '- Discord'); aerospace move right --window-id $(aeroplace -w 2 -a '/Applications/Obsidian.app' -t 'Obsidian')",
 
     # workspace 3 composition
-    "exec-and-forget aeroplace '3' '/Applications/Microsoft Outlook.app' ' • '; aeroplace '3' '/Applications/ForkLift.app' ''",
+    "exec-and-forget aeroplace -w 3 -a '/Applications/Microsoft Outlook.app' -t ' • '; aeroplace -w 3 -a '/Applications/ForkLift.app' -t ''",
 
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
