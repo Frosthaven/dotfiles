@@ -7,21 +7,17 @@ after-login-command = [ # called when user logs into system
 ]
 
 after-startup-command = [ # called when aerospace launches
+    # required applications
     "exec-and-forget borders",
 
-    # @todo: create helper functions that can:
-    # - open an app
-    # - wait for it to open
-    # - adjust it (callbacks) using aerospace CLI
-
     # workspace 1 composition
-    "exec-and-forget open -a '/Applications/Zen Browser.app' && sleep 6 && open -a '/Applications/WezTerm.app'",
+    "exec-and-forget aeroplace '1' '/Applications/Zen Browser.app'; aeroplace '1' '/Applications/WezTerm.app'",
 
     # wokspace 2 composition
-    "exec-and-forget sleep 10 && open -a '/Applications/Slack.app' && sleep 1 && open -a '/Applications/Discord.app' && sleep 8 && aerospace join-with left --window-id $(aerospace list-windows --all | grep -i Discord | awk '{print $1}'); sleep 2 && open -a '/Applications/Obsidian.app' && sleep 3 && aerospace move right --window-id $(aerospace list-windows --all | grep -i Obsidian | awk '{print $1}') && aerospace focus --window-id $(aerospace list-windows --all | grep -i WezTerm | awk '{print $1}')",
+    "exec-and-forget aeroplace '2' '/Applications/Slack.app' ''; aerospace move left --window-id $(aeroplace '2' '/Applications/Discord.app' '- Discord'); aerospace move right --window-id $(aeroplace '2' '/Applications/Obsidian.app' 'Obsidian')",
 
     # workspace 3 composition
-    "exec-and-forget open -a '/Applications/Microsoft Outlook.app' && sleep 8 && open -a /Applications/ForkLift.app",
+    "exec-and-forget aeroplace '3' '/Applications/Microsoft Outlook.app' ' • '; aeroplace '3' '/Applications/ForkLift.app' ''",
 
     # disabled due to weird center-window snapping that would yank the mouse
     # to a previous window pane
