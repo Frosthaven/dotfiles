@@ -15,7 +15,7 @@ after-startup-command = [ # called when aerospace launches
 # 1
 """
 exec-and-forget \
-aeroplace -w 1 -a 'Zen Browser'; \
+aeroplace -w 1 -a 'Zen Browser' -t 'Zen'; \
 aeroplace -w 1 -a 'WezTerm';
 """,
 
