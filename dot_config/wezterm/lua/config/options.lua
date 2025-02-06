@@ -35,7 +35,7 @@ M.setup = function()
                 left = "4cell",
                 right = "4cell",
                 top = "0.25cell",
-                bottom = "0cell",
+                bottom = "0.25cell",
             },
 
             set_environment_variables = {},
