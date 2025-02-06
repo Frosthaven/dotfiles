@@ -6,21 +6,33 @@ start-at-login = true
 after-login-command = [ # called when user logs into system
 ]
 
+# aeroplace workspace composition - each workspace builds in its own
+# parallel process
 after-startup-command = [ # called when aerospace launches
+
 "exec-and-forget borders",
 
-# aeroplace workspace composition
+# 1
+"""
+exec-and-forget \
+aeroplace -w 1 -a 'Zen Browser'; \
+aeroplace -w 1 -a 'WezTerm'
+""",
+
+# 2
+"""
+exec-and-forget \
+aeroplace -w 2 -a 'Slack'; \
+aerospace join left --window-id $(aeroplace -w 2 -a 'Discord' -t '- Discord'); \
+aerospace move right --window-id $(aeroplace -w 2 -a 'Obsidian' -t 'Obsidian');
+""",
+
+# 3
 """
 exec-and-forget \
 aeroplace -w 3 -a 'Microsoft Outlook' -t ' • '; \
 aeroplace -w 3 -a 'ForkLift'
-aeroplace -w 2 -a 'Slack'; \
-aerospace join left --window-id $(aeroplace -w 2 -a 'Discord' -t '- Discord'); \
-aerospace move right --window-id $(aeroplace -w 2 -a 'Obsidian' -t 'Obsidian');
-aeroplace -w 1 -a 'Zen Browser'; \
-aeroplace -w 1 -a 'WezTerm' \
-""",
-
+"""
 ]
 
 # LAYOUT **********************************************************************
