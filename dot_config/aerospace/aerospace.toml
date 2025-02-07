@@ -184,7 +184,7 @@ backspace = ['close-all-windows-but-current', 'mode main']
 
 [workspace-to-monitor-force-assignment]
 1 = ['studio display', 'built-in']
-2 = ['secondary',      'built-in']
+2 = ['built-in'                  ]
 3 = ['g246hl',         'built-in']
 4 = ['g246hl',         'built-in']
 
