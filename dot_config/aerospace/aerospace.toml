@@ -16,22 +16,12 @@ after-startup-command = [ # called when aerospace launches
 """
 exec-and-forget \
 aeroplace -w 1 -a 'Zen Browser'; \
-aeroplace -w 1 -a 'WezTerm' -m 'focus'; \
-""",
-
-# workspace 2 communication
-"""
-exec-and-forget \
-aeroplace -w 3 -a 'Microsoft Outlook' -t ' • '; \
+aeroplace -w 1 -a 'WezTerm'; \
+aeroplace -w 2 -a 'Microsoft Outlook' -t ' • '; \
 aeroplace -w 2 -a 'Slack'; \
 aeroplace -w 2 -a 'Discord' -t 'Friends' -m 'join-with left'; \
-""",
-
-# workspace 3 files & notes
-"""
-exec-and-forget \
-aeroplace -w 2 -a 'Obsidian' -m 'move right'; \
 aeroplace -w 3 -a 'ForkLift'; \
+aeroplace -w 3 -a 'Obsidian'; \
 """
 
 ]
