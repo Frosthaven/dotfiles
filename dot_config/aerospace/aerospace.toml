@@ -12,7 +12,6 @@ after-startup-command = [ # called when aerospace launches
 
 "exec-and-forget borders",
 
-# workspace 1 browse & dev
 """
 exec-and-forget \
 aeroplace -w 1 -a 'Zen Browser'; \
@@ -22,6 +21,7 @@ aeroplace -w 2 -a 'Slack'; \
 aeroplace -w 2 -a 'Discord' -t 'Friends' -m 'join-with left'; \
 aeroplace -w 3 -a 'ForkLift'; \
 aeroplace -w 3 -a 'Obsidian'; \
+afplay /System/Library/Sounds/Bottle.aiff \
 """
 
 ]
