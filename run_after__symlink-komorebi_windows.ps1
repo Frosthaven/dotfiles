@@ -15,6 +15,9 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     If (-Not (Test-Path $env:USERPROFILE\komorebi.generated.ps1)) {
         New-Item -Path $env:USERPROFILE\komorebi.generated.ps1 -ItemType SymbolicLink -Value $env:USERPROFILE\.config\komorebi\komorebi.generated.ps1
     }
+    If (-Not (Test-Path $env:USERPROFILE\komorebi.ahk)) {
+        New-Item -Path $env:USERPROFILE\komorebi.ahk -ItemType SymbolicLink -Value $env:USERPROFILE\.config\komorebi\komorebi.ahk
+    }
 
     # komorebi bar file links
     If (-Not (Test-Path $env:USERPROFILE\komorebi.bar.json)) {
