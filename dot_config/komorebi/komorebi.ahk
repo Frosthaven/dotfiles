@@ -42,10 +42,10 @@ Komorebic(cmd) {
 
 ; workspaces ************************************
 
-#1::Komorebic("focus-workspace 1")
-#2::Komorebic("focus-workspace 2")
-#3::Komorebic("focus-workspace 3")
-#4::Komorebic("focus-workspace 4")
+#1::Komorebic("focus-workspace 0")
+#2::Komorebic("focus-workspace 1")
+#3::Komorebic("focus-workspace 2")
+#4::Komorebic("focus-workspace 3")
 
 ; MOVEMENT KEYMAPS ************************************************************
 ; *****************************************************************************
@@ -66,10 +66,10 @@ Komorebic(cmd) {
 
 ; workspaces ************************************
 
-#+1::Komorebic("move-to-workspace 1")
-#+2::Komorebic("move-to-workspace 2")
-#+3::Komorebic("move-to-workspace 3")
-#+4::Komorebic("move-to-workspace 4")
+#+1::Komorebic("move-to-workspace 0")
+#+2::Komorebic("move-to-workspace 1")
+#+3::Komorebic("move-to-workspace 2")
+#+4::Komorebic("move-to-workspace 3")
 
 ; JOIN KEYMAPS ****************************************************************
 ; *****************************************************************************

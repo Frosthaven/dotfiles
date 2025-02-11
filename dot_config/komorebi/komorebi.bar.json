@@ -6,7 +6,7 @@
       "left": 0,
       "top": 40,
       "right": 0,
-      "bottom": 40
+      "bottom": 20
     }
   },
   "font_family": "JetBrains Mono",
@@ -45,19 +45,19 @@
     },
     {
       "Storage": {
-        "enable": true
+        "enable": false
       }
     },
     {
       "Memory": {
-        "enable": true
+        "enable": false
       }
     },
     {
       "Network": {
-        "enable": true,
-        "show_total_data_transmitted": true,
-        "show_network_activity": true
+        "enable": false,
+        "show_total_data_transmitted": false,
+        "show_network_activity": false
       }
     },
     {

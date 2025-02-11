@@ -14,16 +14,14 @@ komorebic cross-monitor-move-behaviour insert
 # Enable hot reloading of changes to this file
 komorebic watch-configuration enable
 
-# create named workspaces 1-4 on monitor 0
-komorebic ensure-named-workspaces 0 1 2 3 4
-# you can do the same thing for secondary monitors too
-# komorebic ensure-named-workspaces 1 A B C D E F
+# create named workspaces 1-4 on monitor 1
+komorebic ensure-named-workspaces 1 1 2 3 4
 
 # assign layouts to workspaces, possible values: bsp, columns, rows, vertical-stack, horizontal-stack, ultrawide-vertical-stack
-komorebic named-workspace-layout 1 columns
-komorebic named-workspace-layout 2 columns
-komorebic named-workspace-layout 3 columns
-komorebic named-workspace-layout 4 columns
+komorebic named-workspace-layout 1 ultrawide-vertical-stack
+komorebic named-workspace-layout 2 ultrawide-vertical-stack
+komorebic named-workspace-layout 3 ultrawide-vertical-stack
+komorebic named-workspace-layout 4 ultrawide-vertical-stack
 
 # set the gaps around the edge of the screen for a workspace
 #komorebic named-workspace-padding 1 5
