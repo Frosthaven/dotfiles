@@ -5,6 +5,20 @@ Komorebic(cmd) {
     RunWait(format("komorebic.exe {}", cmd), , "Hide")
 }
 
+init() {
+    Run "komorebic alt-focus-hack enable", , "Hide"
+    Run "komorebic window-hiding-behavior cloak", , "Hide"
+    Run "komorebic cross-monitor-move-behavior insert", , "Hide"
+    Run "komorebic watch-configuration enable", , "Hide"
+    Run "komorebic ensure-named-workspaces 1 1 2 3 4", , "Hide"
+    Run "komorebic workspace-layout 1 0 ultrawide-vertical-stack", , "Hide"
+    Run "komorebic workspace-layout 1 1 ultrawide-vertical-stack", , "Hide"
+    Run "komorebic workspace-layout 1 2 ultrawide-vertical-stack", , "Hide"
+    Run "komorebic workspace-layout 1 3 ultrawide-vertical-stack", , "Hide"
+}
+
+init()
+
 !q::Komorebic("close")
 !m::Komorebic("minimize")
 
