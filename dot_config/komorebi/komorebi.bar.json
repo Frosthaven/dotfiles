@@ -4,11 +4,18 @@
     "index": 1,
     "work_area_offset": {
       "left": 0,
-      "top": 40,
+      "top": 20,
       "right": 0,
       "bottom": 20
     }
   },
+  "frame": {
+    "inner_margin": {
+      "x": 2,
+      "y": 2
+    },
+  },
+  "transparency_alpha": 200,
   "font_family": "JetBrains Mono",
   "theme": {
     "palette": "Base16",
