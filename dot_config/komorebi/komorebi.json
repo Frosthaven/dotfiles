@@ -25,6 +25,10 @@
     {
       "workspaces": [
         {
+          "name": "0",
+          "layout": "Columns"
+        },
+        {
           "name": "1",
           "layout": "Columns"
         },
@@ -34,10 +38,6 @@
         },
         {
           "name": "3",
-          "layout": "Columns"
-        },
-        {
-          "name": "4",
           "layout": "Columns"
         },
       ]
