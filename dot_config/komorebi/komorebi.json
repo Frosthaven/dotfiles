@@ -29,22 +29,33 @@
   },
   "monitors": [
     {
+      "workspaces": []
+    },
+    {
       "workspaces": [
         {
-          "name": "0",
-          "layout": "Columns"
-        },
-        {
           "name": "1",
-          "layout": "Columns"
+          "custom_layout_rules": {
+            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          },
         },
         {
           "name": "2",
-          "layout": "Columns"
+          "custom_layout_rules": {
+            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          },
         },
         {
           "name": "3",
-          "layout": "Columns"
+          "custom_layout_rules": {
+            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          },
+        },
+        {
+          "name": "4",
+          "custom_layout_rules": {
+            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          },
         },
       ]
     }

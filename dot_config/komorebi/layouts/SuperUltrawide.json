@@ -1,11 +1,11 @@
 [
     {
         "column": "Primary",
-        "WidthPercentage": 37,
+        "WidthPercentage": 40,
     },
     {
         "column": "Secondary",
-        "WidthPercentage": 37,
+        "WidthPercentage": 40,
     },
     {
         "column": "Tertiary",

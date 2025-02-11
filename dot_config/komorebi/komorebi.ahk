@@ -11,10 +11,6 @@ init() {
     Run "komorebic cross-monitor-move-behavior insert", , "Hide"
     Run "komorebic watch-configuration enable", , "Hide"
     Run "komorebic ensure-named-workspaces 1 1 2 3 4", , "Hide"
-    Run "komorebic workspace-layout 1 0 ~/.config/komorebi/layouts/SuperUltrawide.json", , "Hide"
-    Run "komorebic workspace-layout 1 1 ~/.config/komorebi/layouts/SuperUltrawide.json", , "Hide"
-    Run "komorebic workspace-layout 1 2 ~/.config/komorebi/layouts/SuperUltrawide.json", , "Hide"
-    Run "komorebic workspace-layout 1 3 ~/.config/komorebi/layouts/SuperUltrawide.json", , "Hide"
 }
 
 init()
