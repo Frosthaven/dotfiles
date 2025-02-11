@@ -7,7 +7,7 @@ return {
                 size = 10,
                 direction = 'float',
                 float_opts = {
-                    border = 'single',
+                    border = 'curved',
                     width = 75,
                     height = 20,
                     --highlights = {
