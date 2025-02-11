@@ -32,30 +32,41 @@
       "workspaces": []
     },
     {
+      "window_based_work_area_offset_limit": 1,
+      "window_based_work_area_offset": {
+        "top": 0,
+        "bottom": 0,
+        "left": 1080,
+        "right": 2160,
+      },
       "workspaces": [
         {
           "name": "1",
-          "custom_layout_rules": {
-            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          "layout_rules": {
+            "0": "Columns",
           },
+          "apply_window_based_work_area_offset": true,
         },
         {
           "name": "2",
-          "custom_layout_rules": {
-            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          "layout_rules": {
+            "0": "Columns",
           },
+          "apply_window_based_work_area_offset": true,
         },
         {
           "name": "3",
-          "custom_layout_rules": {
-            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          "layout_rules": {
+            "0": "Columns",
           },
+          "apply_window_based_work_area_offset": true,
         },
         {
           "name": "4",
-          "custom_layout_rules": {
-            "0": "~/.config/komorebi/layouts/SuperUltrawide.json",
+          "layout_rules": {
+            "0": "Columns",
           },
+          "apply_window_based_work_area_offset": true,
         },
       ]
     }
