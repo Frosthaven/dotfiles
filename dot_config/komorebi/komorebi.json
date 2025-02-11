@@ -8,6 +8,12 @@
   "border": true,
   "border_width": 6,
   "border_offset": -1,
+  "transparency": false,
+  "transparency_alpha":240,
+  "animation": {
+    "enabled": true,
+    "duration": 170
+  },
   "theme": {
     "palette": "Base16",
     "name": "Ashes",
