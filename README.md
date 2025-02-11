@@ -39,7 +39,7 @@ provide a consistent developer experience.
 On Windows, the AutoHotKey executable does not have a consistently cased name.
 You will want to create an environmental variable `KOMOREBI_AHK_EXE` that points
 to the AutoHotKey executable. This allows komorebi to launch with AutoHotKey
-correctly.
+correctly. If installed using winget, the path is usually `%LocalAppData%\Programs\AutoHotkey\v2\AutoHotkey64.exe`.
 
 ## Chezmoi Quick Reference
 
