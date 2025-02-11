@@ -20,10 +20,10 @@ komorebic ensure-named-workspaces 0 1 2 3 4
 # komorebic ensure-named-workspaces 1 A B C D E F
 
 # assign layouts to workspaces, possible values: bsp, columns, rows, vertical-stack, horizontal-stack, ultrawide-vertical-stack
-#komorebic named-workspace-layout 1 columns
-#komorebic named-workspace-layout 2 columns
-#komorebic named-workspace-layout 3 columns
-#komorebic named-workspace-layout 4 columns
+komorebic named-workspace-layout 1 columns
+komorebic named-workspace-layout 2 columns
+komorebic named-workspace-layout 3 columns
+komorebic named-workspace-layout 4 columns
 
 # set the gaps around the edge of the screen for a workspace
 #komorebic named-workspace-padding 1 5
