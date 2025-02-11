@@ -89,10 +89,10 @@ outer.right       = 20
 # window panes **********************************
 
 # vim-style
-#cmd-h     = 'focus left'
-#cmd-j     = 'focus down'
-#cmd-k     = 'focus up'
-#cmd-l     = 'focus right'
+cmd-alt-h     = 'focus left'
+cmd-alt-j     = 'focus down'
+cmd-alt-k     = 'focus up'
+cmd-alt-l     = 'focus right'
 # arrow-style
 cmd-alt-left  = 'focus left'
 cmd-alt-down  = 'focus down'
@@ -114,10 +114,10 @@ cmd-4 = 'workspace 4'
 # window panes **********************************
 
 # vim-style
-#cmd-shift-h     = 'move left'
-#cmd-shift-j     = 'move down'
-#cmd-shift-k     = 'move up'
-#cmd-shift-l     = 'move right'
+cmd-shift-h     = 'move left'
+cmd-shift-j     = 'move down'
+cmd-shift-k     = 'move up'
+cmd-shift-l     = 'move right'
 # arrow-style
 cmd-shift-left  = 'move left'
 cmd-shift-down  = 'move down'
@@ -135,10 +135,10 @@ cmd-shift-4 = 'move-node-to-workspace 4'
 # *****************************************************************************
 
 # vim-style
-# cmd-ctrl-h     = ['join-with left',  'mode main']
-# cmd-ctrl-j     = ['join-with down',  'mode main']
-# cmd-ctrl-k     = ['join-with up',    'mode main']
-# cmd-ctrl-l     = ['join-with right', 'mode main']
+cmd-ctrl-h     = ['join-with left',  'mode main']
+cmd-ctrl-j     = ['join-with down',  'mode main']
+cmd-ctrl-k     = ['join-with up',    'mode main']
+cmd-ctrl-l     = ['join-with right', 'mode main']
 # arrow-style
 cmd-ctrl-left  = ['join-with left',  'mode main']
 cmd-ctrl-down  = ['join-with down',  'mode main']
@@ -151,10 +151,10 @@ cmd-ctrl-right = ['join-with right', 'mode main']
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 
-cmd-alt-shift-left  = 'resize smart -50'
-cmd-alt-shift-down  = 'resize smart -50'
-cmd-alt-shift-up    = 'resize smart +50'
-cmd-alt-shift-right = 'resize smart +50'
+cmd-alt-shift-left  = 'resize width -50'
+cmd-alt-shift-down  = 'resize height -50'
+cmd-alt-shift-up    = 'resize height +50'
+cmd-alt-shift-right = 'resize width +50'
 
 # MISC KEYMAPS ****************************************************************
 # *****************************************************************************
