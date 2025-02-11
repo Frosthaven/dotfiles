@@ -19,8 +19,8 @@ init() {
 
 init()
 
-!q::Komorebic("close")
-!m::Komorebic("minimize")
+^q::Komorebic("close")
+^m::Komorebic("minimize")
 
 ; Focus windows should be meta + alt + hjkl/arrow keys
 ; ! = alt,
