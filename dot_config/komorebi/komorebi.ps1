@@ -15,7 +15,7 @@ komorebic cross-monitor-move-behaviour insert
 komorebic watch-configuration enable
 
 # create named workspaces 1-4 on monitor 1
-komorebic ensure-named-workspaces 1 1 2 3 4
+komorebic ensure-workspaces 1 1 2 3 4
 
 # assign layouts to workspaces, possible values: bsp, columns, rows, vertical-stack, horizontal-stack, ultrawide-vertical-stack
 komorebic named-workspace-layout 1 ultrawide-vertical-stack
