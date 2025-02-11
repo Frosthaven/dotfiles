@@ -15,12 +15,10 @@ init() {
     Run "komorebic workspace-layout 1 1 ultrawide-vertical-stack", , "Hide"
     Run "komorebic workspace-layout 1 2 ultrawide-vertical-stack", , "Hide"
     Run "komorebic workspace-layout 1 3 ultrawide-vertical-stack", , "Hide"
+    Run "komorebic animation enable", , "Hide"
 }
 
 init()
-
-^q::Komorebic("close")
-^m::Komorebic("minimize")
 
 ; Focus windows should be meta + alt + hjkl/arrow keys
 ; ! = alt,
@@ -36,6 +34,17 @@ init()
  #Right::return
  #Up::return
  #Down::return
+
+; GLOBALS *********************************************************************
+; *****************************************************************************
+
+; ctrl+q to close the current window
+^q::Komorebic("close")
+
+; f11 to toggle maximize
+f11::Komorebic("toggle-maximize")
+
+;#m::Komorebic("minimize")
 
 ; FOCUS CHANGE KEYMAPS ********************************************************
 ; *****************************************************************************
