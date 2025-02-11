@@ -5,20 +5,20 @@
   "cross_monitor_move_behaviour": "Insert",
   "default_workspace_padding": 10,
   "default_container_padding": 10,
-  "border": true,
-  "border_width": 6,
-  "border_offset": -1,
   "transparency": false,
   "transparency_alpha":240,
   "animation": {
     "enabled": true,
     "duration": 170
   },
-  "theme": {
-    "palette": "Base16",
-    "name": "Ashes",
-    "unfocused_border": "Base03",
-    "bar_accent": "Base0D"
+  "border": true,
+  "border_width": 6,
+  "border_offset": -1,
+  "border_colours": {
+    "single": "#ff06b5",
+    "stack": "#00a542",
+    "monocle": "#ff3399",
+    "unfocused": "#505050"
   },
   "stackbar": {
     "height": 0,
