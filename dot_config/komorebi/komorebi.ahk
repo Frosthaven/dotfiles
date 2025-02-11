@@ -15,7 +15,6 @@ init() {
     Run "komorebic workspace-layout 1 1 ultrawide-vertical-stack", , "Hide"
     Run "komorebic workspace-layout 1 2 ultrawide-vertical-stack", , "Hide"
     Run "komorebic workspace-layout 1 3 ultrawide-vertical-stack", , "Hide"
-    Run "komorebic animation enable", , "Hide"
 }
 
 init()
@@ -43,6 +42,9 @@ init()
 
 ; f11 to toggle maximize
 f11::Komorebic("toggle-maximize")
+
+; win+m to monocle
+#m::Komorebic("toggle-monocle")
 
 ;#m::Komorebic("minimize")
 
