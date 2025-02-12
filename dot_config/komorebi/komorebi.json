@@ -1,6 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/v0.1.33/schema.json",
   "app_specific_configuration_path": "$Env:USERPROFILE/applications.json",
+  "ignore_rules": [
+    {
+      "kind": "Exe",
+      "id": "Rainmeter.exe",
+      "matching_strategy": "Exact",
+    },
+  ]
   "window_hiding_behaviour": "Cloak",
   "cross_monitor_move_behaviour": "Insert",
   "default_workspace_padding": 10,
