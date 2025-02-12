@@ -5,9 +5,9 @@
     {
       "kind": "Exe",
       "id": "Rainmeter.exe",
-      "matching_strategy": "Exact",
+      "matching_strategy": "Equals",
     },
-  ]
+  ],
   "window_hiding_behaviour": "Cloak",
   "cross_monitor_move_behaviour": "Insert",
   "default_workspace_padding": 10,
