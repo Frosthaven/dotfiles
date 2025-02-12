@@ -3,7 +3,7 @@ README.md
 {{ if ne .chezmoi.os "windows" }}
 **/*_windows.*
 .config/komorebi
-whkdrc
+.config/whkdrc
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
