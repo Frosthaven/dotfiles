@@ -13,33 +13,34 @@ provide a consistent developer experience.
 ## Software Requirements
 
 ### All Platforms
-    - chezmoi (dotfiles manager)
-    - git (version control)
-    - [ripgrep](https://github.com/BurntSushi/ripgrep#installation) (fast grep)
-    - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip) (font)
+
+- chezmoi (dotfiles manager)
+- git (version control)
+- [ripgrep](https://github.com/BurntSushi/ripgrep#installation) (fast grep)
+- [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip) (font)
 
 ### MacOS
-    - brew (package manager)
-    - aerospace (window manager)
-    - aeroplace (window manager extension)
+
+- brew (package manager)
+- aerospace (window manager)
+- aeroplace (window manager extension)
 
 ### Windows
-    - winget (package manager)
-    - AutoHotKey v2 (hotkey manager)
-    - Komorebi (window manager)
-    - Powershell (shell)
+
+- winget (package manager)
+- Komorebi (window manager)
+- Powershell (shell)
 
 ### Linux
-    - Hyprland (window manager)
-    - tbd
+
+- Hyprland (window manager)
+- tbd
 
 ## Extra Configuration Requirements
 
 ### Windows
-On Windows, the AutoHotKey executable does not have a consistently cased name.
-You will want to create an environmental variable `KOMOREBI_AHK_EXE` that points
-to the AutoHotKey executable. This allows komorebi to launch with AutoHotKey
-correctly. If installed using winget, the path is usually `%LocalAppData%\Programs\AutoHotkey\v2\AutoHotkey64.exe`.
+To autostart tiling windows on boot, you will want to create a shortcut in
+`shell:startup` that points to `"C:\Program Files\komorebi\bin\komorebic.exe" start --bar --whkd`
 
 ## Chezmoi Quick Reference
 
