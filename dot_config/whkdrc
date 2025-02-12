@@ -49,10 +49,10 @@ lwin + alt + j : komorebic focus down
 lwin + alt + k : komorebic focus up
 lwin + alt + l : komorebic focus right
 # arrow-style
-lwin + left  : komorebic focus left
-lwin + down  : komorebic focus down
-lwin + up    : komorebic focus up
-lwin + right : komorebic focus right
+lwin + alt + left  : komorebic focus left
+lwin + alt + down  : komorebic focus down
+lwin + alt + up    : komorebic focus up
+lwin + alt + right : komorebic focus right
 
 # workspaces ************************************
 lwin + 1 : komorebic focus-workspace 0
