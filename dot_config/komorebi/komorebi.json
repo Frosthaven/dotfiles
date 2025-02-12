@@ -23,15 +23,18 @@
   "border_offset": -1,
   "border_colours": {
     "single": "#ff06b5",
-    "stack": "#00a542",
-    "monocle": "#ff3399",
+    "stack": "#ff06b5",
+    "monocle": "#ff06b5",
     "unfocused": "#505050"
   },
   "stackbar": {
-    "height": 0,
+    "height": 40,
     "mode": "OnStack",
     "tabs": {
-      "width": 300
+      "width": 300,
+      "focused_text": "#ff06b5",
+      "unfocused_text": "#b3b3b3",
+      "background": "#141414"
     }
   },
   "monitors": [
