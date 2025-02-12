@@ -100,7 +100,7 @@ lwin + control + right : komorebic stack right
 lwin + alt + u     : komorebic unstack
 # navigate stack next
 lwin + control + d : komorebic cycle-stack previous
-lwin + control + n : komorebic cycle-stack next
+lwin + control + u : komorebic cycle-stack next
 
 # RESIZE KEYMAPS **************************************************************
 # *****************************************************************************
