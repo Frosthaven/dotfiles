@@ -84,18 +84,23 @@ lwin + shift + 4 : komorebic move-to-workspace 3
 # STACK KEYMAPS ***************************************************************
 # *****************************************************************************
 
-# vim-style
-#lwin + control + h : komorebic stack left
-#lwin + control + j : komorebic stack down
-#lwin + control + k : komorebic stack up
-#lwin + control + l : komorebic stack right
-# arrow-style
-#lwin + control + left  : komorebic stack left
-#lwin + control + down  : komorebic stack down
-#lwin + control + up    : komorebic stack up
-#lwin + control + right : komorebic stack right
+# window panes **********************************
 
-#alt + oem_1             : komorebic unstack # oem_1 is ;
+# vim-style
+lwin + control + h : komorebic stack left
+lwin + control + j : komorebic stack down
+lwin + control + k : komorebic stack up
+lwin + control + l : komorebic stack right
+# arrow-style
+lwin + control + left  : komorebic stack left
+lwin + control + down  : komorebic stack down
+lwin + control + up    : komorebic stack up
+lwin + control + right : komorebic stack right
+
+lwin + alt + u     : komorebic unstack
+# navigate stack next
+lwin + control + d : komorebic cycle-stack previous
+lwin + control + n : komorebic cycle-stack next
 
 # RESIZE KEYMAPS **************************************************************
 # *****************************************************************************
