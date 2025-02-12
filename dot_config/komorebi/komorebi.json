@@ -23,16 +23,17 @@
   "border_offset": -1,
   "border_colours": {
     "single": "#ff06b5",
-    "stack": "#ff06b5",
-    "monocle": "#ff06b5",
-    "unfocused": "#505050"
+    "stack": "#06acff",
+    "monocle": "#0eff06",
+    "unfocused": "#505050",
+    "floating": "#f8f8ff",
   },
   "stackbar": {
     "height": 40,
     "mode": "OnStack",
     "tabs": {
       "width": 300,
-      "focused_text": "#ff06b5",
+      "focused_text": "#06acff",
       "unfocused_text": "#b3b3b3",
       "background": "#141414"
     }
