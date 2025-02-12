@@ -14,16 +14,15 @@ lwin + down  : Ignore
 # GLOBALS *********************************************************************
 # *****************************************************************************
 
-control + q : komorebic close
-f11         : komorebic toggle-maximize
-lwin + m    : komorebic toggle-monocle
+lwin + alt + q : komorebic close
+lwin + alt + f : komorebic toggle-maximize
+lwin + alt + t : komorebic toggle-float
+lwin + alt + m : komorebic toggle-monocle
 #alt + m     : komorebic minimize
-#alt + t     : komorebic toggle-float
 
 # Reload whkd configuration
-#alt + o         : taskkill /f /im whkd.exe && start /b whkd # if shell is cmd
-#alt + o         : taskkill /f /im whkd.exe; Start-Process whkd -WindowStyle hidden # if shell is pwsh / powershell
-#alt + shift + o : komorebic reload-configuration
+#lwin + alt + o         : taskkill /f /im whkd.exe && start /b whkd; komorebic reload-configuration # if shell is cmd
+lwin + alt + o         : taskkill /f /im whkd.exe; Start-Process whkd -WindowStyle hidden; komorebic reload-configuration # if shell is pwsh / powershell
 
 # App shortcuts - these require shell to be pwsh / powershell
 # The apps will be focused if open, or launched if not open
