@@ -1,0 +1,32 @@
+packages:
+    windows:
+        winget:
+            # languages
+            - Python.Python.3.11
+            # cli tools
+            - Git.Git
+            - BurntSushi.ripgrep.MSVC
+            - junegunn.fzf
+            - junegunn.fd
+            - eza-community.eza
+            - ajeetdsouza.zoxide
+            # software
+            - wez.wezterm
+            - Neovim.Neovim
+            - LGUG2Z.komorebi
+    darwin:
+        brew: #@todo - figure this out
+            # languages
+            - python@3.11
+            # cli tools
+            - git
+            - ripgrep
+            - fzf
+            - fd
+            - eza
+            - zoxide
+            # software
+            - wezterm
+            - neovim
+    linux:
+
