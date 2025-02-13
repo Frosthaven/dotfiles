@@ -15,6 +15,8 @@ packages:
             - Neovim.Neovim
             - LGUG2Z.komorebi
     darwin:
+        taps:
+            - frosthaven/aeroplace
         brews:
             - python
             - git
@@ -24,6 +26,7 @@ packages:
             - eza
             - zoxide
             - neovim
+            - aeroplace
         casks:
             - wezterm
     linux:
