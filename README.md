@@ -52,6 +52,17 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
         
     create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
     </details>
+    
+    <details>
+    <summary>Windows - Fix Wezterm Transparency on Nvidia GPUs</summary>
+        
+    - Open NVIDIA Control Panel
+    - Go to `Manage 3D Settings`
+    - Click the `Program Settings` tab
+    - Add wezterm if it isn't already in the list
+    - Change `OpenGL GDI Compatibility` to `Prefer compatible`
+    - Click Apply
+    </details>
 
 ### Todo
 
