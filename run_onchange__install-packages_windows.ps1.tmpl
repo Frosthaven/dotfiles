@@ -1,0 +1,9 @@
+# this is a powershell script that runs winget to install packages
+
+{{ if eq .chezmoi.os "windows" -}}
+
+{{ range .packages.windows.winget -}}
+winget install -e {{ . }}
+{{ end -}}
+
+{{ end -}}
