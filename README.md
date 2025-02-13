@@ -20,9 +20,9 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
 
-### 2. Enable Shell Profile Customizations
+### 2. Enable Shell Profile Extensions
 
-#### Windows
+#### Windows Powershell
 
 Add the following to your PowerShell profile (usually located at
 `$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1`):
@@ -30,7 +30,8 @@ Add the following to your PowerShell profile (usually located at
 ```powershell
 . $env:USERPROFILE\.config\shell\chezmoi-powershell.ps1
 ```
-#### MacOS
+
+#### MacOS ZSH
 
 Add the following to your shell profile (usually located at
 `$HOME/.config/shell/chezmoi-zsh.sh`):
@@ -48,3 +49,6 @@ To autostart tiling windows on boot, you will want to create a shortcut in
 ### Todo
 
 - [ ] Add Linux
+- [ ] Add MacOS shell profile extension for zsh
+- [ ] Add Windows shell profile extension for clink
+
