@@ -6,9 +6,7 @@ for cross-platform interoperability.
 ## Notable
 
 This collection of dotfiles aims to provide a consistent tiling window manager
-and terminal experience across all platforms. I leverage the [WezTerm](https://wezterm.com/)
-terminal emulator along with the [NeoVim](https://neovim.io/) text editor to
-provide a consistent developer experience.
+and terminal experience across all platforms. You can review the [package.yaml](./.chezmoidata/package.yaml) file for a list of all packages that are installed on each platform.
 
 ## Software Requirements
 
