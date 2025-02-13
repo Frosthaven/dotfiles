@@ -14,12 +14,30 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 
 ## Deploying These Dotfiles
 
+### 1. Configure Chezmoi
+
 1. Install the listed software requirements for your platform.
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
-4. Configure your shell profile by using [shell_profiles](./shell_profiles)
-   as a reference.
-5. Restart your shell.
+
+### 2. Enable Shell Profile Customizations
+
+#### Windows
+
+Add the following to your PowerShell profile (usually located at
+`$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1`):
+
+```powershell
+. $env:USERPROFILE\.config\shell\chezmoi-powershell.ps1
+```
+#### MacOS
+
+Add the following to your shell profile (usually located at
+`$HOME/.config/shell/chezmoi-zsh.sh`):
+
+```sh
+source $HOME/.config/shell/chezmoi-zsh.sh
+```
 
 ## Extra Configuration Notes
 

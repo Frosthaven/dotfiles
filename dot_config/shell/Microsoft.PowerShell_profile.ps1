@@ -1,7 +1,7 @@
 # SHELL PROFILE: POWERSHELL ***************************************************
 # *****************************************************************************
 
-# This file is generally located here:
+# To use, source this file in your shell profile. Usually located here:
 # $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 
 # CONTENTS ********************************************************************
