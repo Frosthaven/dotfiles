@@ -56,6 +56,11 @@ M.setup = function()
     vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
     vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
     vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
+
+    vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+    vim.keymap.set('x', 'p', function()
+        return 'pgv"' .. vim.v.register .. 'y'
+    end, { remap = false, expr = true })
 end
 
 return M
