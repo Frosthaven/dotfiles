@@ -3,7 +3,7 @@
 {{ if eq .chezmoi.os "windows" -}}
 
 {{ range .packages.windows.winget -}}
-echo "- Checking for {{ . }}"
+echo "- Checking for {{ . }}..."
 winget install -e {{ . }}
 {{ end -}}
 
