@@ -12,43 +12,43 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 - [chezmoi](https://www.chezmoi.io/install/)
 - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip)
 
-## Deploying These Dotfiles
-
-### 1. Configure Chezmoi
+## Deployment
 
 1. Install the listed software requirements for your platform.
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
+4. Add shell integrations from the next section.
 
-### 2. Enable Shell Profile Extensions
+## Shell Integration
 
-#### Windows Powershell
+<details>
+<summary>Powershell</summary>
 
-Add the following to your PowerShell profile (usually located at
-`$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1`):
+Add the following line to `$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`:
 
 ```powershell
 . $env:USERPROFILE\.config\shell\chezmoi-powershell.ps1
 ```
+</details>
 
-#### MacOS ZSH
+<details>
+<summary>ZSH</summary>
 
-Add the following to your shell profile (usually located at
-`$HOME/.config/shell/chezmoi-zsh.sh`):
+Add the following line to `$HOME/.zshrc`:
 
 ```sh
 source $HOME/.config/shell/chezmoi-zsh.sh
 ```
+</details>
 
-## Extra Configuration Notes
+## Optional Configuration
 
-### Komorebic (Windows)
-To autostart tiling windows on boot, you will want to create a shortcut in
-`shell:startup` that points to `"C:\Program Files\komorebi\bin\komorebic.exe" start --bar --whkd`
+<details>
+<summary>Windows: Automatically start tiling window manager</summary>
+    
+create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
+</details>
 
 ### Todo
 
 - [ ] Add Linux
-- [ ] Add MacOS shell profile extension for zsh
-- [ ] Add Windows shell profile extension for clink
-
