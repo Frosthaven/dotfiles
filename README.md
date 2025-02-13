@@ -1,45 +1,25 @@
-# dotfiles
+# Frosthaven's dotfiles
 
-My personal dotfiles, managed by [Chezmoi](https://github.com/twpayne/chezmoi)
-for cross-platform interoperability.
+My personal dotfiles, managed by [chezmoi](https://github.com/twpayne/chezmoi).
 
-## Notable
+This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
 
-This collection of dotfiles aims to provide a consistent tiling window manager
-and terminal experience across all platforms. You can review the [package.yaml](.chezmoidata/packages.yaml) file for a list of all packages that are installed on each platform.
+You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all packages, or browse the [dot_config](dot_config) folder for the raw dots.
 
 ## Software Requirements
 
-### All Platforms
-
-- Chezmoi
+- Package Manager (Windows: [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget), MacOS: [homebrew](https://brew.sh/), Linux: tbd)
+- [chezmoi](https://www.chezmoi.io/install/)
 - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip)
 
-### MacOS
+## Deploying These Dotfiles
 
-- brew (package manager)
+1. Install the listed software requirements for your platform.
+2. Clone this repository to `~/.local/share/chezmoi`.
+3. Run `chezmoi -v apply`.
 
-### Windows
-
-- winget (package manager)
-- Powershell (shell)
-
-### Linux
-
-- tbd
-
-## Extra Configuration Requirements
+## Extra Configuration Notes
 
 ### Windows
 To autostart tiling windows on boot, you will want to create a shortcut in
 `shell:startup` that points to `"C:\Program Files\komorebi\bin\komorebic.exe" start --bar --whkd`
-
-## Chezmoi Quick Reference
-
-Clone this repository to `~/.local/share/chezmoi` on all platforms. Apply
-dotfiles and package installation with:
-
-```shell
-chezmoi -v apply
-```
-
