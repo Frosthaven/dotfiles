@@ -48,3 +48,4 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 ### Todo
 
 - [ ] Add Linux
+- [ ] Automate package manager installation
