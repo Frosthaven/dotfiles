@@ -17,8 +17,8 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 1. Install the listed software requirements for your platform.
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
-4. View the [shell_profiles](./shell_profiles) folder for integrating into your
-   shell of choice. This step is generally only needed for the initial setup.
+4. Either say yes to install shell profiles automatically, or view the
+   [shell_profiles](./shell_profiles) folder for references.
 
 ## Extra Configuration Notes
 
