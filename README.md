@@ -27,16 +27,7 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 3. Clone this repository into `~/.local/share/chezmoi`.
 4. Run `chezmoi -v apply`.
-5. Manual shell integration:
-    <summary>ZSH</summary>
-
-    Add the following line to `$HOME/.zshrc`:
-
-    ```sh
-    source $HOME/.config/shell/chezmoi-zsh.sh
-    ```
-    </details>
-6. Apply optional configurations:
+5. Apply optional configurations:
     <details>
     <summary>Windows - Automatically start tiling window manager</summary>
 
