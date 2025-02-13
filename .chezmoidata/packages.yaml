@@ -4,6 +4,7 @@ packages:
 
         winget:
             - Python.Python.3.11
+            - clink
             - Microsoft.PowerShell
             - starship
             - Git.Git
