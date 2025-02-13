@@ -13,10 +13,10 @@ packages:
             # software
             - wez.wezterm
             - Neovim.Neovim
-            - LGUG2Z.komorebi
+            - LGUG2Z.komorebi # tiling window manager
     darwin:
         taps:
-            - frosthaven/aeroplace
+            - frosthaven/aeroplace # tiling window manager helper
         brews:
             - python
             - git
@@ -29,5 +29,6 @@ packages:
             - aeroplace
         casks:
             - wezterm
+            - nikitabobko/tap/aerospace # tiling window manager
     linux:
 
