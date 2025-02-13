@@ -15,18 +15,16 @@ packages:
             - Neovim.Neovim
             - LGUG2Z.komorebi
     darwin:
-        brew: #@todo - figure this out
-            # languages
-            - python@3.11
-            # cli tools
+        brews:
+            - python
             - git
             - ripgrep
             - fzf
             - fd
             - eza
             - zoxide
-            # software
-            - wezterm
             - neovim
+        casks:
+            - wezterm
     linux:
 
