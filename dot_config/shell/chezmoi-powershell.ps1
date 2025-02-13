@@ -15,6 +15,7 @@ Set-PSReadLineOption -Colors @{ InlinePrediction = '#5A6374'}
 
 # Zoxide
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
+Remove-Alias -Name cd
 
 # Starship
 Invoke-Expression (&starship init powershell)
@@ -22,7 +23,7 @@ Invoke-Expression (&starship init powershell)
 # Module: CommandNotFound
 Import-Module -Name Microsoft.WinGet.CommandNotFound
 
-# Enable OC7 Escape Sequence Support
+# Wezterm: Enable OC7 Escape Sequence Support
 # see: https://wezfurlong.org/wezterm/shell-integration.html#osc-7-on-windows-with-cmdexe
 $prompt = ""
 function Invoke-Starship-PreCommand {
