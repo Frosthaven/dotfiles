@@ -7,12 +7,12 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 1. Install software requirements
     <details open>
     <summary>Package Manager</summary>
-        
+
     - Windows: [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget)
     - MacOS: [homebrew](https://brew.sh/)
     - Linux: tbd
     </details>
-    
+
     <details open>
     <summary>chezmoi</summary>
 
@@ -30,18 +30,18 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 5. Add shell integrations:
     <details>
     <summary>Powershell</summary>
-    
+
     Add the following line to `$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`:
-    
+
     ```powershell
     . $env:USERPROFILE\.config\shell\chezmoi-powershell.ps1
     ```
     </details>
     <details>
     <summary>ZSH</summary>
-    
+
     Add the following line to `$HOME/.zshrc`:
-    
+
     ```sh
     source $HOME/.config/shell/chezmoi-zsh.sh
     ```
@@ -49,13 +49,13 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 6. Apply optional configurations:
     <details>
     <summary>Windows - Automatically start tiling window manager</summary>
-        
-    create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
+
+    - create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
     </details>
-    
+
     <details>
     <summary>Windows - Fix Wezterm Transparency on Nvidia GPUs</summary>
-        
+
     - Open NVIDIA Control Panel
     - Go to `Manage 3D Settings`
     - Click the `Program Settings` tab
