@@ -1,5 +1,7 @@
 packages:
-    windows:
+
+    windows: # ****************************************************************
+
         winget:
             # languages
             - Python.Python.3.11
@@ -14,7 +16,9 @@ packages:
             - wez.wezterm
             - Neovim.Neovim
             - LGUG2Z.komorebi # tiling window manager
-    darwin:
+
+    darwin: # *****************************************************************
+
         taps:
             - frosthaven/aeroplace # tiling window manager helper
         brews:
@@ -30,5 +34,7 @@ packages:
         casks:
             - wezterm
             - nikitabobko/tap/aerospace # tiling window manager
-    linux:
 
+    linux: # ******************************************************************
+
+        # tbd
