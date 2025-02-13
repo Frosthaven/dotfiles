@@ -17,8 +17,9 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 1. Install the listed software requirements for your platform.
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
-4. Either say yes to install shell profiles automatically, or view the
-   [shell_profiles](./shell_profiles) folder for references.
+4. Configure your shell profile by using [shell_profiles](./shell_profiles)
+   as a reference.
+5. Restart your shell.
 
 ## Extra Configuration Notes
 
@@ -28,5 +29,4 @@ To autostart tiling windows on boot, you will want to create a shortcut in
 
 ### Todo
 
-- [ ] Add MacOS shell profile management
 - [ ] Add Linux
