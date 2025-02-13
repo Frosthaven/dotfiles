@@ -17,6 +17,8 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 1. Install the listed software requirements for your platform.
 2. Clone this repository to `~/.local/share/chezmoi`.
 3. Run `chezmoi -v apply`.
+4. View the [shell_profiles](./shell_profiles) folder for integrating into your
+   shell of choice. This step is generally only needed for the initial setup.
 
 ## Extra Configuration Notes
 
@@ -24,5 +26,7 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 To autostart tiling windows on boot, you will want to create a shortcut in
 `shell:startup` that points to `"C:\Program Files\komorebi\bin\komorebic.exe" start --bar --whkd`
 
-### Starship (All Platforms)
-This will require adding starship to your shell's environment. See the [starship page](https://starship.rs/) for details.
+### Todo
+
+- [ ] Add MacOS shell profile management
+- [ ] Add Linux
