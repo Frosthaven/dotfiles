@@ -8,7 +8,10 @@ You can review [package.yaml](.chezmoidata/packages.yaml) for a list of all pack
 
 ## Software Requirements
 
-- Package Manager (Windows: [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget), MacOS: [homebrew](https://brew.sh/), Linux: tbd)
+- Package Manager
+    - Windows: [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget)
+    - MacOS: [homebrew](https://brew.sh/)
+    - Linux: tbd
 - [chezmoi](https://www.chezmoi.io/install/)
 - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip)
 
