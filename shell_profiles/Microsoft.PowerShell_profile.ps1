@@ -1,18 +1,29 @@
+# SHELL PROFILE: POWERSHELL ***************************************************
+# *****************************************************************************
+
+# This file is generally located here:
+# $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+
+# CONTENTS ********************************************************************
+# *****************************************************************************
+
 # Predictive Text Setup (REQUIRES powershell ^7.2)
 # First, run this in Admin session:
 # - Install-Module PSReadLine -Force
 Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineOption -Colors @{ InlinePrediction = '#5A6374'}
 
+# Zoxide
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
+
 # Starship
 Invoke-Expression (&starship init powershell)
-#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
 
+# Module: CommandNotFound
 Import-Module -Name Microsoft.WinGet.CommandNotFound
-#f45873b3-b655-43a6-b217-97c00aa0db58
 
-# Adds OC7 Escape Sequence Support
-# https://wezfurlong.org/wezterm/shell-integration.html#osc-7-on-windows-with-cmdexe
+# Enable OC7 Escape Sequence Support
+# see: https://wezfurlong.org/wezterm/shell-integration.html#osc-7-on-windows-with-cmdexe
 $prompt = ""
 function Invoke-Starship-PreCommand {
     $current_location = $executionContext.SessionState.Path.CurrentLocation
@@ -24,5 +35,3 @@ function Invoke-Starship-PreCommand {
     $host.ui.Write($prompt)
 }
 
-# Add Zoxide
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
