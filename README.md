@@ -27,17 +27,7 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 3. Clone this repository into `~/.local/share/chezmoi`.
 4. Run `chezmoi -v apply`.
-5. Add shell integrations:
-    <details>
-    <summary>Powershell</summary>
-
-    Add the following line to `$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`:
-
-    ```powershell
-    . $env:USERPROFILE\.config\shell\chezmoi-powershell.ps1
-    ```
-    </details>
-    <details>
+5. Manual shell integration:
     <summary>ZSH</summary>
 
     Add the following line to `$HOME/.zshrc`:

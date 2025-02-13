@@ -40,5 +40,14 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         New-Item -Path $env:LOCALAPPDATA\clink -ItemType Directory
     }
     Copy-Item -Path $env:USERPROFILE\.config\clink\* -Destination $env:LOCALAPPDATA\clink -Recurse -Force
+
+    # Automatic Shell Integration
+    If (-Not (Test-Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1)) {
+        New-Item -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -ItemType File
+    }
+    If (-Not (Select-String -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Pattern "chezmoi-powershell.ps1")) {
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Chezmoi PowerShell profile"
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1'"
+    }
 }
 
