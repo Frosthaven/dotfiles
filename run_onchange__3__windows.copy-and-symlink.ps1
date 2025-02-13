@@ -1,8 +1,5 @@
-# This links Window's configuration files back to the ~/.config directory.
-#
-# This is necessary because Windows uses a different location for config than
-# Unix does, and we want to keep the config in the same location for all
-# platforms to keep them maintainable.
+# This handles symbolic links, junctions, and copying files, which allows us
+# to continue using the same configuration files in the repository.
 
 If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     Write-Host ""
@@ -36,12 +33,5 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     If ((Get-Item $env:USERPROFILE\komorebi.bar.json).Attributes -ne "ReparsePoint") {
         Remove-Item $env:USERPROFILE\komorebi.bar.json -Recurse -Force -Confirm:$false
         $null = New-Item -Path $env:USERPROFILE\komorebi.bar.json -ItemType SymbolicLink -Value $env:USERPROFILE\.config\komorebi\komorebi.bar.json
-    }
-
-    # Shell Profiles
-    Write-Host ""
-    $overwriteProfile = Read-Host "READ CAREFULLY: Do you want to overwrite your shell profiles? (y/n)"
-    If ($overwriteProfile -eq "y") {
-        Copy-Item -Path $env:USERPROFILE\.local\share\chezmoi\shell_profiles\Microsoft.PowerShell_profile.ps1 -Destination $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Force
     }
 }
