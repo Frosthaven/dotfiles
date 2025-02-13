@@ -6,6 +6,7 @@ packages:
             # languages
             - Python.Python.3.11
             # cli tools
+            - starship
             - Git.Git
             - BurntSushi.ripgrep.MSVC
             - junegunn.fzf
@@ -20,9 +21,11 @@ packages:
     darwin: # *****************************************************************
 
         taps:
-            - frosthaven/aeroplace # tiling window manager helper
+            - frosthaven/aeroplace # tiling window manager utility
+            - FelixKratz/formulae  # tiling window manager utility
         brews:
             - python
+            - starship
             - git
             - ripgrep
             - fzf
@@ -31,6 +34,7 @@ packages:
             - zoxide
             - neovim
             - aeroplace
+            - borders
         casks:
             - wezterm
             - nikitabobko/tap/aerospace # tiling window manager
