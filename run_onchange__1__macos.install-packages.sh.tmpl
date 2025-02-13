@@ -1,3 +1,7 @@
+{{ if eq .chezmoi.os "darwin" -}}
+
+#!/bin/bash
+
 # FILEHASH ********************************************************************
 # *****************************************************************************
 
@@ -5,13 +9,10 @@
 # changes if the hashed file changes. This will prevent unnecessarily running
 # the script when the target file hasn't changed.
 
-$fileHash = sha256sum "./.chezmoidata/packages.yaml"
+fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml")
 
 # SCRIPT **********************************************************************
 # *****************************************************************************
-
-{{ if eq .chezmoi.os "darwin" -}}
-#!/bin/bash
 
 {{ range .packages.macos.taps -}}
     brew tap {{ . | quote }}
