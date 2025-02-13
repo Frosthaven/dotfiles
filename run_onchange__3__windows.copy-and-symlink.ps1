@@ -34,5 +34,11 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         Remove-Item $env:USERPROFILE\komorebi.bar.json -Recurse -Force -Confirm:$false
         $null = New-Item -Path $env:USERPROFILE\komorebi.bar.json -ItemType SymbolicLink -Value $env:USERPROFILE\.config\komorebi\komorebi.bar.json
     }
+
+    # Clink Scripts
+    If (-Not (Test-Path $env:LOCALAPPDATA\clink)) {
+        New-Item -Path $env:LOCALAPPDATA\clink -ItemType Directory
+    }
+    Copy-Item -Path $env:USERPROFILE\.config\clink\* -Destination $env:LOCALAPPDATA\clink -Recurse -Force
 }
 
