@@ -1,0 +1,18 @@
+# FILEHASH ********************************************************************
+# *****************************************************************************
+
+# by embedding the file hash into this template, chezmoi will only detect
+# changes if the hashed file changes. This will prevent unnecessarily running
+# the script when the target file hasn't changed.
+
+$fileHash = CertUtil -hashfile "./.chezmoidata/packages.yaml" SHA256
+
+# SCRIPT **********************************************************************
+# *****************************************************************************
+
+{{ if eq .chezmoi.os "windows" -}}
+    {{ range .packages.windows.winget -}}
+    echo "- Checking for {{ . }}..."
+    winget install {{ . }}
+    {{ end -}}
+{{ end -}}

@@ -1,0 +1,31 @@
+# FILEHASH ********************************************************************
+# *****************************************************************************
+
+# by embedding the file hash into this template, chezmoi will only detect
+# changes if the hashed file changes. This will prevent unnecessarily running
+# the script when the target file hasn't changed.
+
+$fileHash = sha256sum "./.chezmoidata/packages.yaml"
+
+# SCRIPT **********************************************************************
+# *****************************************************************************
+
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+
+{{ range .packages.macos.taps -}}
+    brew tap {{ . | quote }}
+{{ end -}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+
+{{ range .packages.macos.brews -}}
+    brew {{ . | quote }}
+{{ end -}}
+{{ range .packages.macos.casks -}}
+    cask {{ . | quote }}
+{{ end -}}
+
+EOF
+
+{{ end -}}
