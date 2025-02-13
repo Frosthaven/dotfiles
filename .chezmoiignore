@@ -1,18 +1,18 @@
 README.md
 
 {{ if ne .chezmoi.os "windows" }}
-**/*__windows__*
+**/*.windows.*
 .config/komorebi
 .config/whkdrc
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
-**/*__darwin__*
-**/*__macos__*
+**/*.darwin.*
+**/*.macos.*
 .config/aerospace
 .config/borders
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
-**/*__linux__*
+**/*.linux.*
 {{ end }}
