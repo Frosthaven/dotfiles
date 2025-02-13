@@ -35,3 +35,4 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         $null = New-Item -Path $env:USERPROFILE\komorebi.bar.json -ItemType SymbolicLink -Value $env:USERPROFILE\.config\komorebi\komorebi.bar.json
     }
 }
+
