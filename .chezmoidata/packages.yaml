@@ -20,7 +20,7 @@ packages:
 
         taps:
             - frosthaven/aeroplace # tiling window manager utility
-            - FelixKratz/formulae  # tiling window manager utility
+            - FelixKratz/formulae  # tiling window manager utility (borders)
         brews:
             - python
             - starship
