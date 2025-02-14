@@ -49,5 +49,12 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Chezmoi PowerShell profile"
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1'"
     }
+
+    # Automatic Zoxide Integration
+    If (-Not (Select-String -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Pattern "chezmoi-powershell-zoxide.ps1")) {
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Zoxide PowerShell profile"
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell-zoxide.ps1'"
+    }
+
 }
 
