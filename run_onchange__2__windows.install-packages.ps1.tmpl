@@ -22,6 +22,11 @@ echo "- Checking for {{ . }}..."
 choco install {{ . }}
 {{ end }}
 
+{{ range .packages.global.uv -}}
+echo "- Checking for {{ . }}..."
+uv tool install {{ . }}
+{{ end }}
+
 {{ range .packages.windows.commands -}}
 {{ . }}
 {{ end -}}

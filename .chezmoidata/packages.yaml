@@ -1,47 +1,53 @@
 packages:
+    global: # *****************************************************************
+
+        uv:
+            - --python 3.12 posting # command line tool (posting)
 
     windows: # ****************************************************************
 
         winget:
-            - chocolatey.chocolatey # package manager
-            - DEVCOM.JetBrainsMonoNerdFont # font
-            - Python.Python.3.11
-            - clink
-            - Microsoft.PowerShell
-            - starship
-            - Git.Git
+            - astral-sh.uv # package manager (uv)
+            - chocolatey.chocolatey # package manager (choco)
+            - DEVCOM.JetBrainsMonoNerdFont # font (JetBrains Mono Nerd Font)
+            - Python.Python.3.11 # programming language (python)
+            - clink # shell (clink for cmd)
+            - Microsoft.PowerShell # shell (powershell)
+            - starship # shell prompt (starship)
+            - Git.Git # version control (git)
             - BurntSushi.ripgrep.MSVC
-            - junegunn.fzf
-            - junegunn.fd
-            - eza-community.eza
-            - ajeetdsouza.zoxide
-            - wez.wezterm
-            - Neovim.Neovim
-            - LGUG2Z.komorebi # tiling window manager
+            - junegunn.fzf # command line tool (fzf)
+            - junegunn.fd # command line tool (fd)
+            - eza-community.eza # command line tool (eza)
+            - ajeetdsouza.zoxide # command line tool (zoxide)
+            - wez.wezterm # terminal emulator (wezterm)
+            - Neovim.Neovim # text editor (neovim)
+            - LGUG2Z.komorebi # tiling window manager (komorebi)
         choco:
         commands:
 
     macos: # ******************************************************************
 
         taps:
-            - frosthaven/aeroplace # tiling window manager utility
+            - frosthaven/aeroplace # tiling window manager utility (aeroplace)
             - FelixKratz/formulae  # tiling window manager utility (borders)
         brews:
-            - python
-            - starship
-            - git
-            - ripgrep
-            - fzf
-            - fd
-            - eza
-            - zoxide
-            - neovim
-            - aeroplace
-            - borders
+            - uv # package manager (uv)
+            - python # programming language (python)
+            - starship # shell prompt (starship)
+            - git # version control (git)
+            - ripgrep # command line tool (ripgrep)
+            - fzf # command line tool (fzf)
+            - fd # command line tool (fd)
+            - eza # command line tool (eza)
+            - zoxide # command line tool (zoxide)
+            - neovim # text editor (neovim)
+            - aeroplace # tiling window manager (aeroplace)
+            - borders # tiling window manager utility (borders)
         casks:
-            - font-jetbrains-mono-nerd-font
-            - wezterm
-            - nikitabobko/tap/aerospace # tiling window manager
+            - font-jetbrains-mono-nerd-font # font (JetBrains Mono Nerd Font)
+            - wezterm # terminal emulator (wezterm)
+            - nikitabobko/tap/aerospace # tiling window manager (aerospace)
         commands:
 
     linux: # ******************************************************************
