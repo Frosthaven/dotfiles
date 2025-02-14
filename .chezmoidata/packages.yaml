@@ -2,8 +2,7 @@ packages:
     global: # *****************************************************************
 
         uv:
-            tool:
-                - --python 3.12 posting # api tool (posting)
+            - --python 3.12 posting # api tool (posting)
 
     windows: # ****************************************************************
 
