@@ -4,10 +4,9 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 ## Deployment
 
-1. Download and install the [JetbrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip).
-2. Clone this repository into `~/.local/share/chezmoi`.
-3. Run `chezmoi -v apply`.
-4. Apply optional configurations:
+1. Clone this repository into `~/.local/share/chezmoi`.
+2. Run `chezmoi -v apply`.
+3. Apply optional configurations:
     <details>
     <summary>Windows - Automatically start tiling window manager</summary>
 
@@ -28,4 +27,4 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 ### Todo
 
 - [ ] Add Linux
-- [x] Automate package manager installation
+
