@@ -2,7 +2,10 @@ packages:
     global: # *****************************************************************
 
         uv:
-            - --python 3.12 posting # command line tool (posting)
+            python: 3.10 3.11 3.12 # python versions (virtual environments)
+            venv: 3.12 # set default python version (virtual environments)
+            tool:
+                - posting # api tool (posting)
 
     windows: # ****************************************************************
 
