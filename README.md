@@ -4,30 +4,10 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 ## Deployment
 
-1. Install software requirements
-    <details open>
-    <summary>Package Manager</summary>
-
-    - Windows: [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget)
-    - MacOS: [homebrew](https://brew.sh/)
-    - Linux: tbd
-    </details>
-
-    <details open>
-    <summary>chezmoi</summary>
-
-    - Follow the [installing guide](https://www.chezmoi.io/install/)
-    </details>
-
-    <details open>
-    <summary>JetBrainsMono Nerd Font</summary>
-
-    - [Download](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip) and install the font.
-    </details>
-
-3. Clone this repository into `~/.local/share/chezmoi`.
-4. Run `chezmoi -v apply`.
-5. Apply optional configurations:
+1. Download and install the [JetbrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip).
+2. Clone this repository into `~/.local/share/chezmoi`.
+3. Run `chezmoi -v apply`.
+4. Apply optional configurations:
     <details>
     <summary>Windows - Automatically start tiling window manager</summary>
 
@@ -48,4 +28,4 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 ### Todo
 
 - [ ] Add Linux
-- [ ] Automate package manager installation
+- [x] Automate package manager installation
