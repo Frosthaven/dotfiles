@@ -22,9 +22,7 @@ echo "- Checking for {{ . }}..."
 choco install {{ . }}
 {{ end }}
 
-uv python install {{ .packages.global.uv.python }}
-uv venv --python {{ .packages.global.uv.venv }}
-{{ range .packages.global.uv.tool -}}
+{{ range .packages.global.uv -}}
 echo "- Checking for {{ . }}..."
 uv tool install {{ . }}
 {{ end }}
