@@ -29,7 +29,9 @@ brew bundle --no-lock --file=/dev/stdin <<EOF
 
 EOF
 
-{{ range .packages.global.uv -}}
+uv python install {{ .packages.global.uv.python }}
+uv venv --python {{ .packages.global.uv.venv }}
+{{ range .packages.global.uv.tool -}}
 echo "- Checking for {{ . }}..."
 uv tool install {{ . }}
 {{ end }}
