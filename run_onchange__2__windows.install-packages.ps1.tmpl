@@ -23,7 +23,6 @@ choco install {{ . }}
 {{ end }}
 
 {{ range .packages.global.uv -}}
-echo "- Checking for {{ . }}..."
 uv tool install {{ . }}
 {{ end }}
 

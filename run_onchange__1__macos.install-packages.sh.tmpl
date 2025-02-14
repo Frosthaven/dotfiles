@@ -30,7 +30,6 @@ brew bundle --no-lock --file=/dev/stdin <<EOF
 EOF
 
 {{ range .packages.global.uv -}}
-echo "- Checking for {{ . }}..."
 uv tool install {{ . }}
 {{ end }}
 
