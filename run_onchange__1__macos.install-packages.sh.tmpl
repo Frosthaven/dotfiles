@@ -29,4 +29,8 @@ brew bundle --no-lock --file=/dev/stdin <<EOF
 
 EOF
 
+{{ range .packages.macos.commands -}}
+{{ . }}
+{{ end -}}
+
 {{ end -}}

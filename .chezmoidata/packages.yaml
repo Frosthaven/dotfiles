@@ -3,7 +3,8 @@ packages:
     windows: # ****************************************************************
 
         winget:
-            - DEVCOM.JetBrainsMonoNerdFont
+            - chocolatey.chocolatey # package manager
+            - DEVCOM.JetBrainsMonoNerdFont # font
             - Python.Python.3.11
             - clink
             - Microsoft.PowerShell
@@ -17,6 +18,8 @@ packages:
             - wez.wezterm
             - Neovim.Neovim
             - LGUG2Z.komorebi # tiling window manager
+        choco:
+        commands:
 
     macos: # ******************************************************************
 
@@ -39,6 +42,7 @@ packages:
             - font-jetbrains-mono-nerd-font
             - wezterm
             - nikitabobko/tap/aerospace # tiling window manager
+        commands:
 
     linux: # ******************************************************************
 

@@ -17,4 +17,13 @@ echo "- Checking for {{ . }}..."
 winget install {{ . }}
 {{ end -}}
 
+{{ range .packages.windows.choco -}}
+echo "- Checking for {{ . }}..."
+choco install {{ . }}
+{{ end }}
+
+{{ range .packages.windows.commands -}}
+{{ . }}
+{{ end -}}
+
 {{ end -}}
