@@ -11,6 +11,7 @@ packages:
             - chocolatey.chocolatey # package manager (choco)
             - DEVCOM.JetBrainsMonoNerdFont # font (JetBrains Mono Nerd Font)
             - Python.Python.3.11 # programming language (python)
+            - GoLang.Go # programming language (go)
             - clink # shell (clink for cmd)
             - Microsoft.PowerShell # shell (powershell)
             - starship # shell prompt (starship)
@@ -34,6 +35,7 @@ packages:
         brews:
             - uv # package manager (uv)
             - python # programming language (python)
+            - go # programming language (go)
             - starship # shell prompt (starship)
             - git # version control (git)
             - ripgrep # command line tool (ripgrep)
