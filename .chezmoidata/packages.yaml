@@ -3,6 +3,7 @@ packages:
     windows: # ****************************************************************
 
         winget:
+            - DEVCOM.JetBrainsMonoNerdFont
             - Python.Python.3.11
             - clink
             - Microsoft.PowerShell
@@ -35,6 +36,7 @@ packages:
             - aeroplace
             - borders
         casks:
+            - font-jetbrains-mono-nerd-font
             - wezterm
             - nikitabobko/tap/aerospace # tiling window manager
 
