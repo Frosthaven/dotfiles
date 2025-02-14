@@ -13,10 +13,6 @@
 Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineOption -Colors @{ InlinePrediction = '#5A6374'}
 
-# Zoxide
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
-Remove-Alias -Name cd
-
 # Starship
 Invoke-Expression (&starship init powershell)
 
@@ -35,4 +31,34 @@ function Invoke-Starship-PreCommand {
     }
     $host.ui.Write($prompt)
 }
+
+# ALIASES *********************************************************************
+# *****************************************************************************
+function docmd { cmd /c $args }
+
+# eza
+function alias-l { docmd "eza --icons=always" }
+Set-Alias -Name l -Value alias-l -Force
+function alias-ls { docmd "eza --icons=always --group --header --group-directories-first" }
+Set-Alias -Name ls -Value alias-ls -Force
+function alias-ll { docmd "eza --icons=always --long" }
+Set-Alias -Name ll -Value alias-ll -Force
+function alias-lg { docmd "eza --icons=always --group --header --group-directories-first --long --git" }
+Set-Alias -Name lg -Value alias-lg -Force
+function alias-le { docmd "eza --icons=always --group --header --group-directories-first --long --extended" }
+Set-Alias -Name le -Value alias-le -Force
+function alias-lt { docmd "eza --icons=always --group --header --group-directories-first --tree --level 2" }
+Set-Alias -Name lt -Value alias-lt -Force
+function alias-lc { docmd "eza --icons=always --group --header --group-directories-first --across" }
+Set-Alias -Name lc -Value alias-lc -Force
+function alias-lo { docmd "eza --icons=always --group --header --group-directories-first --oneline" }
+Set-Alias -Name lo -Value alias-lo -Force
+function alias-la { docmd "eza --icons=always --all" }
+Set-Alias -Name la -Value alias-la -Force
+function alias-lsa { docmd "eza --icons=always --group --header --group-directories-first --all" }
+Set-Alias -Name lsa -Value alias-lsa -Force
+function alias-lla { docmd "eza --icons=always --group --header --group-directories-first --all --long --git" }
+Set-Alias -Name lla -Value alias-lla -Force
+function alias-lga { docmd "eza --icons=always --group --header --group-directories-first --all --long --git --git-ignore" }
+Set-Alias -Name lga -Value alias-lga -Force
 
