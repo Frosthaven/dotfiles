@@ -10,6 +10,7 @@
   ],
   "window_hiding_behaviour": "Cloak",
   "cross_monitor_move_behaviour": "Insert",
+  "mouse_follows_focus": true,
   "default_workspace_padding": 10,
   "default_container_padding": 10,
   "transparency": false,
