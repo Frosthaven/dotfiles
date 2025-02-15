@@ -3,12 +3,15 @@ packages:
 
         uv:
             - --python 3.12 posting # api tool (posting)
+        npm:
+            - -g twiggy-language-server # twig lsp helper for neovim
 
     windows: # ****************************************************************
 
         winget:
             - astral-sh.uv # package manager (uv)
             - chocolatey.chocolatey # package manager (choco)
+            - CoreyButler.NVMforWindows # node version manager
             - DEVCOM.JetBrainsMonoNerdFont # font (JetBrains Mono Nerd Font)
             - zig.zig # programming language (zig)
             - Python.Python.3.11 # programming language (python)
@@ -35,6 +38,7 @@ packages:
             - FelixKratz/formulae  # tiling window manager utility (borders)
         brews:
             - uv # package manager (uv)
+            - nvm # node version manager
             - zig # programming language (zig)
             - python # programming language (python)
             - go # programming language (go)

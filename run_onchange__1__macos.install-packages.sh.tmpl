@@ -33,6 +33,10 @@ EOF
 uv tool install {{ . }}
 {{ end }}
 
+{{ range .packages.global.npm -}}
+npm install {{ . }}
+{{ end }}
+
 {{ range .packages.macos.commands -}}
 {{ . }}
 {{ end -}}
