@@ -24,6 +24,14 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     - Click Apply
     </details>
 
+    <details>
+    <summary>Windows - Autohide the cursor</summary>
+
+    - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html)
+    - Run the binary
+    - Configure it to start with Windows and adjust timing (I prefer 3 seconds)
+    </details>
+
 ### Todo
 
 - [ ] Add Linux
