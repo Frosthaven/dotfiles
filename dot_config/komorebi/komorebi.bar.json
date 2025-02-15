@@ -13,7 +13,7 @@
   "transparency_alpha": 0,
   "position": {
     "start": {"x":12, "y":8},
-    "end": {"x":5096, "y":25},
+    "end": {"x":5096, "y":27},
   },
   "grouping": {
     "kind": "Widget",
