@@ -10,6 +10,13 @@
     }
   },
   "font_family": "JetBrains Mono",
+  "transparency_alpha": 0,
+  "grouping": {
+    "kind": "Widget",
+    "style": "Default",
+    "rounding": 5,
+    "transparency_alpha": 100,
+  },
   "theme": {
     "palette": "Base16",
     "name": "Ashes",
