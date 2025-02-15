@@ -4,13 +4,17 @@
     "index": 1,
     "work_area_offset": {
       "left": 0,
-      "top": 40,
+      "top": 22,
       "right": 0,
-      "bottom": 40
+      "bottom": 20,
     }
   },
   "font_family": "JetBrains Mono",
   "transparency_alpha": 0,
+  "position": {
+    "start": {"x":12, "y":8},
+    "end": {"x":5096, "y":25},
+  },
   "grouping": {
     "kind": "Widget",
     "style": "Default",
@@ -20,7 +24,7 @@
   "theme": {
     "palette": "Base16",
     "name": "Ashes",
-    "accent": "Base0D"
+    "accent": "Base0D",
   },
   "left_widgets": [
     {
@@ -76,7 +80,7 @@
     {
       "Time": {
         "enable": true,
-        "format": "TwentyFourHour"
+        "format": "TwelveHour"
       }
     },
     {
