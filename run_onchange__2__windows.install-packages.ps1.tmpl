@@ -13,18 +13,29 @@ $fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" S
 # *****************************************************************************
 
 {{ range .packages.windows.winget -}}
-echo "- Checking for {{ . }}..."
+echo "- Checking WinGet for {{ . }}..."
 winget install {{ . }}
 {{ end -}}
 
 {{ range .packages.windows.choco -}}
-echo "- Checking for {{ . }}..."
+echo "- Checking Chocolatey for {{ . }}..."
 choco install {{ . }}
 {{ end }}
 
 {{ range .packages.global.uv -}}
+echo "- Checking UV for {{ . }} ..."
 uv tool install {{ . }}
 {{ end }}
+
+# if npm isn't available, launch an admin window to do the commands
+if (!(Get-Command 'npm' -errorAction SilentlyContinue)) {
+    Start-Process -FilePath powershell -ArgumentList "-Command", "nvm install latest; nvm use latest;{{ range .packages.global.npm -}}npm install {{ . }}; {{ end }}" -Verb RunAs
+} else {
+    {{ range .packages.global.npm -}}
+    echo "- Checking NPM for {{ . }} ..."
+    npm install {{ . }}
+    {{ end }}
+}
 
 {{ range .packages.windows.commands -}}
 {{ . }}
