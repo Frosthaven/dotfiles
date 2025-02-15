@@ -10,6 +10,7 @@ packages:
             - astral-sh.uv # package manager (uv)
             - chocolatey.chocolatey # package manager (choco)
             - DEVCOM.JetBrainsMonoNerdFont # font (JetBrains Mono Nerd Font)
+            - zig.zig # programming language (zig)
             - Python.Python.3.11 # programming language (python)
             - GoLang.Go # programming language (go)
             - clink # shell (clink for cmd)
@@ -34,6 +35,7 @@ packages:
             - FelixKratz/formulae  # tiling window manager utility (borders)
         brews:
             - uv # package manager (uv)
+            - zig # programming language (zig)
             - python # programming language (python)
             - go # programming language (go)
             - starship # shell prompt (starship)
