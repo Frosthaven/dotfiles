@@ -4,7 +4,7 @@ packages:
         uv:
             - --python 3.12 posting # api tool (posting)
         npm:
-            - -g twiggy-language-server # twig lsp helper for neovim
+            - -g prettier
 
     windows: # ****************************************************************
 
