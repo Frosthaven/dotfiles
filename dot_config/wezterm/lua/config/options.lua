@@ -23,7 +23,7 @@ M.setup = function()
             window_background_opacity = 0.85,
 
             window_decorations = "TITLE | RESIZE",
-            -- window_close_confirmation = "NeverPrompt",
+            window_close_confirmation = "NeverPrompt",
 
             webgpu_preferred_adapter = helpers.getIdealGPU(),
             bold_brightens_ansi_colors = true,
