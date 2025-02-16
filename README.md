@@ -27,10 +27,11 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     <details>
     <summary>Windows - Autohide the cursor</summary>
 
-    - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html)
-    - Run the binary
-    - Configure it to start minimized to tray
-    - Configure it to start with Windows and adjust timing (I prefer 3 seconds)
+    - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html) somewhere safe
+    - Run the downloaded exe
+    - Enable `Strat with Windows`
+    - Enable `Hide when a key is pressed`
+    - Set the timer range to `3 seconds`
     - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
     </details>
 
