@@ -177,6 +177,7 @@ cmd-alt-shift-right = 'resize width +50'
 cmd-alt-q      = 'close'
 cmd-alt-f      = 'fullscreen'
 cmd-alt-t      = 'layout floating tiling'
+cmd-alt-m      = 'layout accordion tiles horizontal'
 
 cmd-alt-o      = 'reload-config'
 
@@ -195,7 +196,7 @@ backspace = ['close-all-windows-but-current', 'mode main']
 # *****************************************************************************
 
 [workspace-to-monitor-force-assignment]
-1 = ['studio display', 'built-in']
+1 = ['Samsung Odyssey G9', 'studio display', 'built-in']
 2 = ['built-in'                  ]
 3 = ['g246hl',         'built-in']
 4 = ['g246hl',         'built-in']
