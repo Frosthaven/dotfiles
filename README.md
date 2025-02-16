@@ -29,7 +29,9 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
     - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html)
     - Run the binary
+    - Configure it to start minimized to tray
     - Configure it to start with Windows and adjust timing (I prefer 3 seconds)
+    - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
     </details>
 
 ### Todo
