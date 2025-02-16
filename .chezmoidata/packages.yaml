@@ -53,6 +53,7 @@ packages:
             - aeroplace # tiling window manager (aeroplace)
             - sketchybar # tiling window manager utility (sketchybar)
             - borders # tiling window manager utility (borders)
+            - wallpaper # helper to set wallpapers without workarounds
         casks:
             - font-jetbrains-mono-nerd-font # font (JetBrains Mono Nerd Font)
             - wezterm # terminal emulator (wezterm)
