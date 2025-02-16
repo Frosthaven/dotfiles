@@ -25,7 +25,6 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     </details>
 
     <details>
-
     <summary>Windows - Autohide the cursor</summary>
 
     - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html) somewhere safe
@@ -34,11 +33,6 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     - Enable `Hide when a key is pressed`
     - Set the timer range to `3 seconds`
     - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
-    </details>
-
-    <summary>Mac - Hide the original MacOS bar</summary>
-
-    - Follow the instructions [listed here](https://felixkratz.github.io/SketchyBar/setup#hiding-the-original-macos-bar)
     </details>
 
 ### Todo
