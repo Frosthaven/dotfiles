@@ -33,10 +33,28 @@
           "enable": true
         },
         "focused_window": {
+          "enable": false,
+          "show_icon": true
+        }
+      }
+    }
+  ],
+  "center_widgets": [
+    {
+      "Komorebi": {
+        "workspaces": {
+          "enable": false,
+          "hide_empty_workspaces": false
+        },
+        "layout": {
+          "enable": false
+        },
+        "focused_window": {
           "enable": true,
           "show_icon": true
         }
       }
+
     }
   ],
   "right_widgets": [
