@@ -35,6 +35,13 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
     </details>
 
+    <details>
+    <summary>Windows - Autohide the cursor</summary>
+
+    - Access `cursorcerer` from the settings panel or spotlight search
+    - Set the automatic timeout to below 5 seconds
+    </details>
+
 ### Todo
 
 - [ ] Add Linux
