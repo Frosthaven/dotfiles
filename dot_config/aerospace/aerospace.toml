@@ -12,7 +12,7 @@ after-login-command = [ # called when user logs into system
 # sketchbar has a built-in detection of already running process,
 # so it won't be run twice on AeroSpace restart
 after-startup-command = [
-# 'exec-and-forget sketchybar', # disabled due to issues: https://github.com/FelixKratz/SketchyBar/discussions/599
+#'exec-and-forget sketchybar', # disabled due to issues: https://github.com/FelixKratz/SketchyBar/discussions/599
 "exec-and-forget borders",
 
 # """
@@ -30,9 +30,9 @@ after-startup-command = [
 ]
 
 # Notify Sketchybar about workspace change
-exec-on-workspace-change = ['/bin/bash', '-c',
-# 'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE' # disabled due to issues: https://github.com/FelixKratz/SketchyBar/discussions/599
-]
+#exec-on-workspace-change = ['/bin/bash', '-c',
+#'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE' # disabled due to issues: https://github.com/FelixKratz/SketchyBar/discussions/599
+#]
 
 # LAYOUT **********************************************************************
 # *****************************************************************************
