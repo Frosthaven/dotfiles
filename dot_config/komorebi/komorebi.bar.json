@@ -4,17 +4,13 @@
     "index": 1,
     "work_area_offset": {
       "left": 0,
-      "top": 22,
+      "top": 40,
       "right": 0,
-      "bottom": 20,
+      "bottom": 40,
     }
   },
   "font_family": "JetBrains Mono",
   "transparency_alpha": 0,
-  "position": {
-    "start": {"x":12, "y":8},
-    "end": {"x":5096, "y":27},
-  },
   "grouping": {
     "kind": "Widget",
     "style": "Default",
