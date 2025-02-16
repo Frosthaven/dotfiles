@@ -8,8 +8,6 @@ after-login-command = [ # called when user logs into system
 
 # aeroplace workspace composition - each workspace builds in its own
 # parallel process
-after-startup-command = [ # called when aerospace launches
-
 # Run Sketchybar together with AeroSpace
 # sketchbar has a built-in detection of already running process,
 # so it won't be run twice on AeroSpace restart
