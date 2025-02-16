@@ -76,3 +76,4 @@ public class Params
 
 echo "Updating wallpaper..."
 Set-Wallpaper -Image "$env:USERPROFILE/.local/share/chezmoi/assets/wallpaper.png" -Style Fill
+
