@@ -42,7 +42,6 @@ npm install {{ . }}
 {{ . }}
 {{ end -}}
 
-# chmod+x all sketchybar scripts
-chmod +x $HOME/.config/sketchybar/plugins/*.sh
-
+# chmod+x all sketchybar scripts if not already done (needs sudo)
+chmod+x $HOME/.config/sketchybar/plugins/*
 {{ end -}}
