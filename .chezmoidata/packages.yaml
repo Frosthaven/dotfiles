@@ -35,9 +35,9 @@ packages:
 
         taps:
             - frosthaven/aeroplace # tiling window manager utility (aeroplace)
-            - FelixKratz/formulae  # tiling window manager utility (borders)
+            - FelixKratz/formulae  # tiling window manager utility (sketchybar/borders)
         brews:
-            - uv # package manager (uv)
+            - uv # package manager (uv
             - nvm # node version manager
             - zig # programming language (zig)
             - python # programming language (python)
@@ -51,6 +51,7 @@ packages:
             - zoxide # command line tool (zoxide)
             - neovim # text editor (neovim)
             - aeroplace # tiling window manager (aeroplace)
+            - sketchybar # tiling window manager utility (sketchybar)
             - borders # tiling window manager utility (borders)
         casks:
             - font-jetbrains-mono-nerd-font # font (JetBrains Mono Nerd Font)
