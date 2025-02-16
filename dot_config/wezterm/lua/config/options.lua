@@ -15,6 +15,7 @@ M.setup = function()
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
             font_size = 15, -- compensation for display scaling
             macos_window_background_blur = 50, -- 0-100
+            window_background_opacity = 0.94,
         },
         common = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
