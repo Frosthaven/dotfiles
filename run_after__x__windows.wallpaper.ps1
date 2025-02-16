@@ -1,14 +1,3 @@
-{{ if eq .chezmoi.os "windows" -}}
-
-# FILEHASH ********************************************************************
-# *****************************************************************************
-
-# by embedding the file hash into this template, chezmoi will only detect
-# changes if the hashed file changes. This will prevent unnecessarily running
-# the script when the target file hasn't changed.
-
-$fileHash = CertUtil -hashfile "$env:USERPROFILE/.local/share/chezmoi/assets/wallpaper.png" SHA256
-
 Function Set-WallPaper {
 
 <#
@@ -85,7 +74,5 @@ public class Params
     $ret = [Params]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $Image, $fWinIni)
 }
 
+echo "Updating wallpaper..."
 Set-Wallpaper -Image "$env:USERPROFILE/.local/share/chezmoi/assets/wallpaper.png" -Style Fill
-
-{{ end -}}
-
