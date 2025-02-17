@@ -7,11 +7,17 @@
 # (or import) custom commands, or run any other startup tasks.
 # See https://www.nushell.sh/book/configuration.html
 
-# add brew to path
-$env.PATH = ($env.PATH | append "/opt/homebrew/bin")
+# carapace autocomplete
+$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
+mkdir ~/.carapace
+carapace _carapace nushell | save --force ~/.carapace/init.nu
+source ~/.carapace/init.nu
 
 # disable osc133, which causes issues with wezterm
 $env.config.shell_integration.osc133 = false
+
+# add brew to path
+$env.PATH = ($env.PATH | append "/opt/homebrew/bin")
 
 # register starship prompt
 $env.STARSHIP_SHELL = "nu"

@@ -1,4 +1,5 @@
 README.md
+**/history.txt
 
 {{ if ne .chezmoi.os "windows" }}
 **/*windows.*
