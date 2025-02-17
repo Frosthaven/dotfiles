@@ -61,7 +61,7 @@ M.setup = function()
     }
 
     local nu_shell_options = {
-        shellcmdflag = '--login --stdin --no-newline -c',
+        shellcmdflag = '--stdin --no-newline -c',
         shellpipe = '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record',
         shellquote = '',
         shellredir = 'out+err> %s',
@@ -91,8 +91,12 @@ M.setup = function()
         vim.opt.shell = 'pwsh'
     elseif vim.fn.executable 'powershell' then
         vim.opt.shell = 'powershell'
-    else
+    elseif vim.fn.executable 'zsh' then
         vim.opt.shell = 'zsh'
+    elseif vim.fn.executable 'bash' then
+        vim.opt.shell = 'bash'
+    else
+        vim.opt.shell = 'sh'
     end
 
     apply_shell_options()
