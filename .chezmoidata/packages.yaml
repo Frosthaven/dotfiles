@@ -14,10 +14,33 @@ packages:
             # gui applications ************************************************
             - Zen-Team.Zen-Browser
             - Discord.Discord
+            - dbeaver.dbeaver
+            - FinalWire.AIDA64.Engineer
+            - Microsoft.Office
+            - Adobe.CreativeCloud
+            - JetBrains.Toolbox
+            # davinci resolve - NO WINGET PACKAGE
+            - Discord.Discord
             - SlackTechnologies.Slack
-            - -i -e --id=9NRX63209R7B --source=msstore --accept-package-agreements # email (outlook)
+            - OBSProject.OBSStudio
+            - Obsidian.Obsidian
+            - qBittorrent.qBittorrent
+            - Spotify.Spotify
+            - SublimeHQ.SublimeText.4
+            - VideoLAN.VLC
+            - WinSCP.WinSCP
+            - Zoom.Zoom
             # tray applications & helpers *************************************
             - Proton.ProtonPass
+            - Flow-Launcher.Flow-Launcher
+            - voidtools.Everything
+            - REALiX.HWiNFO
+            - Logitech.GHUB
+            - M2Team.NanaZip
+            - Microsoft.PowerToys
+            - Rainmeter.Rainmeter
+            - ShareX.ShareX
+            # Macrium Reflect - NO WINGET PACKAGE
             # package managers ************************************************
             - astral-sh.uv
             - chocolatey.chocolatey
@@ -27,6 +50,7 @@ packages:
             - zig.zig
             - Python.Python.3.11
             - GoLang.Go
+            - DDEVFoundation.DDEV
             # shell ***********************************************************
             - clink
             - Microsoft.PowerShell
@@ -37,7 +61,7 @@ packages:
             - Git.Git
             - BurntSushi.ripgrep.MSVC
             - junegunn.fzf
-            - junegunn.fd
+            - sharkdp.fd
             - eza-community.eza
             - ajeetdsouza.zoxide
             - Neovim.Neovim
@@ -61,6 +85,7 @@ packages:
             - zig
             - python
             - go
+            - ddev/ddev/ddev
             # shell ***********************************************************
             - starship
             # cli *************************************************************
@@ -91,13 +116,12 @@ packages:
             - zen-browser
             - discord
             - slack
-            - microsoft-outlook
-            - microsoft-word
-            - microsoft-excel
-            - microsoft-powerpoint
+            - microsoft-office
+            - adobe-creative-cloud
+            - jetbrains-toolbox
+            # davinci resolve - NO BREW CASK PACKAGE
             - forklift
             # tray applications & helpers *************************************
-            - jetbrains-toolbox
             - pixelsnap
             - istat-menus
             - jettison
@@ -126,6 +150,8 @@ packages:
         commands:
             # make forklift the default file manager
             - defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
+            # one-time install for ddev
+            - mkcert -install
 
     linux: # ******************************************************************
 

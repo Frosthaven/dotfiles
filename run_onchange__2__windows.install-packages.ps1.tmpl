@@ -12,9 +12,29 @@ $fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" S
 # SCRIPT **********************************************************************
 # *****************************************************************************
 
+$currentPackage = 0
+$totalPackages = {{ .packages.windows.winget | len }}
 {{ range .packages.windows.winget -}}
-    echo "- Checking WinGet for {{ . }}..."
-    winget install {{ . }}
+    $currentPackage++
+
+    # get the id from either a provided id flag or the string itself
+    if ("{{ . }}" -match "--id") {
+        $id = "{{ . }}" -split "--id " | Select-Object -Last 1
+    } else {
+        $id = "{{ . }}"
+    }
+    winget list --id $id | Out-Null
+    if ($?) {
+        echo "[$currentPackage/$totalPackages] $id is already installed"
+    } else {
+        echo "[$currentPackage/$totalPackages] Installing $id..."
+        # check if we provided a package id or a search string
+        if ($id -match "--") {
+            winget install $id
+        } else {
+            winget install --id $id
+        }
+    }
 {{ end -}}
 
 {{ range .packages.windows.choco -}}
