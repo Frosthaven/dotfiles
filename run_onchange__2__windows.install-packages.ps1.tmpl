@@ -14,6 +14,7 @@ $fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" S
 
 $currentPackage = 0
 $totalPackages = {{ .packages.windows.winget | len }}
+echo "Processing WinGet..."
 {{ range .packages.windows.winget -}}
     $currentPackage++
 
