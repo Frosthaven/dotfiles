@@ -21,6 +21,7 @@ $env.config.show_banner = false
 # add brew to path
 $env.PATH = ($env.PATH | append "/opt/homebrew/bin")
 
+source ./themes/catppuccin-mocha.nu
 use ./starship.nu
 use ./fnm.nu
 
