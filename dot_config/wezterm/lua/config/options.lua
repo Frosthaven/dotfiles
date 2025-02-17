@@ -11,7 +11,6 @@ M.setup = function()
             win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
             -- default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" },
             -- nushell
-            default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" },
         },
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
@@ -44,6 +43,12 @@ M.setup = function()
             set_environment_variables = {},
         },
     }
+
+    if helpers.osTag() == "windows" then
+        opts.windows.default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" }
+    elseif helpers.osTag() == "macos" then
+        opts.macos.default_prog = { "/opt/homebrew/bin/nu" }
+    end
 
     -- combine common and platform specific options into a unified config
     local osTag = helpers.osTag()
