@@ -25,9 +25,9 @@ $totalPackages = {{ .packages.windows.winget | len }}
     }
     winget list --id $id | Out-Null
     if ($?) {
-        echo "[$currentPackage/$totalPackages] $id is already installed"
+        echo "[$currentPackage/$totalPackages] Using $id"
     } else {
-        echo "[$currentPackage/$totalPackages] Installing $id..."
+        echo "[$currentPackage/$totalPackages] Installing $id"
         # check if we provided a package id or a search string
         if ($id -match "--") {
             winget install $id
