@@ -33,14 +33,14 @@ EOF
 uv tool install {{ . }}
 {{ end }}
 
+{{ range .packages.macos.commands -}}
+{{ . }}
+{{ end -}}
+
 {{ range .packages.global.npm -}}
 echo "Checking NPM for {{ . }}..."
 npm install {{ . }}
 {{ end }}
-
-{{ range .packages.macos.commands -}}
-{{ . }}
-{{ end -}}
 
 # chmod+x all sketchybar scripts if not already done (needs sudo)
 chmod +x $HOME/.config/sketchybar/plugins/*
