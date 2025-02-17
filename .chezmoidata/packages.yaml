@@ -3,10 +3,13 @@ packages:
 
         uv:
             - --python 3.12 posting # api tool (posting)
+        npm:
+            - -g prettier # formatter
 
     windows: # ****************************************************************
 
         winget:
+            - XAMPPRocky.tokei # code counter tool
             - astral-sh.uv # package manager (uv)
             - chocolatey.chocolatey # package manager (choco)
             - CoreyButler.NVMforWindows # node version manager
@@ -35,6 +38,7 @@ packages:
             - frosthaven/aeroplace # tiling window manager utility (aeroplace)
             - FelixKratz/formulae  # tiling window manager utility (sketchybar/borders)
         brews:
+            - tokei # code counter tool
             - uv # package manager (uv
             - nvm # node version manager
             - zig # programming language (zig)
