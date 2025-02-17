@@ -85,11 +85,13 @@ M.setup = function()
         end
     end
 
-    if vim.fn.executable 'nu' then
+    --[[if vim.fn.executable 'nu' then
         vim.opt.shell = 'nu'
-    elseif vim.fn.executable 'pwsh' then
+    else--]]
+    -- also check if windows
+    if vim.fn.has 'win32' == 1 and vim.fn.executable 'pwsh' then
         vim.opt.shell = 'pwsh'
-    elseif vim.fn.executable 'powershell' then
+    elseif vim.fn.has 'win32' == 1 and vim.fn.executable 'powershell' then
         vim.opt.shell = 'powershell'
     elseif vim.fn.executable 'zsh' then
         vim.opt.shell = 'zsh'
