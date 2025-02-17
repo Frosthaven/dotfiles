@@ -15,7 +15,7 @@ export-env {
 
         # Process fnm-related environment variables
         # Iterate through all variables except the first element (PATH) and add them to env_vars
-        for v in ($pwsh_vars | range 1..) {
+        for v in ($pwsh_vars | [1:] | rows) {
             $env_vars = ($env_vars | insert $v.key $v.value)
         }
 
