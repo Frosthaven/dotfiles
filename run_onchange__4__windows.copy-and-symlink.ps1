@@ -55,5 +55,11 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Zoxide PowerShell profile"
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell-zoxide.ps1'"
     }
+
+    # Nushell
+    If ((Get-Item $env:APPDATA\nushell).Attributes -ne "ReparsePoint") {
+        Remove-Item $env:APPDATA\nushell -Recurse -Force -Confirm:$false
+        New-Item -Path $env:APPDATA\nushell -ItemType Junction -Value $env:USERPROFILE\.config\nushell
+    }
 }
 

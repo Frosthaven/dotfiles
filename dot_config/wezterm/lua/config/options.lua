@@ -9,7 +9,9 @@ M.setup = function()
         linux = {},
         windows = {
             win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
-            default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" },
+            -- default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" },
+            -- nushell
+            default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" },
         },
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
