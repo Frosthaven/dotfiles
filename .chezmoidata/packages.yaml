@@ -51,6 +51,7 @@ packages:
             - Python.Python.3.11
             - GoLang.Go
             - DDEVFoundation.DDEV
+            - Stripe.StripeCli
             # shell ***********************************************************
             - clink
             - Microsoft.PowerShell
@@ -86,6 +87,7 @@ packages:
             - python
             - go
             - ddev/ddev/ddev
+            - stripe-cli
             # shell ***********************************************************
             - starship
             # cli *************************************************************
