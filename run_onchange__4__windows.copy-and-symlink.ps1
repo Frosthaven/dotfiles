@@ -47,19 +47,19 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     }
     If (-Not (Select-String -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Pattern "chezmoi-powershell.ps1")) {
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Chezmoi PowerShell profile"
-        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell.ps1'"
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\powershell\chezmoi-powershell.ps1'"
     }
 
     # Automatic Zoxide Integration
     If (-Not (Select-String -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Pattern "chezmoi-powershell-zoxide.ps1")) {
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Zoxide PowerShell profile"
-        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell-zoxide.ps1'"
+        Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\powershell\chezmoi-powershell-zoxide.ps1'"
     }
 
     # Nushell
     If ((Get-Item $env:APPDATA\nushell).Attributes -ne "ReparsePoint") {
         Remove-Item $env:APPDATA\nushell -Recurse -Force -Confirm:$false
-        New-Item -Path $env:APPDATA\nushell -ItemType Junction -Value $env:USERPROFILE\.config\nushell
+        New-Item -Path $env:APPDATA\nushell -ItemType Junction -Value $env:USERPROFILE\.config\shell\nushell
     }
 }
 
