@@ -10,6 +10,9 @@
 # disable osc133, which causes issues with wezterm
 $env.config.shell_integration.osc133 = false
 
+# disable the welcome message
+$env.config.show_banner = false
+
 # add brew to path
 $env.PATH = ($env.PATH | append "/opt/homebrew/bin")
 
