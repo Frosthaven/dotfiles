@@ -13,22 +13,36 @@ $fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" S
 # *****************************************************************************
 
 {{ range .packages.windows.winget -}}
-echo "- Checking WinGet for {{ . }}..."
-winget install {{ . }}
+    echo "- Checking WinGet for {{ . }}..."
+    winget install {{ . }}
 {{ end -}}
 
 {{ range .packages.windows.choco -}}
-echo "- Checking Chocolatey for {{ . }}..."
-choco install {{ . }}
+    echo "- Checking Chocolatey for {{ . }}..."
+    choco install {{ . }}
 {{ end }}
 
 {{ range .packages.global.uv -}}
-echo "- Checking UV for {{ . }} ..."
-uv tool install {{ . }}
+    echo "- Checking UV for {{ . }} ..."
+    uv tool install {{ . }}
 {{ end }}
+
+# on windows, nvm doesn't become available to the user without fresh terminal
+if (!(Get-Command 'npm' -errorAction SilentlyContinue)) {
+    echo "Configuring NVMforWindows for the first time..."
+    Start-Process -FilePath powershell -ArgumentList "-Command", "nvm install latest; nvm use latest;{{ range .packages.global.npm -}}echo '- Checking NPM for {{ . }} ...'; npm install {{ . }}{{ end }}" -Verb RunAs -Wait
+} else {
+    {{ range .packages.global.npm -}}
+        echo "- Checking NPM for {{ . }} ..."
+        npm install {{ . }}
+    {{ end }}
+}
 
 {{ range .packages.windows.commands -}}
 {{ . }}
 {{ end -}}
+
+echo ""
+echo "Please restart your terminal process to refresh your path"
 
 {{ end -}}

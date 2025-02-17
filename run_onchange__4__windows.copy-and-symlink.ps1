@@ -55,6 +55,5 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value "# Load Zoxide PowerShell profile"
         Add-Content -Path $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 -Value ". '$env:USERPROFILE\.config\shell\chezmoi-powershell-zoxide.ps1'"
     }
-
 }
 

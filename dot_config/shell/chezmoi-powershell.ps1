@@ -32,6 +32,12 @@ function Invoke-Starship-PreCommand {
     $host.ui.Write($prompt)
 }
 
+# NVMforWindows
+$env:Path += ";$env:NVM_SYMLINK"
+
+# UV binaries
+$env:Path += ";$env:USERPROFILE\.local\bin"
+
 # ALIASES *********************************************************************
 # *****************************************************************************
 function docmd { cmd /c $args }
