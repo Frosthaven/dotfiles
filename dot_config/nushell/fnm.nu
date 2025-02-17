@@ -4,19 +4,19 @@ export-env {
     def fnm-env [] {
         # Create a mutable empty record to store environment variables
         mut env_vars = {}
-        
+
         # Get fnm environment variable settings under PowerShell
         # Parse the output into key-value pairs through pipeline processing
         let pwsh_vars = (
-            ^fnm env --shell powershell | 
-            lines | 
+            ^fnm env --shell powershell |
+            lines |
             parse "$env:{key} = \"{value}\""
         )
 
         # Process fnm-related environment variables
         # Iterate through all variables except the first element (PATH) and add them to env_vars
-        for v in ($pwsh_vars | slice 1..) { 
-            $env_vars = ($env_vars | insert $v.key $v.value) 
+        for v in ($pwsh_vars | slice 1..) {
+            $env_vars = ($env_vars | insert $v.key $v.value)
         }
 
         # Special handling for PATH environment variable
@@ -39,13 +39,13 @@ export-env {
         if (not ($env | default false __fnm_hooked | get __fnm_hooked)) {
             # Mark hook as set
             $env.__fnm_hooked = true
-            
+
             # Initialize configuration structure
             $env.config = ($env | default {} config).config
             $env.config = ($env.config | default {} hooks)
             $env.config = ($env.config | update hooks ($env.config.hooks | default {} env_change))
             $env.config = ($env.config | update hooks.env_change ($env.config.hooks.env_change | default [] PWD))
-            
+
             # Add directory change handler function
             # When .nvmrc or .node-version file exists in the directory
             # Automatically switch to the corresponding Node.js version
