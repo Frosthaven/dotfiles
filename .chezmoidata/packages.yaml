@@ -29,8 +29,13 @@ packages:
             - wez.wezterm # terminal emulator (wezterm)
             - Neovim.Neovim # text editor (neovim)
             - LGUG2Z.komorebi # tiling window manager (komorebi)
+
             - Docker.DockerDesktop # containerization (docker)
+            - Zen-Team.Zen-Browser # browser (zen browser)
             - Proton.ProtonPass # password manager (protonpass)
+            - Discord.Discord # chat (discord)
+            - SlackTechnologies.Slack # chat (slack)
+            - -i -e --id=9NRX63209R7B --source=msstore --accept-package-agreements # email (outlook)
         choco:
         commands:
 
@@ -64,7 +69,11 @@ packages:
             - nikitabobko/tap/aerospace # tiling window manager (aerospace)
             - cursorcerer # autohide cursor
             - orbstack # containerization (orbstack)
-            - proton-pass
+            - zen-browser # browser (zen browser)
+            - proton-pass # password manager (protonpass)
+            - discord # chat (discord)
+            - slack # chat (slack)
+            - microsoft-outlook # email (outlook)
         commands:
 
     linux: # ******************************************************************
