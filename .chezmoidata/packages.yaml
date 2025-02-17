@@ -68,7 +68,6 @@ packages:
             - wezterm # terminal emulator (wezterm)
             - nikitabobko/tap/aerospace # tiling window manager (aerospace)
             - cursorcerer # autohide cursor
-            - orbstack # containerization (orbstack)
             - zen-browser # browser (zen browser)
             - proton-pass # password manager (protonpass)
             - discord # chat (discord)
@@ -100,6 +99,7 @@ packages:
             - spotify # productivity (spotify)
             - sublime-text # productivity (sublime-text)
             - zoom # productivity (zoom)
+            # orbstack - need the gui, NOT BREW PACKAGE
             # logitech-g-hub - BREW CASK BROKEN
             # amphetamine - NO BREW PACKAGE
             # colorslurp - NO BREW PACKAGE
