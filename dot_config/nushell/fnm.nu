@@ -30,8 +30,8 @@ export-env {
         return $env_vars
     }
 
-    # Check if fnm command exists
-    if not (which fnm | is-empty) {
+    # Check if fnm command exists rows exists
+    if not (which fnm | is-empty) and not (which rows | is-empty) {
         # Load fnm environment variables
         fnm-env | load-env
 
