@@ -46,7 +46,7 @@ packages:
             - chocolatey.chocolatey
             # development tools ***********************************************
             - Docker.DockerDesktop
-            - CoreyButler.NVMforWindows
+            - winget install Schniz.fnm
             - zig.zig
             - Python.Python.3.11
             - GoLang.Go
@@ -71,6 +71,8 @@ packages:
             - LGUG2Z.komorebi
         choco:
         commands:
+            # get lts node binary
+            - fnm install --lts; fnm use --lts;
 
     macos: # ******************************************************************
 
@@ -83,7 +85,7 @@ packages:
             # package managers ************************************************
             - uv
             # development tools ***********************************************
-            - nvm
+            - fnm
             - zig
             - python
             - go
@@ -151,6 +153,7 @@ packages:
             - nikitabobko/tap/aerospace
 
         commands:
+            - fnm install --lts; fnm use --lts;
             # make forklift the default file manager
             - defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
             # one-time install for ddev

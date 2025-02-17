@@ -60,20 +60,14 @@ echo "Processing WinGet..."
     uv tool install {{ . }}
 {{ end }}
 
-# on windows, nvm doesn't become available to the user without fresh terminal
-if (!(Get-Command 'npm' -errorAction SilentlyContinue)) {
-    echo "Configuring NVMforWindows for the first time..."
-    Start-Process -FilePath powershell -ArgumentList "-Command", "nvm install latest; nvm use latest;{{ range .packages.global.npm -}}echo '- Checking NPM for {{ . }} ...'; npm install {{ . }}{{ end }}" -Verb RunAs -Wait
-} else {
-    {{ range .packages.global.npm -}}
-        echo "- Checking NPM for {{ . }} ..."
-        npm install {{ . }}
-    {{ end }}
-}
-
 {{ range .packages.windows.commands -}}
 {{ . }}
 {{ end -}}
+
+{{ range .packages.global.npm -}}
+    echo "- Checking NPM for {{ . }} ..."
+    npm install {{ . }}
+{{ end }}
 
 echo ""
 echo "Please restart your terminal process to refresh your path"
