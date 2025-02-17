@@ -29,6 +29,8 @@ packages:
             - wez.wezterm # terminal emulator (wezterm)
             - Neovim.Neovim # text editor (neovim)
             - LGUG2Z.komorebi # tiling window manager (komorebi)
+            - Docker.DockerDesktop # containerization (docker)
+            - Proton.ProtonPass # password manager (protonpass)
         choco:
         commands:
 
@@ -61,6 +63,8 @@ packages:
             - wezterm # terminal emulator (wezterm)
             - nikitabobko/tap/aerospace # tiling window manager (aerospace)
             - cursorcerer # autohide cursor
+            - orbstack # containerization (orbstack)
+            - proton-pass
         commands:
 
     linux: # ******************************************************************
