@@ -46,7 +46,7 @@ packages:
             - chocolatey.chocolatey
             # development tools ***********************************************
             - Docker.DockerDesktop
-            - winget install Schniz.fnm
+            - Schniz.fnm
             - zig.zig
             - Python.Python.3.11
             - GoLang.Go
