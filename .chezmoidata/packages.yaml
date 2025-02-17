@@ -9,101 +9,120 @@ packages:
     windows: # ****************************************************************
 
         winget:
-            - XAMPPRocky.tokei # code counter tool
-            - astral-sh.uv # package manager (uv)
-            - chocolatey.chocolatey # package manager (choco)
-            - CoreyButler.NVMforWindows # node version manager
-            - DEVCOM.JetBrainsMonoNerdFont # font (JetBrains Mono Nerd Font)
-            - zig.zig # programming language (zig)
-            - Python.Python.3.11 # programming language (python)
-            - GoLang.Go # programming language (go)
-            - clink # shell (clink for cmd)
-            - Microsoft.PowerShell # shell (powershell)
-            - starship # shell prompt (starship)
-            - Git.Git # version control (git)
-            - BurntSushi.ripgrep.MSVC
-            - junegunn.fzf # command line tool (fzf)
-            - junegunn.fd # command line tool (fd)
-            - eza-community.eza # command line tool (eza)
-            - ajeetdsouza.zoxide # command line tool (zoxide)
-            - wez.wezterm # terminal emulator (wezterm)
-            - Neovim.Neovim # text editor (neovim)
-            - LGUG2Z.komorebi # tiling window manager (komorebi)
-
-            - Docker.DockerDesktop # containerization (docker)
-            - Zen-Team.Zen-Browser # browser (zen browser)
-            - Proton.ProtonPass # password manager (protonpass)
-            - Discord.Discord # chat (discord)
-            - SlackTechnologies.Slack # chat (slack)
+            # misc ************************************************************
+            - DEVCOM.JetBrainsMonoNerdFont
+            # gui applications ************************************************
+            - Zen-Team.Zen-Browser
+            - Discord.Discord
+            - SlackTechnologies.Slack
             - -i -e --id=9NRX63209R7B --source=msstore --accept-package-agreements # email (outlook)
+            # tray applications & helpers *************************************
+            - Proton.ProtonPass
+            # package managers ************************************************
+            - astral-sh.uv
+            - chocolatey.chocolatey
+            # development tools ***********************************************
+            - Docker.DockerDesktop
+            - CoreyButler.NVMforWindows
+            - zig.zig
+            - Python.Python.3.11
+            - GoLang.Go
+            # shell ***********************************************************
+            - clink
+            - Microsoft.PowerShell
+            - starship
+            - wez.wezterm
+            # cli *************************************************************
+            - XAMPPRocky.tokei
+            - Git.Git
+            - BurntSushi.ripgrep.MSVC
+            - junegunn.fzf
+            - junegunn.fd
+            - eza-community.eza
+            - ajeetdsouza.zoxide
+            - Neovim.Neovim
+            # window management ***********************************************
+            - LGUG2Z.komorebi
         choco:
         commands:
 
     macos: # ******************************************************************
 
-        taps:
-            - frosthaven/aeroplace # tiling window manager utility (aeroplace)
-            - FelixKratz/formulae  # tiling window manager utility (sketchybar/borders)
+        taps: # required for some packages
+            - frosthaven/aeroplace # required for aeroplace
+            - FelixKratz/formulae  # required for sketchybar,borders
         brews:
-            - tokei # code counter tool
-            - uv # package manager (uv
-            - nvm # node version manager
-            - zig # programming language (zig)
-            - python # programming language (python)
-            - go # programming language (go)
-            - starship # shell prompt (starship)
-            - git # version control (git)
-            - ripgrep # command line tool (ripgrep)
-            - fzf # command line tool (fzf)
-            - fd # command line tool (fd)
-            - eza # command line tool (eza)
-            - zoxide # command line tool (zoxide)
-            - neovim # text editor (neovim)
-            - aeroplace # tiling window manager (aeroplace)
-            - sketchybar # tiling window manager utility (sketchybar)
-            - borders # tiling window manager utility (borders)
-            - wallpaper # helper to set wallpapers without workarounds
+            # misc ************************************************************
+            - wallpaper
+            # package managers ************************************************
+            - uv
+            # development tools ***********************************************
+            - Docker.DockerDesktop
+            - nvm
+            - zig
+            - python
+            - go
+            # shell ***********************************************************
+            - starship
+            # cli *************************************************************
+            - tokei
+            - git
+            - ripgrep
+            - fzf
+            - fd
+            - eza
+            - zoxide
+            - neovim
+            # window management ***********************************************
+            - aeroplace
+            - sketchybar
+            - borders
         casks:
-            - font-jetbrains-mono-nerd-font # font (JetBrains Mono Nerd Font)
-            - wezterm # terminal emulator (wezterm)
-            - nikitabobko/tap/aerospace # tiling window manager (aerospace)
-            - cursorcerer # autohide cursor
-            - zen-browser # browser (zen browser)
-            - proton-pass # password manager (protonpass)
-            - discord # chat (discord)
-            - slack # chat (slack)
-            - microsoft-outlook # email (outlook)
-            - microsoft-word # productivity (word)
-            - microsoft-excel # productivity (excel)
-            - microsoft-powerpoint # productivity (powerpoint)
-            - onedrive # productivity (onedrive)
-            - forklift # file manager (forklift)
-            - raycast # productivity (raycast)
-            - localsend # productivity (localsend)
-            - logitune # productivity (logitune)
-            - logi-options+ # productivity (logi-options+)
-            - paragon-ntfs # productivity (paragon-ntfs)
-            - bartender # productivity (bartender)
-            - cleanshot # productivity (cleanshot)
-            - dbeaver-community # productivity (dbeaver-community)
-            - iina # productivity (iina)
-            - istat-menus # productivity (istat-menus)
-            - jettison # productivity (jettison)
-            - keka # productivity (keka)
-            - jetbrains-toolbox # productivity (jetbrains-toolbox)
-            - obs # productivity (obs)
-            - obsidian # productivity (obsidian)
-            - pixelsnap # productivity (pixelsnap)
-            - powershell # productivity (powershell)
-            - qbittorrent # productivity (qbittorrent)
-            - spotify # productivity (spotify)
-            - sublime-text # productivity (sublime-text)
-            - zoom # productivity (zoom)
+            # misc ************************************************************
+            - font-jetbrains-mono-nerd-font
+            # gui applications ************************************************
+            - qbittorrent
+            - spotify
+            - sublime-text
+            - zoom
+            - obs
+            - obsidian
+            - iina
+            - dbeaver-community
+            - zen-browser
+            - discord
+            - slack
+            - microsoft-outlook
+            - microsoft-word
+            - microsoft-excel
+            - microsoft-powerpoint
+            - forklift
+            # tray applications & helpers *************************************
+            - jetbrains-toolbox
+            - pixelsnap
+            - istat-menus
+            - jettison
+            - keka
+            - proton-pass
+            - onedrive
+            - raycast
+            - localsend
+            - cursorcerer
+            - logitune
+            - logi-options+
+            - paragon-ntfs
+            - bartender
+            - cleanshot
             # orbstack - need the gui, NOT BREW PACKAGE
             # logitech-g-hub - BREW CASK BROKEN
             # amphetamine - NO BREW PACKAGE
             # colorslurp - NO BREW PACKAGE
             # dropover - NO BREW PACKAGE
+            # shell ***********************************************************
+            - wezterm
+            - powershell
+            # window management ***********************************************
+            - nikitabobko/tap/aerospace
 
         commands:
             # make forklift the default file manager
