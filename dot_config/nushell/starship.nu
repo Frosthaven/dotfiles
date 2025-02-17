@@ -1,3 +1,5 @@
+export-env {
+
 # register starship prompt
 $env.STARSHIP_SHELL = "nu"
 $env.STARSHIP_SESSION_KEY = (random chars -l 16)
@@ -18,3 +20,4 @@ $env.PROMPT_COMMAND = {
 # Thus does not play well with default `add_newline = True`.
 $env.PROMPT_COMMAND_RIGHT = {''}
 
+}
