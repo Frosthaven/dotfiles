@@ -30,7 +30,7 @@ M.setup = function()
     end)
 
     local shell_priority = {
-        'nu',
+        -- 'nu',
         'pwsh',
         'powershell',
         'bash',
@@ -48,7 +48,7 @@ M.setup = function()
     -- better nu support in nvim
     -- https://www.kiils.dk/en/blog/2024-06-22-using-nushell-in-neovim/
     local powershell_options = {
-        shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;',
+        shellcmdflag = '-nologo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;',
         shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode',
         shellquote = '',
         shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait',
