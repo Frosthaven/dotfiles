@@ -29,16 +29,19 @@ M.setup = function()
         vim.opt.clipboard = 'unnamedplus'
     end)
 
-    -- If on windows, configure shell to use Powershell
-    if vim.fn.has 'win32' == 1 then
-        if vim.fn.executable 'nu' then
-            vim.opt.shell = 'nu'
-        elseif vim.fn.executable 'pwsh' then
-            vim.opt.shell = 'pwsh'
-        elseif vim.fn.executable 'powershell' then
-            vim.opt.shell = 'powershell'
-        else
-            vim.opt.shell = 'cmd'
+    shell_priority = {
+        'nu',
+        'pwsh',
+        'powershell',
+        'bash',
+        'zsh',
+        'fish',
+        'sh',
+    }
+    for _, shell in ipairs(shell_priority) do
+        if vim.fn.executable(shell) == 1 then
+            vim.opt.shell = shell
+            break
         end
     end
 
@@ -63,7 +66,7 @@ M.setup = function()
         shellxquote = '',
     }
     local nu_shell_options = {
-        shellcmdflag = '--stdin --no-newline -c',
+        shellcmdflag = '--login --interactive --stdin --no-newline -c',
         shellpipe = '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record',
         shellquote = '',
         shellredir = 'out+err> %s',
