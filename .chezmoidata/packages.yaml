@@ -66,6 +66,8 @@ packages:
             - junegunn.fzf
             - sharkdp.fd
             - sharkdp.bat
+            - jqlang.jq
+            - MikeFarah.yq
             - eza-community.eza
             - ajeetdsouza.zoxide
             - Neovim.Neovim
@@ -104,6 +106,8 @@ packages:
             - fzf
             - fd
             - bat
+            - jq
+            - yq
             - eza
             - zoxide
             - neovim
