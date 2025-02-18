@@ -42,8 +42,6 @@ M.setup = function()
         end
     end
 
-    vim.opt.shell = 'nu'
-
     -- better nu support in nvim
     -- https://www.kiils.dk/en/blog/2024-06-22-using-nushell-in-neovim/
     local powershell_options = {
