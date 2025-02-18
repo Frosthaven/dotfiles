@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# fnm
+fnm_env_output=$(fnm env)
+if ! grep -q "fnm_multishell" "$HOME/.zshrc"; then
+  echo "# fnm" >> "$HOME/.zshrc"
+  echo $fnm_env_output >> "$HOME/.zshrc"
+fi
+
 # Automatic Shell Integration
 zshrc="$HOME/.zshrc"
 chezmoi_zsh_profile="$HOME/.config/shell/zsh/chezmoi-zsh.sh"
@@ -17,4 +24,6 @@ if [ -d "$nushell_folder" ] && [ ! -L "$nushell_folder" ]; then
   rm -rf "$nushell_folder"
 fi
 ln -s "$nushell_symlink" "$nushell_folder"
+
+source $HOME/.zshrc
 
