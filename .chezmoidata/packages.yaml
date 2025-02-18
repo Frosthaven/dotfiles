@@ -65,6 +65,7 @@ packages:
             - BurntSushi.ripgrep.MSVC
             - junegunn.fzf
             - sharkdp.fd
+            - sharkdp.bat
             - eza-community.eza
             - ajeetdsouza.zoxide
             - Neovim.Neovim
@@ -102,6 +103,7 @@ packages:
             - ripgrep
             - fzf
             - fd
+            - bat
             - eza
             - zoxide
             - neovim
