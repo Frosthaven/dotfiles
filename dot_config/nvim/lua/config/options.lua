@@ -29,7 +29,7 @@ M.setup = function()
         vim.opt.clipboard = 'unnamedplus'
     end)
 
-    shell_priority = {
+    local shell_priority = {
         'nu',
         'pwsh',
         'powershell',
