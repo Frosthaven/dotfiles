@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Automatic Shell Integration
 zshrc="$HOME/.zshrc"
