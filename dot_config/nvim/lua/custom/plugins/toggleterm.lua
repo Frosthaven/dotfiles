@@ -8,7 +8,7 @@ return {
                 direction = 'float',
                 float_opts = {
                     border = 'curved',
-                    width = 75,
+                    width = 120,
                     height = 20,
                     --highlights = {
                     --     border = 'Normal',
