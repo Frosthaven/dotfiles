@@ -23,3 +23,16 @@ alias vi='nvim'
 eval "$(zoxide init zsh)"
 alias cd=z # replace cd with zoxide
 
+# fnm
+if [[ -z "$FNM_DIR" ]]; then
+    # setup environment
+    output=$(fnm env)
+    eval "$output"
+
+    # install the latest version
+    if ! command -v node &>/dev/null; then
+        fnm install --lts
+        fnm use lts-latest
+    fi
+fi
+

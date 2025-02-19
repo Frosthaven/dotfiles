@@ -25,5 +25,11 @@ if [ -d "$nushell_folder" ] && [ ! -L "$nushell_folder" ]; then
 fi
 ln -s "$nushell_symlink" "$nushell_folder"
 
+# source the shell profile
 source $HOME/.zshrc
+
+echo ""
+echo "------------------------------------------------------------------------"
+echo "Done. Restart your shell to pick up on any environmental changes."
+echo "------------------------------------------------------------------------"
 

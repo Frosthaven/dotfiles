@@ -32,8 +32,17 @@ function Invoke-Starship-PreCommand {
     $host.ui.Write($prompt)
 }
 
-# NVMforWindows
-$env:Path += ";$env:NVM_SYMLINK"
+# fnm
+if (-not $env:FNM_DIR) {
+    # setup environment
+    $output = (fnm env | Out-String).Trim()
+    Invoke-Expression $output
+    # install the latest version
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        fnm install --lts
+        fnm use lts-latest
+    }
+}
 
 # UV binaries
 $env:Path += ";$env:USERPROFILE\.local\bin"
