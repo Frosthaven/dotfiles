@@ -1,172 +1,361 @@
 packages:
-    global: # *****************************************************************
 
-        uv:
-            - --python 3.12 posting # api tool (posting)
-        npm:
-            - -g prettier # formatter
+    # fonts *******************************************************************
+    # *************************************************************************
 
-    windows: # ****************************************************************
+    font-jetbrains-mono:
+        win: winget install --id DEVCOM.JetBrainsMonoNerdFont
+        mac: brew install --cask font-jetbrains-mono-nerd-font
+        lin: # n/a
 
-        winget:
-            # misc ************************************************************
-            - DEVCOM.JetBrainsMonoNerdFont
-            # gui applications ************************************************
-            - Zen-Team.Zen-Browser
-            - Discord.Discord
-            - dbeaver.dbeaver
-            - FinalWire.AIDA64.Engineer
-            - Microsoft.Office
-            - Adobe.CreativeCloud
-            - JetBrains.Toolbox
-            # davinci resolve - NO WINGET PACKAGE
-            - Discord.Discord
-            - SlackTechnologies.Slack
-            - OBSProject.OBSStudio
-            - Obsidian.Obsidian
-            - qBittorrent.qBittorrent
-            - Spotify.Spotify
-            - SublimeHQ.SublimeText.4
-            - VideoLAN.VLC
-            - WinSCP.WinSCP
-            - Zoom.Zoom
-            # tray applications & helpers *************************************
-            - Proton.ProtonPass
-            - Flow-Launcher.Flow-Launcher
-            - voidtools.Everything
-            - REALiX.HWiNFO
-            - Logitech.GHUB
-            - M2Team.NanaZip
-            - Microsoft.PowerToys
-            - Rainmeter.Rainmeter
-            - ShareX.ShareX
-            # Macrium Reflect - NO WINGET PACKAGE
-            # package managers ************************************************
-            - astral-sh.uv
-            - chocolatey.chocolatey
-            # development tools ***********************************************
-            - Docker.DockerDesktop
-            - Schniz.fnm
-            - zig.zig
-            - Python.Python.3.11
-            - GoLang.Go
-            - DDEVFoundation.DDEV
-            - Stripe.StripeCli
-            # shell ***********************************************************
-            - clink
-            - Microsoft.PowerShell
-            - Nushell.Nushell
-            - steube.Carapace
-            - starship
-            - wez.wezterm
-            # cli *************************************************************
-            - XAMPPRocky.tokei
-            - Git.Git
-            - BurntSushi.ripgrep.MSVC
-            - junegunn.fzf
-            - sharkdp.fd
-            - sharkdp.bat
-            - jqlang.jq
-            - MikeFarah.yq
-            - eza-community.eza
-            - ajeetdsouza.zoxide
-            - Neovim.Neovim
-            # window management ***********************************************
-            - LGUG2Z.komorebi
-        choco:
-        commands:
-            # get lts node binary
-            - fnm install --lts; fnm use lts-latest;
+    # package managers ********************************************************
+    # *************************************************************************
 
-    macos: # ******************************************************************
+    package-manager-uv: # universal package manager
+        win: winget install --id astral-sh.uv
+        mac: brew install uv
+        lin: # n/a
+    package-manager-fnm: # node version manager + same-shell setup
+        win: winget install --id Schniz.fnm; if (-not $env:FNM_DIR) { $output = (fnm env | Out-String).Trim(); Invoke-Expression $output; if (-not (Get-Command node -ErrorAction SilentlyContinue)) { fnm install --lts; fnm use lts-latest } }
+        mac: brew install fnm; if [ -z "$FNM_DIR" ]; then eval "$(fnm env)"; if [ -z "$(command -v node)" ]; then fnm install --lts; fnm use lts-latest; fi; fi
+        lin: # n/a
 
-        taps: # required for some packages
-            - frosthaven/aeroplace # required for aeroplace
-            - FelixKratz/formulae  # required for sketchybar,borders
-        brews:
-            # misc ************************************************************
-            - wallpaper
-            # package managers ************************************************
-            - uv
-            # development tools ***********************************************
-            - fnm
-            - zig
-            - python
-            - go
-            - ddev/ddev/ddev
-            - stripe-cli
-            # shell ***********************************************************
-            - starship
-            - nushell
-            - carapace
-            # cli *************************************************************
-            - tokei
-            - git
-            - ripgrep
-            - fzf
-            - fd
-            - bat
-            - jq
-            - yq
-            - eza
-            - zoxide
-            - neovim
-            # window management ***********************************************
-            - aeroplace
-            - sketchybar
-            - borders
-        casks:
-            # misc ************************************************************
-            - font-jetbrains-mono-nerd-font
-            # gui applications ************************************************
-            - qbittorrent
-            - spotify
-            - sublime-text
-            - zoom
-            - obs
-            - obsidian
-            - iina
-            - dbeaver-community
-            - zen-browser
-            - discord
-            - slack
-            - microsoft-office
-            - adobe-creative-cloud
-            - jetbrains-toolbox
-            # davinci resolve - NO BREW CASK PACKAGE
-            - forklift
-            # tray applications & helpers *************************************
-            - pixelsnap
-            - istat-menus
-            - jettison
-            - keka
-            - proton-pass
-            - raycast
-            - localsend
-            - cursorcerer
-            - logitune
-            - logi-options+
-            - paragon-ntfs
-            - bartender
-            - cleanshot
-            # orbstack - need the gui, NOT BREW PACKAGE
-            # logitech-g-hub - BREW CASK BROKEN
-            # amphetamine - NO BREW PACKAGE
-            # colorslurp - NO BREW PACKAGE
-            # dropover - NO BREW PACKAGE
-            # shell ***********************************************************
-            - wezterm
-            - powershell
-            # window management ***********************************************
-            - nikitabobko/tap/aerospace
+    # programming languages ***************************************************
+    # *************************************************************************
 
-        commands:
-            - fnm install --lts; fnm use lts-latest;
-            # make forklift the default file manager
-            - defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
-            # one-time install for ddev
-            - mkcert -install
+    language-zig: # needed to auto-compile telescope in neovim cross-platform
+        win: winget install --id zig.zig
+        mac: brew install zig
+        lin: # n/a
+    language-rust:
+        win: winget install --id Rustlang.Rust
+        mac: brew install rust
+        lin: # n/a
+    language-python:
+        win: winget install --id Python.Python.3.11
+        mac: brew install python
+        lin: # n/a
+    language-go:
+        win: winget install --id GoLang.Go
+        mac: brew install go
+        lin: # n/a
+    language-php:
+        win: winget install --id PHP.PHP.8.4
+        mac: brew install php
+        lin: # n/a
 
-    linux: # ******************************************************************
+    # terminal emulators ******************************************************
+    # *************************************************************************
 
-        # tbd
+    terminal-wezterm:
+        win: winget install --id wez.wezterm
+        mac: brew install wezterm
+        lin: # n/a
+
+    # shells ******************************************************************
+    # *************************************************************************
+
+    shell-powershell:
+        win: winget install --id Microsoft.PowerShell
+        mac: brew install powershell
+        lin: # n/a
+    shell-clink: # spices up cmd.exe
+        win: winget install --id chrisant996.Clink
+        mac: # n/a
+        lin: # n/a
+    shell-nushell: # structured data, used as sidekick
+        win: winget install --id Nushell.Nushell
+        mac: brew install nushell
+        lin: # n/a
+    shell-carapace: # shell autocomplete
+        win: winget install --id rsteube.Carapace
+        mac: brew install carapace
+        lin: # n/a
+    shell-starship: # prompt
+        win: winget install --id Starship.Starship
+        mac: brew install starship
+        lin: # n/a
+
+    # command line tools ******************************************************
+    # *************************************************************************
+
+    cli-git:
+        win: winget install --id Git.Git
+        mac: brew install git
+        lin: # n/a
+    cli-neovim: # text editor
+        win: winget install --id Neovim.Neovim
+        mac: brew install neovim
+        lin: # n/a
+    cli-ripgrep: # search tool
+        win: winget install --id BurntSushi.ripgrep.MSVC
+        mac: brew install ripgrep
+        lin: # n/a
+    cli-fzf: # fuzzy finder
+        win: winget install --id junegunn.fzf
+        mac: brew install fzf
+        lin: # n/a
+    cli-fd: # alternative to find
+        win: winget install --id sharkdp.fd
+        mac: brew install fd
+        lin: # n/a
+    cli-bat: # alternative to cat
+        win: winget install --id sharkdp.bat
+        mac: brew install bat
+        lin: # n/a
+    cli-jq: # json processor
+        win: winget install --id jqlang.jq
+        mac: brew install jq
+        lin: # n/a
+    cli-yq: # yaml processor
+        win: winget install --id MikeFarah.yq
+        mac: brew install yq
+        lin: # n/a
+    cli-eza: # alternative to ls
+        win: winget install --id eza-community.eza
+        mac: brew install eza
+        lin: # n/a
+    cli-zoxide: # alternative to cd (has jumping)
+        win: winget install --id ajeetdsouza.zoxide
+        mac: brew install zoxide
+        lin: # n/a
+    cli-tokei: # code line counter
+        win: winget install --id XAMPPRocky.tokei
+        mac: brew install tokei
+        lin: # n/a
+    cli-stripe-cli: # stripe cli
+        win: winget install --id Stripe.StripeCli
+        mac: brew install stripe-cli
+        lin: # n/a
+    cli-posting: # api tool
+        win: uv tool install --python 3.12 posting
+        mac: uv tool install --python 3.12 posting
+        lin: # n/a
+
+    # container management ****************************************************
+    # *************************************************************************
+
+    containers-docker:
+        win: winget install --id Docker.DockerDesktop
+        mac: # n/a
+        lin: # n/a
+    containers-orbstack: # alternative to docker on mac
+        win: # n/a
+        mac: echo "WARNING Cannot automatically install - Install from https://orbstack.dev/download"
+        lin: # n/a
+    containers-ddev: # local development container management
+        win: winget install --id DDEVFoundation.DDEV
+        mac: brew install ddev/ddev/ddev; mkcert -install;
+        lin: # n/a
+
+    # desktop window management ***********************************************
+    # *************************************************************************
+
+    window-management-komorebi:
+        win: winget install --id LGUG2Z.komorebi
+        mac: # n/a
+        lin: # n/a
+    window-management-aerospace:
+        win: # n/a
+        mac: brew install nikitabobko/tap/aerospace
+        lin: # n/a
+    window-management-aeroplace:
+        win: # n/a
+        mac: brew tap frosthaven/aeroplace; brew install aeroplace;
+        lin: # n/a
+    window-management-borders:
+        win: # n/a
+        mac: brew tap FelixKratz/formulae; brew install borders;
+        lin: # n/a
+    window-management-sketchybar:
+        win: # n/a
+        mac: brew tap FelixKratz/formulae; brew install sketchybar;
+        lin: # n/a
+    window-management-wallpaper:
+        win: # n/a
+        mac: brew install wallpaper;
+        lin: # n/a
+
+    # desktop toys ************************************************************
+    # *************************************************************************
+    # toys are small applications that have a single purpose, often living in
+    # the system tray
+
+    toy-proton-pass: # password manager
+        win: winget install --id Proton.ProtonPass
+        mac: brew install proton-pass
+        lin: # n/a
+    toy-everything: # search tool
+        win: winget install --id voidtools.Everything
+        mac: # n/a
+        lin: # n/a
+    toy-flow-launcher: # launcher
+        win: winget install --id Flow-Launcher.Flow-Launcher
+        mac: # n/a
+        lin: # n/a
+    toy-keka: # archive manager
+        win: # n/a
+        mac: brew install keka
+        lin: # n/a
+    toy-raycast: # launcher
+        win: # n/a
+        mac: brew install raycast
+        lin: # n/a
+    toy-cursorcerer: # cursor manager
+        win: # n/a
+        mac: brew install cursorcerer
+        lin: # n/a
+    toy-logitune: # logitech mouse manager
+        win: # n/a
+        mac: brew install logitune
+        lin: # n/a
+    toy-logi-options-plus: # logitech mouse manager
+        win: winget install --id Logitech.OptionsPlus
+        mac: brew install logi-options-plus
+        lin: # n/a
+    toy-logi-g-hub: # logitech mouse manager
+        win: winget install --id Logitech.GHUB
+        mac: echo "WARNING Cannot automatically install - Install from https://www.logitechg.com/en-us/innovation/g-hub.html"
+        lin: # n/a
+    toy-paragon-ntfs: # ntfs driver
+        win: # n/a
+        mac: brew install paragon-ntfs
+        lin: # n/a
+    toy-bartender: # menu bar manager
+        win: # n/a
+        mac: brew install bartender
+        lin: # n/a
+    toy-cleanshot: # screen capture
+        win: # n/a
+        mac: brew install cleanshot
+        lin: # n/a
+    toy-amphetamine: # keep mac awake
+        win: # n/a
+        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/amphetamine/id937984704?mt=12"
+        lin: # n/a
+    toy-colorslurp: # color picker
+        win: # n/a
+        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/colorslurp/id1287239339?mt=12"
+        lin: # n/a
+    toy-dropover: # drag and drop
+        win: # n/a
+        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/dropover/id1482681073?mt=12"
+        lin: # n/a
+    toy-rainmeter: # desktop customization
+        win: winget install --id Rainmeter.Rainmeter
+        mac: # n/a
+        lin: # n/a
+    toy-nanazip: # archive manager
+        win: winget install --id M2Team.NanaZip
+        mac: # n/a
+        lin: # n/a
+    toy-sharex: # screen capture
+        win: winget install --id ShareX.ShareX
+        mac: # n/a
+        lin: # n/a
+    toy-hwinfo: # system monitor
+        win: winget install --id REALiX.HWiNFO
+        mac: # n/a
+        lin: # n/a
+    toy-powertoys: # system utilities
+        win: winget install --id Microsoft.PowerToys
+        mac: # n/a
+        lin: # n/a
+    toy-macrium-reflect: # backup
+        win: echo "WARNING Cannot automatically install - Install from https://www.macrium.com/reflectfree"
+        mac: # n/a
+        lin: # n/a
+    toy-istat-menus: # system monitor
+        win: # n/a
+        mac: brew install istat-menus
+        lin: # n/a
+    toy-jettison:
+        win: # n/a
+        mac: brew install jettison
+        lin: # n/a
+    toy-pixelsnap:
+        win: # n/a
+        mac: brew install pixelsnap
+        lin: # n/a
+
+
+    # desktop applications ****************************************************
+    # *************************************************************************
+
+    desktop-adobe-creative-cloud: # creative suite
+        win: winget install --id Adobe.CreativeCloud
+        mac: brew install adobe-creative-cloud
+        lin: # n/a
+    desktop-microsoft-office: # office suite
+        win: winget install --id Microsoft.Office
+        mac: brew install microsoft-office
+        lin: # n/a
+    desktop-jetbrains-toolbox: # jetbrains suite
+        win: winget install --id JetBrains.Toolbox
+        mac: brew install jetbrains-toolbox
+        lin: # n/a
+    desktop-obsidian: # note taking
+        win: winget install --id Obsidian.Obsidian
+        mac: brew install obsidian
+        lin: # n/a
+    desktop-sublime-text:
+        win: winget install --id SublimeHQ.SublimeText.4 --include-unknown
+        mac: brew install sublime-text
+        lin: # n/a
+    desktop-zen-browser: # browser
+        win: winget install --id Zen-Team.Zen-Browser
+        mac: brew install zen-browser
+        lin: # n/a
+    desktop-local-send: # file sharing
+        win: winget install --id LocalSend.LocalSend
+        mac: brew install local-send
+        lin: # n/a
+    desktop-discord: # chat
+        win: winget install --id Discord.Discord
+        mac: brew install discord
+        lin: # n/a
+    desktop-slack: # chat
+        win: winget install --id SlackTechnologies.Slack
+        mac: brew install slack
+        lin: # n/a
+    desktop-spotify: # music
+        win: winget install --id Spotify.Spotify
+        mac: brew install spotify
+        lin: # n/a
+    desktop-zoom:
+        win: winget install --id Zoom.Zoom
+        mac: brew install zoom
+        lin: # n/a
+    desktop-obs:
+        win: winget install --id OBSProject.OBSStudio
+        mac: brew install obs
+        lin: # n/a
+    desktop-winscp:
+        win: winget install --id WinSCP.WinSCP
+        mac: # n/a
+        lin: # n/a
+    desktop-qbittorrent:
+        win: winget install --id qBittorrent.qBittorrent
+        mac: brew install qbittorrent
+        lin: # n/a
+    desktop-dbeaver: # database management
+        win: winget install --id DBeaver.DBeaver
+        mac: brew install dbeaver
+        lin: # n/a
+    desktop-iina: # video player
+        win: # n/a
+        mac: brew install iina
+        lin: # n/a
+    desktop-vlc: # video player
+        win: winget install --id VideoLAN.VLC
+        mac: # n/a
+        lin: # n/a
+    desktop-forklift: # file manager
+        win: # n/a
+        mac: brew install forklift
+        lin: # n/a
+    desktop-forklift-set-default:
+        win: # n/a
+        mac: defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
+        lin: # n/a
+

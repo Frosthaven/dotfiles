@@ -63,3 +63,11 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     }
 }
 
+# source the shell profile
+. $profile
+
+echo ""
+echo "------------------------------------------------------------------------"
+echo "Done. Restart your shell to pick up on any environmental changes."
+echo "------------------------------------------------------------------------"
+

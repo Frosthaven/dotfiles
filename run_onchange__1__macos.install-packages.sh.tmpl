@@ -14,36 +14,31 @@ fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
 # SCRIPT **********************************************************************
 # *****************************************************************************
 
-{{ range .packages.macos.taps -}}
-    brew tap {{ . | quote }}
-{{ end -}}
+# ask the user if they want to install packages, and if not then exit
+read -p "Install Packages? (y/n)" -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Skipping package installation."
+    read -p "Press Enter to exit"
+    exit
+else
+    $totalPackages = {{ .packages | len }};
+    $currentPackage = 0;
+    echo "Processing $totalPackages Packages..."
+    echo ""
+    {{ range .packages -}}
+        $currentPackage++;
+        {{ if .mac -}}
+            echo "----- [$currentPackage/$totalPackages] {{ .mac }}"
+            {{ .mac }}
+        {{ end -}}
+    {{ end -}}
+fi
 
-brew bundle --no-lock --file=/dev/stdin <<EOF
-
-{{ range .packages.macos.brews -}}
-    brew {{ . | quote }}
-{{ end -}}
-{{ range .packages.macos.casks -}}
-    cask {{ . | quote }}
-{{ end -}}
-
-EOF
-
-{{ range .packages.global.uv -}}
-uv tool install {{ . }}
-{{ end }}
-
-{{ range .packages.macos.commands -}}
-{{ . }}
-{{ end -}}
-
-{{ range .packages.global.npm -}}
-echo "Checking NPM for {{ . }}..."
-npm install {{ . }}
-{{ end }}
-
-# chmod+x all sketchybar scripts if not already done (needs sudo)
 chmod +x $HOME/.config/sketchybar/plugins/*
+
+echo ""
+read -p "Done! Press Enter to exit the package installer."
 
 {{ end -}}
 

@@ -24,52 +24,29 @@ $fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" S
 # SCRIPT **********************************************************************
 # *****************************************************************************
 
-$currentPackage = 0
-$totalPackages = {{ .packages.windows.winget | len }}
-echo "Processing WinGet..."
-{{ range .packages.windows.winget -}}
-    $currentPackage++
-
-    # get the id from either a provided id flag or the string itself
-    if ("{{ . }}" -match "--id") {
-        $id = "{{ . }}" -split "--id " | Select-Object -Last 1
-    } else {
-        $id = "{{ . }}"
+$installPackages = $false
+Read-Host -Prompt "Install Packages? (y/n)" | ForEach-Object {
+    if ($_ -eq 'n') {
+        echo "Skipping package installation."
+        Read-Host -Prompt "Press Enter to exit"
+        exit
     }
-    winget list --id $id | Out-Null
-    if ($?) {
-        echo "[$currentPackage/$totalPackages] Using $id"
-    } else {
-        echo "[$currentPackage/$totalPackages] Installing $id"
-        # check if we provided a package id or a search string
-        if ($id -match "--") {
-            winget install $id
-        } else {
-            winget install --id $id
-        }
-    }
+}
+
+$totalPackages = {{ .packages | len }};
+$currentPackage = 0;
+echo "Processing $totalPackages Packages..."
+echo ""
+{{ range .packages -}}
+    $currentPackage++;
+    {{ if .win -}}
+        echo "----- [$currentPackage/$totalPackages] {{ .win }}"
+        {{ .win }}
+    {{ end -}}
 {{ end -}}
-
-{{ range .packages.windows.choco -}}
-    echo "- Checking Chocolatey for {{ . }}..."
-    choco install {{ . }}
-{{ end }}
-
-{{ range .packages.global.uv -}}
-    echo "- Checking UV for {{ . }} ..."
-    uv tool install {{ . }}
-{{ end }}
-
-{{ range .packages.windows.commands -}}
-{{ . }}
-{{ end -}}
-
-{{ range .packages.global.npm -}}
-    echo "- Checking NPM for {{ . }} ..."
-    npm install {{ . }}
-{{ end }}
 
 echo ""
-echo "Please restart your terminal process to refresh your path"
+Read-Host -Prompt "Done! Press Enter to exit the package installer."
 
 {{ end -}}
+
