@@ -17,7 +17,7 @@ packages:
         lin: # n/a
     package-manager-fnm: # node version manager + same-shell setup
         win: winget install --id Schniz.fnm; if (-not $env:FNM_DIR) { $output = (fnm env | Out-String).Trim(); Invoke-Expression $output; if (-not (Get-Command node -ErrorAction SilentlyContinue)) { fnm install --lts; fnm use lts-latest } }
-        mac: brew install fnm; if [ -z "$FNM_DIR" ]; then eval "$(fnm env)"; if [ -z "$(command -v node)" ]; then fnm install --lts; fnm use lts-latest; fi; fi
+        mac: brew install fnm; [[ -z "$FNM_DIR" ]] && output=$(fnm env) && eval "$output" && ! command -v node &>/dev/null && fnm install --lts && fnm use lts-latest
         lin: # n/a
 
     # programming languages ***************************************************
