@@ -1,11 +1,4 @@
-#!/bin/bash
-
-# fnm
-fnm_env_output=$(fnm env)
-if ! grep -q "fnm_multishell" "$HOME/.zshrc"; then
-  echo "# fnm" >> "$HOME/.zshrc"
-  echo $fnm_env_output >> "$HOME/.zshrc"
-fi
+#!/bin/zsh
 
 # Automatic Shell Integration
 zshrc="$HOME/.zshrc"
