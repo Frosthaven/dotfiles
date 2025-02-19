@@ -36,7 +36,7 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     </details>
 
     <details>
-    <summary>Windows - Autohide the cursor</summary>
+    <summary>MacOS - Autohide the cursor</summary>
 
     - Access `cursorcerer` from the settings panel or spotlight search
     - Set the automatic timeout to below 5 seconds
