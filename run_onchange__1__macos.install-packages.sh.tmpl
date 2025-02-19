@@ -20,20 +20,15 @@ echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Skipping package installation."
     read -p "Press Enter to exit"
+    chmod +x $HOME/.config/sketchybar/plugins/*
     exit
-else
-    $totalPackages = {{ .packages | len }};
-    $currentPackage = 0;
-    echo "Processing $totalPackages Packages..."
-    echo ""
-    {{ range .packages -}}
-        $currentPackage++;
-        {{ if .mac -}}
-            echo "----- [$currentPackage/$totalPackages] {{ .mac }}"
-            {{ .mac }}
-        {{ end -}}
-    {{ end -}}
 fi
+
+{{ range .packages -}}
+    {{ if .mac -}}
+        {{ .mac }}
+    {{ end -}}
+{{ end -}}
 
 chmod +x $HOME/.config/sketchybar/plugins/*
 
