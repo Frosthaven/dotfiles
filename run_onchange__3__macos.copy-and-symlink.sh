@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Automatic Shell Integration
 zshrc="$HOME/.zshrc"
@@ -10,7 +10,6 @@ fi
 
 # delete the folder $HOME/Library/Application Support/nushell if it
 # isnt a symlink, and then symlink it to $HOME/.config/nushell
-
 nushell_symlink="$HOME/Library/Application Support/nushell"
 nushell_folder="$HOME/.config/shell/nushell"
 if [ -d "$nushell_folder" ] && [ ! -L "$nushell_folder" ]; then
