@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "darwin" -}}
 
-#!/bin/bash
+#!/bin/zsh
 
 # FILEHASH ********************************************************************
 # *****************************************************************************
@@ -16,10 +16,10 @@ fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
 
 # ask the user if they want to install packages, and if not then exit
 echo ""
-if [[ $REPLY != "y" ]]; then
-    echo "Skipping package installation."
-    chmod +x $HOME/.config/sketchybar/plugins/*
-    exit
+if read -qs "?Do you want to install packages? (N/y)"; then
+    >&2 echo $REPLY;
+else
+    >&2 echo $REPLY; echo "Skipping package installation."; chmod +x $HOME/.config/sketchybar/plugins/*; exit
 fi
 
 {{ range .packages -}}
