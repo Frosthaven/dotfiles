@@ -31,11 +31,11 @@ M.setup = function()
 
     local shell_priority = {
         -- 'nu',
+        'zsh',
         'pwsh',
         'powershell',
-        'bash',
-        'zsh',
         'fish',
+        'bash',
         'sh',
     }
     for _, shell in ipairs(shell_priority) do
