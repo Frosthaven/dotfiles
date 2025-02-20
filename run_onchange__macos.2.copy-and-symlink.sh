@@ -11,17 +11,10 @@ if ! grep -q "source \"$chezmoi_zsh_profile\"" "$zshrc"; then
   echo "source \"$chezmoi_zsh_profile\"" >> "$zshrc"
 fi
 
-# delete the folder $HOME/Library/Application Support/nushell if it
-# isnt a symlink, and then symlink it to $HOME/.config/nushell
-sym_nushell="$HOME/Library/Application Support/nushell"
-dot_nushell="$HOME/.config/shell/nushell"
-if [ -d "$sym_nushell" ] && [ ! -L "$sym_nushell" ]; then
-  rm -rf "$sym_nushell"
-fi
-if [ ! -L "$sym_nushell" ]; then
-  ln -s "$dot_nushell" "$sym_nushell"
-fi
-
+# copy nushell files to $HOME/Library/Application Support/nushell/
+nushell_dir="$HOME/Library/Application Support/nushell"
+chezmoi_nushell_dir="$HOME/.config/shell/nushell"
+cp -r "$chezmoi_nushell_dir" "$nushell_dir"
 
 # source the shell profile
 source $HOME/.zshrc
