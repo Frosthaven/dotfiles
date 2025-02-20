@@ -12,9 +12,9 @@ if ! grep -q "source \"$chezmoi_zsh_profile\"" "$zshrc"; then
 fi
 
 # copy nushell files to $HOME/Library/Application Support/nushell/
-nushell_dir="$HOME/Library/Application Support/nushell"
-chezmoi_nushell_dir="$HOME/.config/shell/nushell"
-cp -r "$chezmoi_nushell_dir" "$nushell_dir"
+nushell_config_parent="$HOME/Library/Application Support"
+chezmoi_nushell_dir="$HOME/.local/share/chezmoi/dot_config/shell/nushell"
+cp -r -f "$chezmoi_nushell_dir" "$nushell_config_parent"
 
 # source the shell profile
 source $HOME/.zshrc
