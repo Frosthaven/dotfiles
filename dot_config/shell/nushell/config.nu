@@ -16,3 +16,5 @@ source ./sources/homebrew.nu
 source ./sources/starship.nu
 source ./sources/zoxide.nu
 try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
+
+echo Nushell $env.NU_VERSION
