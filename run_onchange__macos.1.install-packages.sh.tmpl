@@ -22,8 +22,21 @@ else
     >&2 echo $REPLY; echo "Skipping package installation."; chmod +x $HOME/.config/sketchybar/plugins/*; exit
 fi
 
-{{ range .packages -}}
+totalPackages=0
+{{ range $key, $value := .packages }}
+  {{ if ne (index $value "mac") nil }}
+    totalPackages=$((totalPackages + 1))
+  {{ end }}
+{{ end }}
+currentPackage=0;
+
+echo ""
+echo "Processing $totalPackages Packages..."
+echo ""
+{{ range $key, $value := .packages -}}
     {{ if .mac -}}
+        currentPackage=$((currentPackage + 1))
+        echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
         {{ .mac }}
     {{ end -}}
 {{ end -}}

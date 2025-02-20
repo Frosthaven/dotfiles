@@ -10,12 +10,15 @@ fi
 
 # delete the folder $HOME/Library/Application Support/nushell if it
 # isnt a symlink, and then symlink it to $HOME/.config/nushell
-nushell_symlink="$HOME/Library/Application Support/nushell"
-nushell_folder="$HOME/.config/shell/nushell"
-if [ -d "$nushell_folder" ] && [ ! -L "$nushell_folder" ]; then
-  rm -rf "$nushell_folder"
+sym_nushell="$HOME/Library/Application Support/nushell"
+dot_nushell="$HOME/.config/nushell"
+if [ -d "$sym_nushell" ] && [ ! -L "$sym_nushell" ]; then
+  rm -rf "$sym_nushell"
 fi
-ln -s "$nushell_symlink" "$nushell_folder"
+if [ ! -L "$sym_nushell" ]; then
+  ln -s "$dot_nushell" "$sym_nushell"
+fi
+
 
 # source the shell profile
 source $HOME/.zshrc
