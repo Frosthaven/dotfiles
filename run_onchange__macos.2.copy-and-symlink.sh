@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+echo ""
+echo "Checking for symbolic links and integrations..."
+
 # Automatic Shell Integration
 zshrc="$HOME/.zshrc"
 chezmoi_zsh_profile="$HOME/.config/shell/zsh/chezmoi-zsh.sh"

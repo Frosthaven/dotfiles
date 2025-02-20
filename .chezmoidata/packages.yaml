@@ -32,7 +32,7 @@ packages:
         mac: brew install zig
         lin: # n/a
     2-language-rust:
-        win: winget install --id Rustlang.Rust
+        win: winget install --id Rustlang.Rust.GNU
         mac: brew install rust
         lin: # n/a
     2-language-python:

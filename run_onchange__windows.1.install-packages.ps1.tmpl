@@ -11,7 +11,6 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
     exit
 }
-$Host.UI.RawUI.BackgroundColor = "Black"
 
 # FILEHASH ********************************************************************
 # *****************************************************************************
