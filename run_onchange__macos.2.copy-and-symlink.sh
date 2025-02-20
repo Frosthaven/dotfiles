@@ -14,7 +14,7 @@ fi
 # delete the folder $HOME/Library/Application Support/nushell if it
 # isnt a symlink, and then symlink it to $HOME/.config/nushell
 sym_nushell="$HOME/Library/Application Support/nushell"
-dot_nushell="$HOME/.config/nushell"
+dot_nushell="$HOME/.config/shell/nushell"
 if [ -d "$sym_nushell" ] && [ ! -L "$sym_nushell" ]; then
   rm -rf "$sym_nushell"
 fi
