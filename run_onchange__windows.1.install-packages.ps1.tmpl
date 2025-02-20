@@ -33,14 +33,21 @@ Read-Host -Prompt "Install Packages? (y/n)" | ForEach-Object {
     }
 }
 
-$totalPackages = {{ .packages | len }};
+$totalPackages = 0;
+{{ range $key, $value := .packages }}
+  {{ if ne (index $value "win") nil }}
+    $totalPackages++;
+  {{ end }}
+{{ end }}
 $currentPackage = 0;
+
+echo ""
 echo "Processing $totalPackages Packages..."
 echo ""
-{{ range .packages -}}
-    $currentPackage++;
+{{ range $key, $value := .packages -}}
     {{ if .win -}}
-        echo "----- [$currentPackage/$totalPackages] {{ .win }}"
+        $currentPackage++;
+        Write-Host "----- [$currentPackage/$totalPackages] {{$key}} -----" -ForegroundColor Magenta
         {{ .win }}
     {{ end -}}
 {{ end -}}

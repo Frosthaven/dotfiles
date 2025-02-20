@@ -11,35 +11,39 @@ packages:
     # package managers ********************************************************
     # *************************************************************************
 
-    package-manager-uv: # universal package manager
+    1-package-manager-uv: # universal package manager
         win: winget install --id astral-sh.uv
         mac: brew install uv
         lin: # n/a
-    package-manager-fnm: # node version manager + same-shell setup
+    1-package-manager-fnm: # node version manager + same-shell setup
         win: winget install --id Schniz.fnm; if (-not $env:FNM_DIR) { $output = (fnm env | Out-String).Trim(); Invoke-Expression $output; if (-not (Get-Command node -ErrorAction SilentlyContinue)) { fnm install --lts; fnm use lts-latest } }
-        mac: brew install fnm; [[ -z "$FNM_DIR" ]] && output=$(fnm env) && eval "$output" && ! command -v node &>/dev/null && fnm install --lts && fnm use lts-latest
+        mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
+        lin: # n/a
+    1-package-manager-mas: # mac app store cli
+        win: # n/a
+        mac: brew install mas
         lin: # n/a
 
     # programming languages ***************************************************
     # *************************************************************************
 
-    language-zig: # needed to auto-compile telescope in neovim cross-platform
+    2-language-zig: # needed to auto-compile telescope in neovim cross-platform
         win: winget install --id zig.zig
         mac: brew install zig
         lin: # n/a
-    language-rust:
+    2-language-rust:
         win: winget install --id Rustlang.Rust
         mac: brew install rust
         lin: # n/a
-    language-python:
+    2-language-python:
         win: winget install --id Python.Python.3.11
         mac: brew install python
         lin: # n/a
-    language-go:
+    2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
         lin: # n/a
-    language-php:
+    2-language-php:
         win: winget install --id PHP.PHP.8.4
         mac: brew install php
         lin: # n/a
@@ -131,6 +135,10 @@ packages:
         win: uv tool install --python 3.12 posting
         mac: uv tool install --python 3.12 posting
         lin: # n/a
+    cli-prettier:
+        win: npm install --global prettier
+        mac: npm install --global prettier
+        lin: # n/a
 
     # container management ****************************************************
     # *************************************************************************
@@ -141,7 +149,7 @@ packages:
         lin: # n/a
     containers-orbstack: # alternative to docker on mac
         win: # n/a
-        mac: echo "WARNING Cannot automatically install - Install from https://orbstack.dev/download"
+        mac: brew install --cask orbstack
         lin: # n/a
     containers-ddev: # local development container management
         win: winget install --id DDEVFoundation.DDEV
@@ -215,7 +223,7 @@ packages:
         lin: # n/a
     toy-logi-g-hub: # logitech mouse manager
         win: winget install --id Logitech.GHUB
-        mac: echo "WARNING Cannot automatically install - Install from https://www.logitechg.com/en-us/innovation/g-hub.html"
+        mac: brew install --cask logitech-g-hub
         lin: # n/a
     toy-paragon-ntfs: # ntfs driver
         win: # n/a
@@ -231,15 +239,11 @@ packages:
         lin: # n/a
     toy-amphetamine: # keep mac awake
         win: # n/a
-        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/amphetamine/id937984704?mt=12"
+        mac: mas install 937984704
         lin: # n/a
     toy-colorslurp: # color picker
         win: # n/a
-        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/colorslurp/id1287239339?mt=12"
-        lin: # n/a
-    toy-dropover: # drag and drop
-        win: # n/a
-        mac: echo "WARNING Cannot automatically install - Install from https://apps.apple.com/us/app/dropover/id1482681073?mt=12"
+        mac: mas install 1287239339
         lin: # n/a
     toy-rainmeter: # desktop customization
         win: winget install --id Rainmeter.Rainmeter
@@ -308,7 +312,7 @@ packages:
         lin: # n/a
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
-        mac: brew install local-send
+        mac: brew install --cask localsend
         lin: # n/a
     desktop-discord: # chat
         win: winget install --id Discord.Discord
@@ -340,7 +344,7 @@ packages:
         lin: # n/a
     desktop-dbeaver: # database management
         win: winget install --id DBeaver.DBeaver
-        mac: brew install dbeaver
+        mac: brew install --cask dbeaver-community
         lin: # n/a
     desktop-iina: # video player
         win: # n/a
@@ -352,10 +356,6 @@ packages:
         lin: # n/a
     desktop-forklift: # file manager
         win: # n/a
-        mac: brew install forklift
-        lin: # n/a
-    desktop-forklift-set-default:
-        win: # n/a
-        mac: defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
+        mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
         lin: # n/a
 
