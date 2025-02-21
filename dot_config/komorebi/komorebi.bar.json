@@ -2,13 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/v0.1.33/schema.bar.json",
   "monitor": {
     "index": 1,
-    "work_area_offset": {
-      "left": 0,
-      "top": 40,
-      "right": 0,
-      "bottom": 40,
-    }
   },
+  "height": 28,
+  "margin": { "vertical": [15,0], "horizontal": 8 },
+  "padding": { "vertical": 2, "horizontal": 10 },
   "font_family": "JetBrains Mono",
   "transparency_alpha": 0,
   "grouping": {
