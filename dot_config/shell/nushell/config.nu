@@ -17,12 +17,3 @@ source ./sources/starship.nu
 source ./sources/zoxide.nu
 try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
 
-echo Nushell $env.NU_VERSION
-
-def nu_version_prompt [] {
-    "nushell v" + $env.NU_VERSION + " "
-}
-
-# set the right prompt to show the nushell version
-$env.PROMPT_COMMAND_RIGHT = { nu_version_prompt }
-
