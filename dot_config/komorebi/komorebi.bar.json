@@ -6,7 +6,7 @@
   "height": 28,
   "margin": { "vertical": [15,0], "horizontal": 8 },
   "padding": { "vertical": 2, "horizontal": 10 },
-  "font_family": "JetBrains Mono",
+  "font_family": "JetBrains Mono NF",
   "transparency_alpha": 0,
   "grouping": {
     "kind": "Widget",
