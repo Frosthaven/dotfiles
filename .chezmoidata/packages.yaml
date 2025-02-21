@@ -123,6 +123,10 @@ packages:
         win: winget install --id ajeetdsouza.zoxide
         mac: brew install zoxide
         lin: # n/a
+    cli-duf: # alternative to du
+        win: winget install --id muesli.duf
+        mac: brew install duf
+        lin: # n/a
     cli-tokei: # code line counter
         win: winget install --id XAMPPRocky.tokei
         mac: brew install tokei
