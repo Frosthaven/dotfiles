@@ -57,25 +57,37 @@ end
 -- looks for the first shell in the list that is found on the system, and sets
 -- the shell configuration to that shell. if no shell is found, the default
 -- shell configuration of neovim is used
-M.configureShell = function()
+M.configureShell = function(shell)
+    if M.configuredShellPriority[shell] then
+        M.applyShellConfigSet(M.configuredShellPriority[shell][2])
+    else
+        M.applyShellConfigSet(M.shellConfigSets['posix'])
+    end
+end
+
+M.getHighestPriorityAvailableShell = function()
     for _, shell in ipairs(M.configuredShellPriority) do
         if vim.fn.executable(shell[1]) == 1 then
-            vim.opt.shell = shell[1]
-            M.applyShellConfigSet(shell[2])
-            return
+            return shell[1]
         end
     end
 end
 
--- sets up the shell configuration immediately, and when the shell is set
-M.setup = function()
-    M.configureShell()
-    vim.api.nvim_create_autocmd('OptionSet', {
-        pattern = 'shell',
+M.registerAutoShellConfig = function()
+    vim.api.nvim_create_autocmd('BufEnter', {
+        pattern = '*',
         callback = function()
-            M.configureShell()
+            M.configureShell(vim.opt.shell:get())
         end,
     })
+end
+
+-- sets up the shell configuration immediately, and update configs when the
+-- shell option is changed
+M.setup = function()
+    vim.opt.shell = M.getHighestPriorityAvailableShell()
+    M.configureShell(vim.opt.shell:get())
+    M.registerAutoShellConfig()
 end
 
 return M
