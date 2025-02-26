@@ -36,3 +36,15 @@ if [[ -z "$FNM_DIR" ]]; then
     fi
 fi
 
+# fzf - [s]earch [f]iles command (sf)
+# this will use the output of the fzf command to open the file in nvim. You can
+# change the editor launch command to whatever you want.
+# see: https://github.com/junegunn/fzf
+# see: https://github.com/sharkdp/bat
+function sf {
+    local file
+    file=$(fzf --preview "bat --color=always {}" --preview-window=right:50%:wrap --height 50% --border --prompt="Search Files: " --query="$args")
+    if [[ -n "$file" ]]; then
+        nvim $file # or with your editor of choice
+    fi
+}

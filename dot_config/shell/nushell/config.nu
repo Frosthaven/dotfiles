@@ -15,5 +15,6 @@ source ./sources/wezterm.nu
 source ./sources/homebrew.nu
 source ./sources/starship.nu
 source ./sources/zoxide.nu
+source ./sources/sf.nu
 try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
 
