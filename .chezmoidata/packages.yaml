@@ -87,6 +87,10 @@ packages:
         win: winget install --id Git.Git
         mac: brew install git
         lin: # n/a
+    cli-yazi:
+        win: winget install --id sxyazi.yazi
+        mac: brew install yazi
+        lin: # n/a
     cli-neovim: # text editor
         win: winget install --id Neovim.Neovim
         mac: brew install neovim
