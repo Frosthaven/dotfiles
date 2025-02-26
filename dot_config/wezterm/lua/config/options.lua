@@ -43,10 +43,10 @@ M.setup = function()
     }
 
     if helpers.osTag() == "windows" then
-        opts.windows.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
-        -- opts.windows.default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" }
+        -- opts.windows.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
+        opts.windows.default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" }
     elseif helpers.osTag() == "macos" then
-        -- opts.macos.default_prog = { "/opt/homebrew/bin/nu" }
+        opts.macos.default_prog = { "/opt/homebrew/bin/nu" }
     end
 
     -- combine common and platform specific options into a unified config
