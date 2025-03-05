@@ -50,21 +50,21 @@ M.setup = function()
     --  Use CTRL+<hjkl> to switch between windows
     --
 
-    -- quickfix list
-    vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
-    vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
-
     --  VIM Style Pane Management
     vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
     vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
     vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
     vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+    vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
+    vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
 
     -- Arrow Style Pane Management
     vim.keymap.set('n', '<C-Up>', '<C-w><Up>', { desc = 'Move focus to the upper window' })
     vim.keymap.set('n', '<C-Down>', '<C-w><Down>', { desc = 'Move focus to the lower window' })
     vim.keymap.set('n', '<C-Left>', '<C-w><Left>', { desc = 'Move focus to the left window' })
     vim.keymap.set('n', '<C-Right>', '<C-w><Right>', { desc = 'Move focus to the right window' })
+    vim.keymap.set('n', '<M-Down>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
+    vim.keymap.set('n', '<M-Up>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
 
     vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
     vim.keymap.set('x', 'p', function()
