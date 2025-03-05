@@ -42,6 +42,13 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
     - Set the automatic timeout to below 5 seconds
     </details>
 
+    <details>
+    <summary>MacOS - Disable Conflicting Hotkeys</summary>
+
+    - Open `System Settings` -> `Keyboard` -> `Keyboard Shortcuts` -> `Mission Control`
+    - Disable or change all entries that use `ctrl + arrow` keys
+    </details>
+
 ### Todo
 
 - [ ] Add Linux
