@@ -83,6 +83,10 @@ packages:
     # command line tools ******************************************************
     # *************************************************************************
 
+    cli-composer:
+        win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { Invoke-WebRequest -Uri https://getcomposer.org/Composer-Setup.exe -OutFile Composer-Setup.exe; Start-Process -Wait -FilePath Composer-Setup.exe }
+        mac: brew install composer
+        lin: # n/a
     cli-git:
         win: winget install --id Git.Git
         mac: brew install git
