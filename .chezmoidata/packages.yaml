@@ -147,6 +147,10 @@ packages:
         win: uv tool install --python 3.12 posting
         mac: uv tool install --python 3.12 posting
         lin: # n/a
+    cli-mkdocs:
+        win: uv tool install --python 3.12 mkdocs-material
+        mac: uv tool install --python 3.12 mkdocs-material
+        lin: # n/a
     cli-prettier:
         win: npm install --global prettier
         mac: npm install --global prettier
