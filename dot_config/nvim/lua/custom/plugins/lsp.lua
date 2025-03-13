@@ -197,6 +197,7 @@ return {
             local servers = {
                 intelephense = {},
                 psalm = {},
+                jsonls = {},
                 -- clangd = {},
                 gopls = {},
                 pyright = {},
