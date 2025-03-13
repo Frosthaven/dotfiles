@@ -17,7 +17,17 @@ M.setup = function()
     vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
     -- Diagnostic keymaps
-    vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+    local function next_diagnostic()
+        vim.diagnostic.jump { count = 1, float = true }
+    end
+    local function prev_diagnostic()
+        vim.diagnostic.jump { count = -1, float = true }
+    end
+    vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+    vim.keymap.set('n', '<leader>dd', vim.diagnostic.open_float, { desc = 'Open diagnostic [D]etails' })
+    -- previous and next diagnostic
+    vim.keymap.set('n', '<leader>dn', next_diagnostic, { desc = 'Go to [N]ext diagnostic' })
+    vim.keymap.set('n', '<leader>dp', prev_diagnostic, { desc = 'Go to [P]revious diagnostic' })
 
     -- tiny terminal
     -- if on windows, use powershell
