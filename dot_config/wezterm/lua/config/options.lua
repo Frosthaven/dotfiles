@@ -32,9 +32,9 @@ M.setup = function()
             cell_width = 1.1,
 
             window_padding = {
-                left = "4cell",
-                right = "4cell",
-                top = "0.25cell",
+                left = "2cell",
+                right = "2cell",
+                top = "0.5cell",
                 bottom = "0.5cell",
             },
 
