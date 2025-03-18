@@ -52,7 +52,7 @@ M.setup = function(config)
             }
         end
 
-        window:set_config_overrides(overrides)
+        -- window:set_config_overrides(overrides)
     end)
     return config
 end
