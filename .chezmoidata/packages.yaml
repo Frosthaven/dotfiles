@@ -322,9 +322,9 @@ packages:
         win: winget install --id SublimeHQ.SublimeText.4 --include-unknown
         mac: brew install sublime-text
         lin: # n/a
-    desktop-zen-browser: # browser
-        win: winget install --id Zen-Team.Zen-Browser
-        mac: brew install zen-browser
+    desktop-edge-browser: # browser
+        win: winget install --id Microsoft.Edge
+        mac: brew install microsoft-edge
         lin: # n/a
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
