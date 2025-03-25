@@ -61,6 +61,21 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         Remove-Item $env:APPDATA\nushell -Recurse -Force -Confirm:$false | Out-Null
         New-Item -Path $env:APPDATA\nushell -ItemType Junction -Value $env:USERPROFILE\.config\shell\nushell | Out-Null
     }
+
+    # rainmeter skins in the Documents folder
+    If (-Not (Test-Path $env:USERPROFILE\Documents\Rainmeter\Skins\frost_hwinfo_black_white)) {
+        # the parent folders might not exist either, so create them if necessary
+        If (-Not (Test-Path $env:USERPROFILE\Documents\Rainmeter)) {
+            New-Item -Path $env:USERPROFILE\Documents\Rainmeter -ItemType Directory | Out-Null
+        }
+
+        If (-Not (Test-Path $env:USERPROFILE\Documents\Rainmeter\Skins)) {
+            New-Item -Path $env:USERPROFILE\Documents\Rainmeter\Skins -ItemType Directory | Out-Null
+        }
+
+        # now create the symlink to the skin folder
+        New-Item -Path $env:USERPROFILE\Documents\Rainmeter\Skins\frost_hwinfo_black_white -ItemType SymbolicLink -Value $env:USERPROFILE\.config\rainmeter\skins\frost_hwinfo_black_white | Out-Null
+    }
 }
 
 # source the shell profile
