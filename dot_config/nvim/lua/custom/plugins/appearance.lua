@@ -14,7 +14,7 @@ return {
     {
         'folke/tokyonight.nvim',
         lazy = false,
-        enabled = true,
+        enabled = false,
         priority = 1000,
         opts = { style = 'storm' },
         init = function()
@@ -31,6 +31,16 @@ return {
                 variant = 'moon',
             }
             vim.cmd.colorscheme 'rose-pine'
+        end,
+    },
+    {
+        'catppuccin/nvim',
+        lazy = false,
+        enabled = true,
+        name = 'catppuccin',
+        priority = 1000,
+        config = function()
+            vim.cmd.colorscheme 'catppuccin-mocha'
         end,
     },
 }
