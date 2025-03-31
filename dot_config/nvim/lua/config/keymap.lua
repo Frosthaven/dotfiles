@@ -18,13 +18,23 @@ M.setup = function()
 
     -- Diagnostic keymaps
     local function next_diagnostic()
-        vim.diagnostic.jump { count = 1, float = true }
+        vim.diagnostic.jump { count = 1, float = false }
     end
     local function prev_diagnostic()
-        vim.diagnostic.jump { count = -1, float = true }
+        vim.diagnostic.jump { count = -1, float = false }
     end
+
     vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-    vim.keymap.set('n', '<leader>dd', vim.diagnostic.open_float, { desc = 'Open diagnostic [D]etails' })
+    vim.keymap.set('n', '<leader>dd', function()
+        if vim.diagnostic.config().virtual_lines == true then
+            vim.diagnostic.config { virtual_lines = { current_line = true } }
+            vim.notify 'Global diagnostic virtual lines disabled'
+        else
+            vim.diagnostic.config { virtual_lines = true }
+            vim.notify 'Global diagnostic virtual lines enabled'
+        end
+    end, { desc = 'Toggle [D]iagnostic [D]isplay' })
+
     -- previous and next diagnostic
     vim.keymap.set('n', '<leader>dn', next_diagnostic, { desc = 'Go to [N]ext diagnostic' })
     vim.keymap.set('n', '<leader>dp', prev_diagnostic, { desc = 'Go to [P]revious diagnostic' })

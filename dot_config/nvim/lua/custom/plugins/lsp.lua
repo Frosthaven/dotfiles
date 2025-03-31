@@ -145,13 +145,15 @@ return {
 
             -- Configure diagnostic messages
             vim.diagnostic.config {
-                virtual_text = false,
-                float = {
-                    border = 'single',
-                    format = function(diagnostic)
-                        return string.format('%s (%s) [%s]', diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code)
-                    end,
+                virtual_lines = {
+                    current_line = true,
                 },
+                -- float = {
+                --     border = 'single',
+                --     format = function(diagnostic)
+                --         return string.format('%s (%s) [%s]', diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code)
+                --     end,
+                -- },
                 underline = true,
                 update_in_insert = true,
                 severity_sort = true,
