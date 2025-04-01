@@ -4,16 +4,17 @@ return {
         enable = true,
         -- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md
         opts = {
-            picker = {}, -- using defaults for now
-            matcher = {
-                fuzzy = true,
-                smartcase = true,
-                ignorecase = true,
-                sort_empty = false,
-                file_pos = true,
-                cwd_bonus = false,
-                history_bonus = false,
-                frecency = true,
+            picker = {
+                matcher = {
+                    fuzzy = true,
+                    smartcase = true,
+                    ignorecase = true,
+                    sort_empty = false,
+                    file_pos = true,
+                    cwd_bonus = false,
+                    history_bonus = false,
+                    frecency = true,
+                },
             },
         },
         keys = {
