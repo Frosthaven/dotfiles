@@ -5,7 +5,10 @@ return {
         dependencies = 'rafamadriz/friendly-snippets',
         version = '1.*',
         opts = {
-            keymap = { preset = 'default' },
+            keymap = {
+                preset = 'default',
+                ['<C-y>'] = { 'select_and_accept' },
+            },
             appearance = {
                 nerd_font_variant = 'mono',
             },
