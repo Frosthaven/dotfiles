@@ -78,12 +78,12 @@ return {
                         vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
                     end
                     Snacks = require 'snacks'
-                    map('<leader>slt', Snacks.picker.lsp_type_definitions, '[S]earch [L]SP [T]ypes')
-                    map('<leader>sld', Snacks.picker.lsp_definitions, '[S]earch [L]SP [D]efinitions')
-                    map('<leader>slD', Snacks.picker.lsp_declarations, '[S]earch [L]SP [D]eclarations')
-                    map('<leader>sli', Snacks.picker.lsp_implementations, '[S]earch [L]SP [I]mplementations')
-                    map('<leader>slr', Snacks.picker.lsp_references, '[S]earch [L]SP [R]eferences')
-                    map('<leader>sls', Snacks.picker.lsp_symbols, '[S]earch [L]SP [S]ymbols')
+                    map('<leader>lt', Snacks.picker.lsp_type_definitions, '[T]ypes')
+                    map('<leader>ld', Snacks.picker.lsp_definitions, '[D]efinitions')
+                    map('<leader>lD', Snacks.picker.lsp_declarations, '[D]eclarations')
+                    map('<leader>li', Snacks.picker.lsp_implementations, '[I]mplementations')
+                    map('<leader>lr', Snacks.picker.lsp_references, '[R]eferences')
+                    map('<leader>ls', Snacks.picker.lsp_symbols, '[S]ymbols')
                 end,
             })
         end,
