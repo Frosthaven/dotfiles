@@ -50,15 +50,6 @@ M.setup = function()
             vim.cmd.hi 'MiniStatusLineInactive guibg=NONE'
             vim.cmd.hi 'TabLine guibg=NONE'
             vim.cmd.hi 'TabLineFill guibg=NONE'
-            vim.cmd.hi 'TelescopeBorder guibg=NONE'
-            vim.cmd.hi 'TelescopePromptBorder guibg=NONE'
-            vim.cmd.hi 'TelescopeResultsBorder guibg=NONE'
-            vim.cmd.hi 'TelescopePreviewBorder guibg=NONE'
-            vim.cmd.hi 'TelescopeResultsTitle guibg=NONE'
-            vim.cmd.hi 'TelescopePreviewTitle guibg=NONE'
-            vim.cmd.hi 'TelescopePromptTitle guibg=NONE'
-            vim.cmd.hi 'TelescopeTitle guibg=NONE'
-            vim.cmd.hi 'TelescopeNormal guibg=NONE'
         end,
     })
 end
