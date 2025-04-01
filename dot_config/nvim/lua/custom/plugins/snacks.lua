@@ -25,7 +25,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker()
                 end,
-                desc = '[S]earch With [A]ll Pickers',
+                desc = '[A]ll Pickers',
             },
             {
                 '<leader>sf',
@@ -33,7 +33,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker.smart()
                 end,
-                desc = '[S]earch [F]iles',
+                desc = '[F]iles',
             },
             {
                 '<leader>sg',
@@ -41,7 +41,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker.grep()
                 end,
-                desc = '[S]earch [G]rep',
+                desc = '[G]rep',
             },
             {
                 '<leader>sb',
@@ -49,7 +49,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker.buffers()
                 end,
-                desc = '[S]earch [B]uffers',
+                desc = '[B]uffers',
             },
             {
                 '<leader>sh',
@@ -57,7 +57,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker.help()
                 end,
-                desc = '[S]earch [H]elp Tags',
+                desc = '[H]elp Tags',
             },
             {
                 '<leader>sr',
@@ -65,7 +65,7 @@ return {
                     Snacks = require 'snacks'
                     Snacks.picker.recent()
                 end,
-                desc = '[S]earch [R]ecent',
+                desc = '[R]ecent',
             },
         },
         config = function()
