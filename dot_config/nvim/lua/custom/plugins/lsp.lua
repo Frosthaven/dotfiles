@@ -177,6 +177,9 @@ return {
 
                 -- configuration/data files -----------------------------------
                 jsonls = {}, -- json
+
+                -- formatting -------------------------------------------------
+                prettierd = {}, -- prettier
             }
 
             -- Ensure the servers and tools above are installed
