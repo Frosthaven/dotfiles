@@ -155,35 +155,28 @@ return {
             --  - settings (table): Override the default settings passed when initializing the server.
             --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
             local servers = {
-                -- lua
-                lua_ls = {
-                    -- cmd = { ... },
-                    -- filetypes = { ... },
-                    -- capabilities = {},
+                -- languages --------------------------------------------------
+                lua_ls = { -- lua
                     settings = {
                         Lua = {
                             completion = {
                                 callSnippet = 'Replace',
                             },
-                            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                            -- diagnostics = { disable = { 'missing-fields' } },
                         },
                     },
                 },
-                -- typescript/eslint
-                ts_ls = {},
-                eslint = {},
-                -- php
-                intelephense = {},
-                -- go
-                gopls = {},
-                -- python
-                pyright = {},
-                -- configuration/data files
-                jsonls = {},
-                -- templating & styling
-                twiggy_language_server = {},
-                tailwindcss = {},
+                ts_ls = {}, -- typescript/javascript/tsx/jsx
+                eslint = {}, -- eslint
+                intelephense = {}, -- php
+                gopls = {}, -- go
+                pyright = {}, -- python
+
+                -- templating & styling ---------------------------------------
+                twiggy_language_server = {}, -- twig
+                tailwindcss = {}, -- tailwind
+
+                -- configuration/data files -----------------------------------
+                jsonls = {}, -- json
             }
 
             -- Ensure the servers and tools above are installed
