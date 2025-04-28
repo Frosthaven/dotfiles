@@ -7,8 +7,8 @@ return {
         enable_close_on_slash = true,
     },
     per_filetype = {
-        ['html'] = {
-            enable_close = false,
-        },
+        -- ['html'] = {
+        --     enable_close = false,
+        -- },
     },
 }
