@@ -1,5 +1,4 @@
 packages:
-
     # fonts *******************************************************************
     # *************************************************************************
 
@@ -205,9 +204,9 @@ packages:
     # toys are small applications that have a single purpose, often living in
     # the system tray
 
-    toy-proton-pass: # password manager
-        win: winget install --id Proton.ProtonPass
-        mac: brew install proton-pass
+    toy-bitwarden: # password manager
+        win: winget install --id Bitwarden.Bitwarden
+        mac: brew install bitwarden
         lin: # n/a
     toy-everything: # search tool
         win: winget install --id voidtools.Everything
@@ -298,7 +297,6 @@ packages:
         mac: brew install pixelsnap
         lin: # n/a
 
-
     # desktop applications ****************************************************
     # *************************************************************************
 
@@ -374,4 +372,3 @@ packages:
         win: # n/a
         mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
         lin: # n/a
-
