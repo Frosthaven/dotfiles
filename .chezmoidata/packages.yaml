@@ -320,10 +320,6 @@ packages:
         win: winget install --id SublimeHQ.SublimeText.4 --include-unknown
         mac: brew install sublime-text
         lin: # n/a
-    desktop-edge-browser: # browser
-        win: winget install --id Microsoft.Edge
-        mac: brew install microsoft-edge
-        lin: # n/a
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
         mac: brew install --cask localsend
@@ -348,27 +344,23 @@ packages:
         win: winget install --id OBSProject.OBSStudio
         mac: brew install obs
         lin: # n/a
-    desktop-winscp:
+    desktop-web-browser:
+        win: winget install --id Microsoft.Edge
+        mac: brew install microsoft-edge
+        lin: # n/a
+    desktop-files-sftp:
         win: winget install --id WinSCP.WinSCP
-        mac: # n/a
+        mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
         lin: # n/a
     desktop-qbittorrent:
         win: winget install --id qBittorrent.qBittorrent
         mac: brew install qbittorrent
         lin: # n/a
-    desktop-dbeaver: # database management
+    desktop-database-manager:
         win: winget install --id DBeaver.DBeaver
         mac: brew install --cask dbeaver-community
         lin: # n/a
-    desktop-iina: # video player
-        win: # n/a
+    desktop-video-player:
+        win: winget install screenbox -s winget
         mac: brew install iina
-        lin: # n/a
-    desktop-vlc: # video player
-        win: winget install --id VideoLAN.VLC
-        mac: # n/a
-        lin: # n/a
-    desktop-forklift: # file manager
-        win: # n/a
-        mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
         lin: # n/a
