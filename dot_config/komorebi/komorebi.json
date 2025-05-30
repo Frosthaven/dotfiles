@@ -1,86 +1,93 @@
 {
-  "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/v0.1.33/schema.json",
-  "app_specific_configuration_path": "$Env:USERPROFILE/applications.json",
-  "ignore_rules": [
-    {
-      "kind": "Exe",
-      "id": "Rainmeter.exe",
-      "matching_strategy": "Equals",
+    "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/v0.1.33/schema.json",
+    "app_specific_configuration_path": "$Env:USERPROFILE/applications.json",
+    "ignore_rules": [
+        {
+            "kind": "Exe",
+            "id": "Rainmeter.exe",
+            "matching_strategy": "Equals"
+        }
+    ],
+    "floating_applications": [
+        {
+            "kind": "Title",
+            "id": "Screenbox",
+            "matching_strategy": "EndsWith"
+        }
+    ],
+    "window_hiding_behaviour": "Cloak",
+    "cross_monitor_move_behaviour": "Insert",
+    "mouse_follows_focus": true,
+    "default_workspace_padding": 8,
+    "default_container_padding": 8,
+    "transparency": false,
+    "transparency_alpha": 240,
+    "animation": {
+        "enabled": true,
+        "duration": 170
     },
-  ],
-  "window_hiding_behaviour": "Cloak",
-  "cross_monitor_move_behaviour": "Insert",
-  "mouse_follows_focus": true,
-  "default_workspace_padding": 8,
-  "default_container_padding": 8,
-  "transparency": false,
-  "transparency_alpha":240,
-  "animation": {
-    "enabled": true,
-    "duration": 170
-  },
-  "border": true,
-  "border_width": 5,
-  "border_offset": -1,
-  "border_colours": {
-    "single": "#ff06b5",
-    "stack": "#06acff",
-    "monocle": "#0eff06",
-    "unfocused": "#505050",
-    "floating": "#f8f8ff",
-  },
-  "stackbar": {
-    "height": 30,
-    "mode": "OnStack",
-    "tabs": {
-      "width": 150,
-      "focused_text": "#06acff",
-      "unfocused_text": "#b3b3b3",
-      "background": "#141414"
-    }
-  },
-  "monitors": [
-    {
-      "workspaces": []
+    "border": true,
+    "border_width": 5,
+    "border_offset": -1,
+    "border_colours": {
+        "single": "#ff06b5",
+        "stack": "#06acff",
+        "monocle": "#0eff06",
+        "unfocused": "#505050",
+        "floating": "#f8f8ff"
     },
-    {
-      "window_based_work_area_offset_limit": 1,
-      "window_based_work_area_offset": {
-        "top": 0,
-        "bottom": 0,
-        "left": 1280,
-        "right": 2560,
-      },
-      "workspaces": [
+    "stackbar": {
+        "height": 30,
+        "mode": "OnStack",
+        "tabs": {
+            "width": 150,
+            "focused_text": "#06acff",
+            "unfocused_text": "#b3b3b3",
+            "background": "#141414"
+        }
+    },
+    "monitors": [
         {
-          "name": "1",
-          "layout_rules": {
-            "0": "Columns",
-          },
-          "apply_window_based_work_area_offset": true,
+            "workspaces": []
         },
         {
-          "name": "2",
-          "layout_rules": {
-            "0": "Columns",
-          },
-          "apply_window_based_work_area_offset": true,
-        },
-        {
-          "name": "3",
-          "layout_rules": {
-            "0": "Columns",
-          },
-          "apply_window_based_work_area_offset": true,
-        },
-        {
-          "name": "4",
-          "layout_rules": {
-            "0": "Columns",
-          },
-          "apply_window_based_work_area_offset": true,
-        },
-      ]
-    }
-  ]
+            "window_based_work_area_offset_limit": 1,
+            "window_based_work_area_offset": {
+                "top": 0,
+                "bottom": 0,
+                "left": 1280,
+                "right": 2560
+            },
+            "workspaces": [
+                {
+                    "name": "1",
+                    "layout_rules": {
+                        "0": "Columns"
+                    },
+                    "apply_window_based_work_area_offset": true
+                },
+                {
+                    "name": "2",
+                    "layout_rules": {
+                        "0": "Columns"
+                    },
+                    "apply_window_based_work_area_offset": true
+                },
+                {
+                    "name": "3",
+                    "layout_rules": {
+                        "0": "Columns"
+                    },
+                    "apply_window_based_work_area_offset": true
+                },
+                {
+                    "name": "4",
+                    "layout_rules": {
+                        "0": "Columns"
+                    },
+                    "apply_window_based_work_area_offset": true
+                }
+            ]
+        }
+    ]
 }
