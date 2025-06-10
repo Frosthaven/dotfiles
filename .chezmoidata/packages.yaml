@@ -312,13 +312,13 @@ packages:
         win: winget install --id JetBrains.Toolbox
         mac: brew install jetbrains-toolbox
         lin: # n/a
+    desktop-code-editor:
+        win: winget install -e --id JetBrains.FleetLauncher.Preview
+        mac: brew install --cask fleet
+        lin: # n/a
     desktop-obsidian: # note taking
         win: winget install --id Obsidian.Obsidian
         mac: brew install obsidian
-        lin: # n/a
-    desktop-sublime-text:
-        win: winget install --id SublimeHQ.SublimeText.4 --include-unknown
-        mac: brew install sublime-text
         lin: # n/a
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
