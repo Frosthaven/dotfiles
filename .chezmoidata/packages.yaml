@@ -312,10 +312,6 @@ packages:
         win: winget install --id JetBrains.Toolbox
         mac: brew install jetbrains-toolbox
         lin: # n/a
-    desktop-code-editor:
-        win: winget install -e --id JetBrains.FleetLauncher.Preview
-        mac: brew install --cask fleet
-        lin: # n/a
     desktop-obsidian: # note taking
         win: winget install --id Obsidian.Obsidian
         mac: brew install obsidian
