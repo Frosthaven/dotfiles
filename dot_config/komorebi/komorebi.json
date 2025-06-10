@@ -10,6 +10,12 @@
     ],
     "floating_applications": [
         {
+            "kind": "Class",
+            "id": "Chrome_WidgetWin_1",
+            "Title": "Bitwarden",
+            "matching_strategy": "Equals"
+        },
+        {
             "kind": "Title",
             "id": "Screenbox",
             "matching_strategy": "EndsWith"
