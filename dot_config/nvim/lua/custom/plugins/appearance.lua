@@ -14,7 +14,7 @@ return {
     {
         'folke/tokyonight.nvim',
         lazy = false,
-        enabled = true,
+        enabled = false,
         priority = 1000,
         opts = { style = 'storm' },
         init = function()
@@ -36,7 +36,7 @@ return {
     {
         'catppuccin/nvim',
         lazy = false,
-        enabled = false,
+        enabled = true,
         name = 'catppuccin',
         priority = 1000,
         config = function()
