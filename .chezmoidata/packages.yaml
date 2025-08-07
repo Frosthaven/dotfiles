@@ -154,6 +154,10 @@ packages:
         win: npm install --global prettier
         mac: npm install --global prettier
         lin: npm install --global prettier
+    cli-fastfetch:
+        win: # n/a
+        mac: brew install fastfetch
+        lin: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
 
     # container management ****************************************************
     # *************************************************************************
