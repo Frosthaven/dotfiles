@@ -203,7 +203,7 @@ packages:
     toy-bitwarden: # password manager
         win: winget install --id Bitwarden.Bitwarden
         mac: brew install bitwarden
-        lin: # n/a
+        lin: flatpak install flathub com.bitwarden.desktop -y
     toy-everything: # search tool
         win: winget install --id voidtools.Everything
         mac: # n/a
@@ -319,27 +319,27 @@ packages:
     desktop-discord: # chat
         win: winget install --id Discord.Discord
         mac: brew install discord
-        lin: # n/a
+        lin: flatpak install flathub com.discordapp.Discord -y
     desktop-slack: # chat
         win: winget install --id SlackTechnologies.Slack
         mac: brew install slack
-        lin: # n/a
+        lin: flatpak install flathub com.slack.Slack -y
     desktop-spotify: # music
         win: winget install --id Spotify.Spotify
         mac: brew install spotify
-        lin: # n/a
+        lin: flatpak install flathub com.spotify.Client -y
     desktop-zoom:
         win: winget install --id Zoom.Zoom
         mac: brew install zoom
-        lin: # n/a
+        lin: flatpak install flathub us.zoom.Zoom -y
     desktop-obs:
         win: winget install --id OBSProject.OBSStudio
         mac: brew install obs
-        lin: # n/a
+        lin: flatpak install flathub com.obsproject.Studio -y
     desktop-web-browser:
         win: winget install --id Microsoft.Edge
         mac: brew install microsoft-edge
-        lin: # n/a
+        lin: flatpak install flathub com.microsoft.Edge -y
     desktop-files-sftp:
         win: winget install --id WinSCP.WinSCP
         mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
@@ -347,11 +347,11 @@ packages:
     desktop-qbittorrent:
         win: winget install --id qBittorrent.qBittorrent
         mac: brew install qbittorrent
-        lin: # n/a
+        lin: flatpak install flathub com.transmissionbt.Transmission -y
     desktop-database-manager:
         win: winget install --id DBeaver.DBeaver
         mac: brew install --cask dbeaver-community
-        lin: # n/a
+        lin: flatpak install flathub io.dbeaver.DbeaverCommunity -y
     desktop-video-player:
         win: winget install screenbox -s winget
         mac: brew install iina
