@@ -35,9 +35,9 @@ packages:
         mac: brew install rust
         lin: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
     2-language-python:
-        win: winget install --id Python.Python.3.11
-        mac: brew install python
-        lin: curl https://pyenv.run | bash
+        win: uv python install
+        mac: uv python install
+        lin: uv python install
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
