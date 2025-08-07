@@ -5,7 +5,7 @@ packages:
     font-jetbrains-mono:
         win: winget install --id DEVCOM.JetBrainsMonoNerdFont
         mac: brew install --cask font-jetbrains-mono-nerd-font
-        lin: # n/a
+        lin: FONT_NAME="JetBrainsMono"; FONT_DIR="$HOME/.local/share/fonts"; if fc-list | grep -qi "$FONT_NAME Nerd Font"; then echo "$FONT_NAME Nerd Font already installed."; else FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${FONT_NAME}.zip"; TEMP_DIR="/tmp/${FONT_NAME}-font"; mkdir -p "$TEMP_DIR"; mkdir -p "$FONT_DIR"; curl -L -o "$TEMP_DIR/${FONT_NAME}.zip" "$FONT_URL"; unzip -o "$TEMP_DIR/${FONT_NAME}.zip" -d "$FONT_DIR"; rm -rf "$TEMP_DIR"; fc-cache -f -v; echo "$FONT_NAME Nerd Font installed successfully."; fi
 
     # package managers ********************************************************
     # *************************************************************************
@@ -13,11 +13,11 @@ packages:
     1-package-manager-uv: # universal package manager
         win: winget install --id astral-sh.uv
         mac: brew install uv
-        lin: # n/a
+        lin: curl -LsSf https://astral.sh/uv/install.sh | sh
     1-package-manager-fnm: # node version manager + same-shell setup
         win: winget install --id Schniz.fnm; if (-not $env:FNM_DIR) { $output = (fnm env | Out-String).Trim(); Invoke-Expression $output; if (-not (Get-Command node -ErrorAction SilentlyContinue)) { fnm install --lts; fnm use lts-latest } }
         mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
-        lin: # n/a
+        lin: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
     1-package-manager-mas: # mac app store cli
         win: # n/a
         mac: brew install mas
@@ -29,23 +29,23 @@ packages:
     2-language-zig: # needed to auto-compile telescope in neovim cross-platform
         win: winget install --id zig.zig
         mac: brew install zig
-        lin: # n/a
+        lin: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     2-language-rust:
         win: winget install --id Rustlang.Rust.GNU
         mac: brew install rust
-        lin: # n/a
+        lin: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
     2-language-python:
         win: winget install --id Python.Python.3.11
         mac: brew install python
-        lin: # n/a
+        lin: curl https://pyenv.run | bash
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
-        lin: # n/a
+        lin: GO_VERSION=1.22.2 && if ! command -v go >/dev/null 2>&1 || [[ "$(go version | awk '{print $3}')" != "go$GO_VERSION" ]]; then curl -LO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local && tar -C ~/.local -xzf go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local/bin && ln -sf ~/.local/go/bin/go ~/.local/bin/go && rm go${GO_VERSION}.linux-amd64.tar.gz && echo "Go $GO_VERSION installed."; else echo "Go $GO_VERSION is already installed."; fi && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     2-language-php:
         win: winget install --id PHP.PHP.8.4
         mac: brew install php
-        lin: # n/a
+        lin: PHP_VERSION=8.4 && if ! command -v php >/dev/null 2>&1 || [[ "$(php -v | head -n1 | awk '{print $2}')" != "$PHP_VERSION" ]]; then sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository -y ppa:ondrej/php && sudo apt update && sudo apt install -y php$PHP_VERSION && sudo update-alternatives --set php /usr/bin/php$PHP_VERSION && echo "PHP $PHP_VERSION installed."; else echo "PHP $PHP_VERSION is already installed."; fi && mkdir -p ~/.local/bin && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
     # terminal emulators ******************************************************
     # *************************************************************************
@@ -53,7 +53,7 @@ packages:
     terminal-wezterm:
         win: winget install --id wez.wezterm
         mac: brew install wezterm
-        lin: # n/a
+        lin: flatpak install flathub org.wezfurlong.wezterm
 
     # shells ******************************************************************
     # *************************************************************************
@@ -61,7 +61,7 @@ packages:
     shell-powershell:
         win: winget install --id Microsoft.PowerShell
         mac: brew install powershell
-        lin: # n/a
+        lin: flatpak install flathub org.kde.Sdk.Extension.powershell
     shell-clink: # spices up cmd.exe
         win: winget install --id chrisant996.Clink
         mac: # n/a
@@ -69,15 +69,15 @@ packages:
     shell-nushell: # structured data, used as sidekick
         win: winget install --id Nushell.Nushell
         mac: brew install nushell
-        lin: # n/a
+        lin: cargo install nu --locked
     shell-carapace: # shell autocomplete
         win: winget install --id rsteube.Carapace
         mac: brew install carapace
-        lin: # n/a
+        lin: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     shell-starship: # prompt
         win: winget install --id Starship.Starship
         mac: brew install starship
-        lin: # n/a
+        lin: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
 
     # command line tools ******************************************************
     # *************************************************************************
@@ -85,75 +85,75 @@ packages:
     cli-composer:
         win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { Invoke-WebRequest -Uri https://getcomposer.org/Composer-Setup.exe -OutFile Composer-Setup.exe; Start-Process -Wait -FilePath Composer-Setup.exe }
         mac: brew install composer
-        lin: # n/a
+        lin: sudo apt install composer -y
     cli-git:
         win: winget install --id Git.Git
         mac: brew install git
-        lin: # n/a
+        lin: sudo apt install git -y
     cli-yazi:
         win: winget install --id sxyazi.yazi
         mac: brew install yazi
-        lin: # n/a
+        lin: sudo snap install yazi --classic
     cli-neovim: # text editor
         win: winget install --id Neovim.Neovim
         mac: brew install neovim
-        lin: # n/a
+        lin: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
     cli-ripgrep: # search tool
         win: winget install --id BurntSushi.ripgrep.MSVC
         mac: brew install ripgrep
-        lin: # n/a
+        lin: cargo install ripgrep
     cli-fzf: # fuzzy finder
         win: winget install --id junegunn.fzf
         mac: brew install fzf
-        lin: # n/a
+        lin: sudo apt install fzf -y
     cli-fd: # alternative to find
         win: winget install --id sharkdp.fd
         mac: brew install fd
-        lin: # n/a
+        lin: cargo install fd-find
     cli-bat: # alternative to cat
         win: winget install --id sharkdp.bat
         mac: brew install bat
-        lin: # n/a
+        lin: sudo apt install bat -y
     cli-jq: # json processor
         win: winget install --id jqlang.jq
         mac: brew install jq
-        lin: # n/a
+        lin: sudo apt install jq -y
     cli-yq: # yaml processor
         win: winget install --id MikeFarah.yq
         mac: brew install yq
-        lin: # n/a
+        lin: sudo snap install yq -y
     cli-eza: # alternative to ls
         win: winget install --id eza-community.eza
         mac: brew install eza
-        lin: # n/a
+        lin: cargo install eza
     cli-zoxide: # alternative to cd (has jumping)
         win: winget install --id ajeetdsouza.zoxide
         mac: brew install zoxide
-        lin: # n/a
+        lin: sudo apt install zoxide -y
     cli-duf: # alternative to du
         win: winget install --id muesli.duf
         mac: brew install duf
-        lin: # n/a
+        lin: sudo apt install duf -y
     cli-tokei: # code line counter
         win: winget install --id XAMPPRocky.tokei
         mac: brew install tokei
-        lin: # n/a
+        lin: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
     cli-stripe-cli: # stripe cli
         win: winget install --id Stripe.StripeCli
         mac: brew install stripe-cli
-        lin: # n/a
+        lin: command -v stripe >/dev/null 2>&1 || curl -fsSL https://stripe.com/install-cli | bash
     cli-posting: # api tool
         win: uv tool install --python 3.12 posting
         mac: uv tool install --python 3.12 posting
-        lin: # n/a
+        lin: uv tool install --python 3.12 posting
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
         mac: uv tool install --python 3.12 mkdocs-material
-        lin: # n/a
+        lin: uv tool install --python 3.12 mkdocs-material
     cli-prettier:
         win: npm install --global prettier
         mac: npm install --global prettier
-        lin: # n/a
+        lin: npm install --global prettier
 
     # container management ****************************************************
     # *************************************************************************
@@ -161,7 +161,7 @@ packages:
     containers-docker:
         win: winget install --id Docker.DockerDesktop
         mac: # n/a
-        lin: # n/a
+        lin: command -v docker >/dev/null 2>&1 || (curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$(whoami)" && echo "Docker installed. Log out/in to apply group changes.")
     containers-orbstack: # alternative to docker on mac
         win: # n/a
         mac: brew install --cask orbstack
@@ -169,7 +169,7 @@ packages:
     containers-ddev: # local development container management
         win: winget install --id DDEVFoundation.DDEV
         mac: brew install ddev/ddev/ddev; mkcert -install;
-        lin: # n/a
+        lin: sudo apt-get update && sudo apt-get install -y curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings && curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/ddev.gpg >/dev/null && sudo chmod a+r /etc/apt/keyrings/ddev.gpg && echo "deb [signed-by=/etc/apt/keyrings/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null && sudo apt-get update && sudo apt-get install -y ddev && mkcert -install
 
     # desktop window management ***********************************************
     # *************************************************************************

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo ""
+echo "Checking for symbolic links and integrations..."
+
+# Automatic Shell Integration
+bashrc="$HOME/.bashrc"
+chezmoi_bash_profile="$HOME/.config/shell/bash/chezmoi-bash.sh"
+if ! grep -q "source \"$chezmoi_bash_profile\"" "$bashrc"; then
+  echo "# Load Chezmoi BASH Profile" >> "$bashrc"
+  echo "source \"$chezmoi_bash_profile\"" >> "$bashrc"
+fi
+
+# copy nushell files to $HOME/Library/Application Support/nushell/
+nushell_config_parent="$HOME/.config"
+chezmoi_nushell_dir="$HOME/.local/share/chezmoi/dot_config/shell/nushell"
+cp -r -f "$chezmoi_nushell_dir" "$nushell_config_parent"
+
+# source the shell profile
+source $HOME/.bashrc
+
+echo ""
+echo "------------------------------------------------------------------------"
+echo "Done. Restart your shell to pick up on any environmental changes."
+echo "------------------------------------------------------------------------"
+
