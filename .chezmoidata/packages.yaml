@@ -311,7 +311,7 @@ packages:
     desktop-obsidian: # note taking
         win: winget install --id Obsidian.Obsidian
         mac: brew install obsidian
-        lin: # n/a
+        lin: flatpak install flathub md.obsidian.Obsidian -y
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
         mac: brew install --cask localsend
