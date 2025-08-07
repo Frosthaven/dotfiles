@@ -194,10 +194,6 @@ packages:
         win: # n/a
         mac: brew tap FelixKratz/formulae; brew install sketchybar;
         lin: # n/a
-    window-management-wallpaper:
-        win: # n/a
-        mac: brew install wallpaper;
-        lin: # n/a
 
     # desktop toys ************************************************************
     # *************************************************************************
