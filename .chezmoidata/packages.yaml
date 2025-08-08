@@ -348,6 +348,10 @@ packages:
         win: winget install --id WinSCP.WinSCP
         mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
         lin: # n/a
+    desktop-code:
+        win: winget install --id Microsoft.VisualStudioCode
+        mac: brew install --cask visual-studio-code
+        lin: command -v code >/dev/null 2>&1 || (wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg && echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null && sudo apt update && sudo apt install -y code)
     desktop-qbittorrent:
         win: winget install --id qBittorrent.qBittorrent
         mac: brew install qbittorrent
