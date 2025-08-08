@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Ensure elevated privileges
+sudo -v
+
+# Install wl-clipboard if on wayland
+# Check if the session is Wayland
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+    sudo apt update && sudo apt install -y wl-clipboard
+fi
+
 # Install snap and flatpak if they aren't already installed
 command -v curl >/dev/null 2>&1 || { sudo apt update && sudo apt install -y curl && echo "curl installed."; } || echo "curl already installed."
 command -v wget >/dev/null 2>&1 || { sudo apt update && sudo apt install -y wget && echo "wget installed."; } || echo "wget already installed."

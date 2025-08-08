@@ -61,7 +61,7 @@ packages:
     shell-powershell:
         win: winget install --id Microsoft.PowerShell
         mac: brew install powershell
-        lin: flatpak install flathub org.kde.Sdk.Extension.powershell
+        lin: sudo snap install powershell --classic
     shell-clink: # spices up cmd.exe
         win: winget install --id chrisant996.Clink
         mac: # n/a
@@ -148,8 +148,8 @@ packages:
         lin: uv tool install --python 3.12 posting
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
-        mac: uv tool install --python 3.12 mkdocs-material
-        lin: uv tool install --python 3.12 mkdocs-material
+        mac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
+        lin: uv tool install --python 3.12 mkdocs-material 2>/dev/null
     cli-prettier:
         win: npm install --global prettier
         mac: npm install --global prettier
