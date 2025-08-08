@@ -355,7 +355,7 @@ packages:
     desktop-database-manager:
         win: winget install --id DBeaver.DBeaver
         mac: brew install --cask dbeaver-community
-        lin: flatpak install flathub io.dbeaver.DbeaverCommunity -y
+        lin: flatpak install flathub io.dbeaver.DBeaverCommunity -y
     desktop-video-player:
         win: winget install screenbox -s winget
         mac: brew install iina
