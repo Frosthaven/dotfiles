@@ -319,7 +319,7 @@ packages:
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
         mac: brew install --cask localsend
-        lin: # n/a
+        lin: flatpak install flathub org.localsend.localsend_app -y
     desktop-discord: # chat
         win: winget install --id Discord.Discord
         mac: brew install discord
