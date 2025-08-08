@@ -21,7 +21,6 @@ echo ""
 if read -r -p "Do you want to install packages? (N/y) " REPLY && [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "$REPLY"
     echo "Skipping package installation."
-    chmod +x "$HOME/.config/sketchybar/plugins/"*
     exit
 fi
 
