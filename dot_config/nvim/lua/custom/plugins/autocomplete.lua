@@ -2,6 +2,7 @@ return {
 
     -- { -- Autocompletion nvim-cmp alternative
     --     'saghen/blink.cmp',
+    --     build = 'cargo +nightly build --release',
     --     dependencies = 'rafamadriz/friendly-snippets',
     --     version = '1.*',
     --     opts = {
