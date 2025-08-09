@@ -80,7 +80,7 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
 
 # source the shell profile
 . $profile
-komorebic stop --whkd --bar; komorebic start --whkd --bar;
+komorebic stop --whkd --bar; komorebic start --whkd;
 
 echo ""
 echo "------------------------------------------------------------------------"
