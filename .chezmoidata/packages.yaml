@@ -42,6 +42,10 @@ packages:
         win: winget install --id GoLang.Go
         mac: brew install go
         lin: GO_VERSION=1.22.2 && if ! command -v go >/dev/null 2>&1 || [[ "$(go version | awk '{print $3}')" != "go$GO_VERSION" ]]; then curl -LO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local && tar -C ~/.local -xzf go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local/bin && ln -sf ~/.local/go/bin/go ~/.local/bin/go && rm go${GO_VERSION}.linux-amd64.tar.gz && echo "Go $GO_VERSION installed."; else echo "Go $GO_VERSION is already installed."; fi && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    2-language-lua:
+        win: winget install --id DEVCOM.Lua
+        mac: brew install lua
+        lin: command -v lua >/dev/null || { echo "Installing lua5.4 and luarocks..."; sudo apt update -qq && sudo apt install -y lua5.4 luarocks; }
     2-language-php:
         win: winget install --id PHP.PHP.8.4
         mac: brew install php
