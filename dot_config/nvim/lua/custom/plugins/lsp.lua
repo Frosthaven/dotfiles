@@ -1,3 +1,7 @@
+local pluginLoader = require 'config.plugin-loader'
+
+local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7th/cmp-nvim-lsp')
+
 return {
     {
         -- Main LSP Configuration
@@ -13,10 +17,7 @@ return {
             -- Useful status updates for LSP.
             { 'j-hui/fidget.nvim', opts = {} },
 
-            -- Allows extra capabilities provided by nvim-cmp
-            'hrsh7th/cmp-nvim-lsp',
-            -- Allows extra capabilities provided by blink
-            --'saghen/blink.cmp',
+            cmpDependency, -- nvim-cmp completion engine
         },
         config = function()
             -- Brief aside: **What is LSP?**
@@ -133,10 +134,13 @@ return {
             --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
 
             -- CHOOSE ONE: ----
-            local capabilities = vim.lsp.protocol.make_client_capabilities()
-            capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+            if pluginLoader.useBlinkCMP then
+                local capabilities = require('blink.cmp').get_lsp_capabilities()
+            else
+                local capabilities = vim.lsp.protocol.make_client_capabilities()
+                capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+            end
 
-            --local capabilities = require('blink.cmp').get_lsp_capabilities()
             -- ----------------
 
             require('lspconfig').lua_ls.setup { capabilities = capabilities }
