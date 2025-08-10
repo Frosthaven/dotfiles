@@ -4,6 +4,18 @@ local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7
 
 return {
     {
+        'mrshmllow/document-color.nvim',
+        config = function()
+            -- This plugin provides a way to see colors in your code.
+            -- It works with LSP, so it requires an LSP server that supports
+            -- the `textDocument/documentColor` method.
+            -- For example, `lua_ls` and `ts_ls` support this method.
+            require('document-color').setup {
+                mode = 'background', -- or 'foreground'
+            }
+        end,
+    },
+    {
         -- Main LSP Configuration
         'neovim/nvim-lspconfig',
         dependencies = {
@@ -98,6 +110,10 @@ return {
                                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
                             end,
                         })
+                    end
+
+                    if client.server_capabilities.colorProvider then
+                        require('document-color').buf_attach(event.buf)
                     end
                 end,
             })

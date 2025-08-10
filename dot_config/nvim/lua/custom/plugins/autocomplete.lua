@@ -34,6 +34,15 @@ end
 
 return {
     {
+        'roobert/tailwindcss-colorizer-cmp.nvim',
+        -- optionally, override the default options:
+        config = function()
+            require('tailwindcss-colorizer-cmp').setup {
+                color_square_width = 2,
+            }
+        end,
+    },
+    {
         'hrsh7th/nvim-cmp',
         event = 'InsertEnter',
         dependencies = {
@@ -144,6 +153,9 @@ return {
                     { name = 'nvim_lsp' },
                     { name = 'luasnip' },
                     { name = 'path' },
+                },
+                formatting = {
+                    format = require('tailwindcss-colorizer-cmp').formatter,
                 },
             }
         end,
