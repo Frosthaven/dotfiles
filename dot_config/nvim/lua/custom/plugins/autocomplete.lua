@@ -1,29 +1,39 @@
+local pluginLoader = require 'config.plugin-loader'
+local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7th/cmp-nvim-lsp')
+
+-- Using blink.cmp ------------------------------------------------------------
+
+if pluginLoader.useBlinkCMP then
+    return {
+        {
+            'saghen/blink.cmp',
+            build = 'cargo +nightly build --release',
+            dependencies = 'rafamadriz/friendly-snippets',
+            version = '1.*',
+            opts = {
+                keymap = {
+                    preset = 'default',
+                    ['<C-y>'] = { 'select_and_accept' },
+                },
+                appearance = {
+                    nerd_font_variant = 'mono',
+                },
+                completion = { documentation = { auto_show = true } },
+                sources = {
+                    default = { 'lsp', 'path', 'snippets', 'buffer' },
+                },
+                signature = { enabled = true },
+                fuzzy = { implementation = 'prefer_rust_with_warning' },
+            },
+            opts_extend = { 'sources.default' },
+        },
+    }
+end
+
+-- Using nvim-cmp -------------------------------------------------------------
+
 return {
-
-    -- { -- Autocompletion nvim-cmp alternative
-    --     'saghen/blink.cmp',
-    --     build = 'cargo +nightly build --release',
-    --     dependencies = 'rafamadriz/friendly-snippets',
-    --     version = '1.*',
-    --     opts = {
-    --         keymap = {
-    --             preset = 'default',
-    --             ['<C-y>'] = { 'select_and_accept' },
-    --         },
-    --         appearance = {
-    --             nerd_font_variant = 'mono',
-    --         },
-    --         completion = { documentation = { auto_show = true } },
-    --         sources = {
-    --             default = { 'lsp', 'path', 'snippets', 'buffer' },
-    --         },
-    --         signature = { enabled = true },
-    --         fuzzy = { implementation = 'prefer_rust_with_warning' },
-    --     },
-    --     opts_extend = { 'sources.default' },
-    -- },
-
-    { -- Autocompletion
+    {
         'hrsh7th/nvim-cmp',
         event = 'InsertEnter',
         dependencies = {
