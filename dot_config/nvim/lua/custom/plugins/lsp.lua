@@ -14,9 +14,9 @@ return {
             { 'j-hui/fidget.nvim', opts = {} },
 
             -- Allows extra capabilities provided by nvim-cmp
-            -- 'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-nvim-lsp',
             -- Allows extra capabilities provided by blink
-            'saghen/blink.cmp',
+            --'saghen/blink.cmp',
         },
         config = function()
             -- Brief aside: **What is LSP?**
@@ -71,12 +71,12 @@ return {
                     map('<leader>lA', vim.lsp.buf.code_action, 'Code [A]ction (extra)', { 'n', 'x' })
 
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
-                    if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+                    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
                         map('<leader>lh', function()
                             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
                         end, 'Inlay [H]ints')
                     end
-                    if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+                    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
                         local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
                         vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
                             buffer = event.buf,
@@ -132,15 +132,13 @@ return {
             --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
             --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
 
-            -- CHOOSE ONE:
-            --  capabilites: nvim-cmp *****************************************
+            -- CHOOSE ONE: ----
+            local capabilities = vim.lsp.protocol.make_client_capabilities()
+            capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-            -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-            -- capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+            --local capabilities = require('blink.cmp').get_lsp_capabilities()
+            -- ----------------
 
-            -- capabilities: blink ********************************************
-
-            local capabilities = require('blink.cmp').get_lsp_capabilities()
             require('lspconfig').lua_ls.setup { capabilities = capabilities }
 
             -- ****************************************************************
@@ -215,16 +213,16 @@ return {
             }
         end,
     },
-    {
-        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-        -- used for completion, annotations and signatures of Neovim apis
-        'folke/lazydev.nvim',
-        ft = 'lua',
-        opts = {
-            library = {
-                -- Load luvit types when the `vim.uv` word is found
-                { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-            },
-        },
-    },
+    -- {
+    --     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+    --     -- used for completion, annotations and signatures of Neovim apis
+    --     'folke/lazydev.nvim',
+    --     ft = 'lua',
+    --     opts = {
+    --         library = {
+    --             -- Load luvit types when the `vim.uv` word is found
+    --             { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+    --         },
+    --     },
+    -- },
 }
