@@ -26,23 +26,6 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
-        # check if windows or mac
-        # if ($nu.os-info.family == "windows") {
-        #     print ""
-        #     print "Cargo Rust updates are not supported on Windows at this time."
-        # } else if ($nu.os-info.name == "macos") {
-        #     print ""
-        #     print "🔄 Updating Cargo Rust packages -------------------------------"
-        #     print "---------------------------------------------------------------"
-        #     print ""
-        #     cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
-        # } else {
-        #     print ""
-        #     print "🔄 Updating Cargo Rust packages -------------------------------"
-        #     print "---------------------------------------------------------------"
-        #     print ""
-        #     bash -c "cargo install $(cargo install --list | egrep '^[a-z0-9_-]+ v[0-9.]+:$' | cut -f1 -d' ')";
-        # }
     }
 
     if (which uv | is-empty) {
