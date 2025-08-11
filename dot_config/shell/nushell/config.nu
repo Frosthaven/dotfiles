@@ -91,7 +91,7 @@ def sysup [] {
             # nothing
         } else {
             print ""
-            print "🔄 Updating winget packages -----------------------------------"
+            print "🔄 Updating Winget packages -----------------------------------"
             powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
     }
