@@ -88,27 +88,3 @@ function alias-lla { docmd "eza --icons=always --group --header --group-director
 Set-Alias -Name lla -Value alias-lla -Force
 function alias-lga { docmd "eza --icons=always --group --header --group-directories-first --all --long --git --git-ignore" }
 Set-Alias -Name lga -Value alias-lga -Force
-
-# system upgrade
-function sysup {
-    Write-Host "🔄 Updating winget packages (including unknown)..."
-    winget upgrade --accept-source-agreements --accept-package-agreements --include-unknown | Out-Null
-
-    Write-Host "🔄 Updating Chocolatey packages..."
-    if (Get-Command choco -ErrorAction SilentlyContinue) {
-        choco upgrade all -y | Out-Null
-    }
-    else {
-        Write-Host "Chocolatey not installed, skipping."
-    }
-
-    Write-Host "🔄 Updating Scoop packages..."
-    if (Get-Command scoop -ErrorAction SilentlyContinue) {
-        scoop update * | Out-Null
-    }
-    else {
-        Write-Host "Scoop not installed, skipping."
-    }
-
-    Write-Host "✅ All system updates completed."
-}

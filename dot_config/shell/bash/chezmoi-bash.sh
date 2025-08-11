@@ -61,42 +61,6 @@ sf() {
 }
 
 # ---------------------
-# System Updates
-# ---------------------
-
-sysup() {
-    sudo -v
-    set -euo pipefail
-
-    if commands -v apt >/dev/null 2>&1; then
-        echo "🔄 Updating APT packages..."
-        sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
-    fi
-
-    if command -v cargo >/dev/null 2>&1; then
-        echo "🔄 Updating Cargo Rust packages..."
-        cargo install $(cargo install --list | egrep '^[a-z0-9_-]+ v[0-9.]+:$' | cut -f1 -d' ');
-    fi
-
-    if command -v snap >/dev/null 2>&1; then
-        echo "🔄 Updating Snap packages..."
-        sudo snap refresh
-    fi
-
-    if command -v flatpak >/dev/null 2>&1; then
-        echo "🔄 Updating Flatpak packages..."
-    fi
-
-    if command -v brew >/dev/null 2>&1; then
-        echo "🔄 Updating Homebrew packages..."
-        brew upgrade
-        brew cleanup
-    fi
-
-    echo "✅ All system updates completed."
-}
-
-# ---------------------
 # Automatic Nushell
 # ---------------------
 if [ -z "$NU" ] && [ -x "$HOME/.cargo/bin/nu" ]; then
