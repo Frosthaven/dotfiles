@@ -50,35 +50,47 @@ function sf {
 }
 
 # system upgrade
-system-upgrade() {
+sysup() {
+    sudo -v
     setopt errexit          # same as -e
     setopt nounset          # same as -u
     setopt pipefail
 
-    echo "🔄 Updating APT packages..."
-    sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    if commands -v apt >/dev/null 2>&1; then
+        echo "🔄 Updating APT packages..."
+        sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    else
+        # echo "unattended-upgrade not installed, skipping."
+    fi
 
-    echo "🔄 Updating Snap packages..."
+    if command -v cargo >/dev/null 2>&1; then
+        echo "🔄 Updating Cargo Rust packages..."
+        cargo install $(cargo install --list | egrep '^[a-z0-9_-]+ v[0-9.]+:$' | cut -f1 -d' ')
+    else
+        #echo "Cargo not installed, skipping."
+    fi
+
     if command -v snap >/dev/null 2>&1; then
+        echo "🔄 Updating Snap packages..."
         sudo snap refresh
     else
-        echo "Snap not installed, skipping."
+        # echo "Snap not installed, skipping."
     fi
 
-    echo "🔄 Updating Flatpak packages..."
     if command -v flatpak >/dev/null 2>&1; then
+        echo "🔄 Updating Flatpak packages..."
         flatpak update -y
     else
-        echo "Flatpak not installed, skipping."
+        # echo "Flatpak not installed, skipping."
     fi
 
-    echo "🔄 Updating Homebrew packages..."
     if command -v brew >/dev/null 2>&1; then
+        echo "🔄 Updating Homebrew packages..."
         brew update
         brew upgrade
         brew cleanup
     else
-        echo "Homebrew not installed, skipping."
+        # echo "Homebrew not installed, skipping."
     fi
 
     echo "✅ All system updates completed."
