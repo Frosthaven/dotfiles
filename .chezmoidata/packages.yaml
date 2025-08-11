@@ -245,7 +245,7 @@ packages:
         mac: brew install logi-options-plus
         lin: # n/a
     toy-logi-g-hub: # logitech mouse manager
-        win: winget install --id Logitech.GHUB
+        win: winget install --id Logitech.GHUB; winget pin add Logitech.GHUB
         mac: brew install --cask logitech-g-hub
         lin: # n/a
     toy-paragon-ntfs: # ntfs driver
