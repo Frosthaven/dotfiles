@@ -122,6 +122,16 @@ def sysup [] {
         brew cleanup
     }
 
+    if (which nvim | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Neovim packages -----------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        nvim --headless "+Lazy! update" "+MasonUpdate" +qa
+    }
+
     print ""
     print "--------------------------------------------------------------"
     print "✅ All system updates completed."
