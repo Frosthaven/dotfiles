@@ -7,7 +7,7 @@ return {
             require('virt-column').setup {
                 char = '│',
                 virtcolumn = '80,120',
-                highlight = 'COMMENT',
+                highlight = 'LineNr',
             }
         end,
     },
