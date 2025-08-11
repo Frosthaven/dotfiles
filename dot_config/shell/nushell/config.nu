@@ -20,7 +20,11 @@ try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
 
 def sysup [] {
 
-    sudo -v
+    if ($nu.os-info.family == "windows") {
+        # no sudo on Windows
+    } else {
+        sudo -v
+    }
 
     if (which apt | is-empty) {
         # nothing
@@ -36,9 +40,9 @@ def sysup [] {
         # nothing
     } else {
         # check if windows
-        if ($nu.os-info.family == "Windows") {
+        if ($nu.os-info.family == "windows") {
             print ""
-            print "Cargo updates are not supported on Windows at this time."
+            print "Cargo Rust updates are not supported on Windows at this time."
         } else {
             print ""
             print "🔄 Updating Cargo Rust packages -------------------------------"
@@ -63,28 +67,31 @@ def sysup [] {
         flatpak update -y
     }
 
-    if (which winget | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating winget packages -----------------------------------"
-        winget upgrade --accept-source-agreements --accept-package-agreements --include-unknown
-    }
+    if ($nu.os-info.family == "windows") {
+        if (which scoop | is-empty) {
+            # nothing
+        } else {
+            print ""
+            print "🔄 Updating Scoop packages ------------------------------------"
+            powershell -Command "$p = Start-Process scoop -ArgumentList 'update','*' -Verb RunAs -PassThru; $p.WaitForExit()"
+        }
 
-    if (which choco | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating Chocolatey packages -------------------------------"
-        choco upgrade all -y
-    }
+        if (which choco | is-empty) {
+            # nothing
+        } else {
+            print ""
+            print "🔄 Updating Chocolatey packages -------------------------------"
+            powershell -Command "$p = Start-Process choco -ArgumentList 'upgrade','all','-y' -Verb RunAs -PassThru; $p.WaitForExit()"
+        }
 
-    if (which scoop | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating Scoop packages ------------------------------------"
-        scoop update *
+        if (which winget | is-empty) {
+            # nothing
+        } else {
+            print ""
+            print "🔄 Updating winget packages -----------------------------------"
+            powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
+        }
+
     }
 
     if (which brew | is-empty) {

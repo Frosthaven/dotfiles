@@ -79,7 +79,7 @@ packages:
         mac: brew install carapace
         lin: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     shell-starship: # prompt
-        win: winget install --id Starship.Starship
+        win: choco install starship.portable
         mac: brew install starship
         lin: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
 
@@ -361,7 +361,7 @@ packages:
         mac: brew install qbittorrent
         lin: flatpak install flathub com.transmissionbt.Transmission -y
     desktop-database-manager:
-        win: sudo choco install dbeaver
+        win: choco install dbeaver
         mac: brew install --cask dbeaver-community
         lin: flatpak install flathub io.dbeaver.DBeaverCommunity -y
     desktop-video-player:
