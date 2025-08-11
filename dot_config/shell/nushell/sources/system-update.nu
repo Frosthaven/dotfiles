@@ -109,6 +109,7 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         nvim --headless "+Lazy! update" "+MasonUpdate" +qa
+        print ""
     }
 
 
