@@ -73,7 +73,7 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Scoop packages ------------------------------------"
-            powershell -Command "$p = Start-Process scoop -ArgumentList 'update','*' -Verb RunAs -PassThru; $p.WaitForExit()"
+            scoop update
         }
 
         if (which choco | is-empty) {
