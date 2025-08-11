@@ -66,3 +66,10 @@ sf() {
 if [ -z "$NU" ] && [ -x "$HOME/.cargo/bin/nu" ]; then
   exec "$HOME/.cargo/bin/nu"
 fi
+
+#  ---------------------
+#  Add Cargo to PATH
+#  ---------------------
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi

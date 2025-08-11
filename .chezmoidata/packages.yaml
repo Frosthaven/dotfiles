@@ -76,7 +76,7 @@ packages:
         lin: # n/a
     shell-nushell: # structured data, used as sidekick
         win: winget install --id Nushell.Nushell
-        mac: brew install nushell
+        mac: cargo install nu --locked
         lin: cargo install nu --locked
     shell-carapace: # shell autocomplete
         win: winget install --id rsteube.Carapace
@@ -108,7 +108,7 @@ packages:
         lin: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
     cli-ripgrep: # search tool
         win: winget install --id BurntSushi.ripgrep.MSVC
-        mac: brew install ripgrep
+        mac: cargo install ripgrep
         lin: cargo install ripgrep
     cli-fzf: # fuzzy finder
         win: winget install --id junegunn.fzf
@@ -116,7 +116,7 @@ packages:
         lin: sudo apt install fzf -y
     cli-fd: # alternative to find
         win: winget install --id sharkdp.fd
-        mac: brew install fd
+        mac: cargo install fd-find
         lin: cargo install fd-find
     cli-bat: # alternative to cat
         win: winget install --id sharkdp.bat
@@ -132,7 +132,7 @@ packages:
         lin: sudo snap install yq -y
     cli-eza: # alternative to ls
         win: winget install --id eza-community.eza
-        mac: brew install eza
+        mac: cargo install eza
         lin: cargo install eza
     cli-zoxide: # alternative to cd (has jumping)
         win: winget install --id ajeetdsouza.zoxide
@@ -144,7 +144,7 @@ packages:
         lin: sudo apt install duf -y
     cli-tokei: # code line counter
         win: winget install --id XAMPPRocky.tokei
-        mac: brew install tokei
+        mac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
         lin: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
     cli-stripe-cli: # stripe cli
         win: winget install --id Stripe.StripeCli

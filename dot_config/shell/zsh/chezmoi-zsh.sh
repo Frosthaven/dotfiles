@@ -48,3 +48,8 @@ function sf {
         nvim $file # or with your editor of choice
     fi
 }
+
+# add cargo to path
+if [[ -d "$HOME/.cargo/bin" ]]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi

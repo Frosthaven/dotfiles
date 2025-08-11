@@ -45,10 +45,17 @@ M.setup = function()
     }
 
     if helpers.osTag() == "windows" then
-        -- opts.windows.default_prog = { "C:/Program Files/Powershell/7/pwsh.exe", "-nologo", "-l" }
         opts.windows.default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" }
     elseif helpers.osTag() == "macos" then
-        opts.macos.default_prog = { "/opt/homebrew/bin/nu" }
+        opts.macos.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        opts.set_environment_variables = {
+            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        }
+    elseif helpers.osTag() == "linux" then
+        opts.linux.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        opts.set_environment_variables = {
+            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        }
     end
 
     -- combine common and platform specific options into a unified config

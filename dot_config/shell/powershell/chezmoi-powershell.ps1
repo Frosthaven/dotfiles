@@ -88,3 +88,6 @@ function alias-lla { docmd "eza --icons=always --group --header --group-director
 Set-Alias -Name lla -Value alias-lla -Force
 function alias-lga { docmd "eza --icons=always --group --header --group-directories-first --all --long --git --git-ignore" }
 Set-Alias -Name lga -Value alias-lga -Force
+
+# Add cargo to path
+$env:Path += ";$env:USERPROFILE\.cargo\bin"
