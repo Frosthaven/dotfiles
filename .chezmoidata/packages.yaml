@@ -22,6 +22,10 @@ packages:
         win: # n/a
         mac: brew install mas
         lin: # n/a
+    1-wsl:
+        win: winget install --id Microsoft.WSL; winget pin add Microsoft.WSL
+        mac: # n/a
+        lin: # n/a
 
     # programming languages ***************************************************
     # *************************************************************************
@@ -325,7 +329,7 @@ packages:
         mac: brew install --cask localsend
         lin: flatpak install flathub org.localsend.localsend_app -y
     desktop-discord: # chat
-        win: winget install --id Discord.Discord
+        win: winget install --id Discord.Discord; winget pin add Discord.Discord
         mac: brew install discord
         lin: flatpak install flathub com.discordapp.Discord -y
     desktop-slack: # chat
@@ -333,7 +337,7 @@ packages:
         mac: brew install slack
         lin: flatpak install flathub com.slack.Slack -y
     desktop-spotify: # music
-        win: winget install --id Spotify.Spotify
+        win: winget install --id Spotify.Spotify; winget pin add Spotify.Spotify
         mac: brew install spotify
         lin: flatpak install flathub com.spotify.Client -y
     desktop-zoom:
