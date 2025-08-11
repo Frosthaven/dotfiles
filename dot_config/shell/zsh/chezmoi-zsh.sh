@@ -86,7 +86,6 @@ sysup() {
 
     if command -v brew >/dev/null 2>&1; then
         echo "🔄 Updating Homebrew packages..."
-        brew update
         brew upgrade
         brew cleanup
     else
