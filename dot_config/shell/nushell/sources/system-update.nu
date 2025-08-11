@@ -101,6 +101,17 @@ def sysup [] {
         }
     }
 
+    if (which nvim | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Neovim plugins ------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        nvim --headless "+Lazy! update" "+MasonUpdate" +qa
+    }
+
+
     if (which mas | is-empty) {
         # nothing
     } else {
@@ -120,16 +131,6 @@ def sysup [] {
         print ""
         brew upgrade
         brew cleanup
-    }
-
-    if (which nvim | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating Neovim packages -----------------------------------"
-        print "---------------------------------------------------------------"
-        print ""
-        nvim --headless "+Lazy! update" "+MasonUpdate" +qa
     }
 
     print ""
