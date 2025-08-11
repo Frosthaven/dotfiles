@@ -103,6 +103,14 @@ def sysup [] {
         brew cleanup
     }
 
+    if (which mas | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Mac App Store packages ----------------------------"
+        mas upgrade
+    }
+
     print "--------------------------------------------------------------"
     print "✅ All system updates completed."
 }
