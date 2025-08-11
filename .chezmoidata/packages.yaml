@@ -162,6 +162,10 @@ packages:
         win: # n/a
         mac: brew install fastfetch
         lin: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
+    cli-cargo-update:
+        win: cargo install cargo-update
+        mac: cargo install cargo-update
+        lin: cargo install cargo-update
 
     # container management ****************************************************
     # *************************************************************************

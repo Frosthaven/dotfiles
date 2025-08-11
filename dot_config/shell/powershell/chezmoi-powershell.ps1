@@ -90,7 +90,7 @@ function alias-lga { docmd "eza --icons=always --group --header --group-director
 Set-Alias -Name lga -Value alias-lga -Force
 
 # system upgrade
-function System-Upgrade {
+function sysup {
     Write-Host "🔄 Updating winget packages (including unknown)..."
     winget upgrade --accept-source-agreements --accept-package-agreements --include-unknown | Out-Null
 

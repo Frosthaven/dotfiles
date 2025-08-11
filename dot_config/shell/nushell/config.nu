@@ -18,55 +18,85 @@ source ./sources/zoxide.nu
 source ./sources/sf.nu
 try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
 
-def system-upgrade [] {
-    echo "🔄 Updating APT packages..."
-    sudo apt update;
-    sudo apt upgrade -y;
-    sudo apt autoremove -y;
+def sysup [] {
 
-    echo "🔄 Updating Snap packages..."
-    if (which snap | is-empty) {
-        echo "Snap not installed, skipping."
+    sudo -v
+
+    if (which apt | is-empty) {
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating APT packages --------------------------------------"
+        sudo apt update;
+        sudo apt upgrade -y;
+        sudo apt autoremove -y;
+    }
+
+    if (which cargo | is-empty) {
+        # nothing
+    } else {
+        # check if windows
+        if ($nu.os-info.family == "Windows") {
+            print ""
+            print "Cargo updates are not supported on Windows at this time."
+        } else {
+            print ""
+            print "🔄 Updating Cargo Rust packages -------------------------------"
+            bash -c "cargo install $(cargo install --list | egrep '^[a-z0-9_-]+ v[0-9.]+:$' | cut -f1 -d' ')";
+        }
+    }
+
+
+    if (which snap | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Snap packages -------------------------------------"
         sudo snap refresh
     }
 
-    echo "🔄 Updating Flatpak packages..."
     if (which flatpak | is-empty) {
-        echo "Flatpak not installed, skipping."
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating Flatpak packages ----------------------------------"
         flatpak update -y
     }
 
-    echo "🔄 Updating winget packages..."
     if (which winget | is-empty) {
-        echo "winget not installed, skipping."
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating winget packages -----------------------------------"
         winget upgrade --accept-source-agreements --accept-package-agreements --include-unknown
     }
 
-    echo "🔄 Updating Chocolatey packages..."
     if (which choco | is-empty) {
-        echo "Chocolatey not installed, skipping."
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating Chocolatey packages -------------------------------"
         choco upgrade all -y
     }
 
-    echo "🔄 Updating Scoop packages..."
     if (which scoop | is-empty) {
-        echo "Scoop not installed, skipping."
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating Scoop packages ------------------------------------"
         scoop update *
     }
 
-    echo "🔄 Updating Homebrew packages..."
     if (which brew | is-empty) {
-        echo "Homebrew not installed, skipping."
+        # nothing
     } else {
+        print ""
+        print "🔄 Updating Homebrew packages ---------------------------------"
         brew update
         brew upgrade
         brew cleanup
     }
 
-    echo "✅ All system updates completed."
+    print "--------------------------------------------------------------"
+    print "✅ All system updates completed."
 }
