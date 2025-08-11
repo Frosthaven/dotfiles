@@ -117,6 +117,7 @@ def sysup [] {
         # nothing
     } else {
         print ""
+        print ""
         print "🔄 Updating Mac App Store packages ----------------------------"
         print "---------------------------------------------------------------"
         print ""
