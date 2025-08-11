@@ -15,8 +15,10 @@ def sysup [] {
         print ""
         print "Updating APT package lists..."
         sudo apt update;
+        print ""
         print "Upgrading all APT packages..."
         sudo apt upgrade -y;
+        print ""
         print "Performing cleanup..."
         sudo apt autoremove -y;
     }
@@ -39,8 +41,6 @@ def sysup [] {
         print "🔄 Updating UV (Python) tools ---------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating UV..."
-        uv self-update
         print "Updating all UV tools..."
         uv tool upgrade --all
     }
@@ -54,6 +54,7 @@ def sysup [] {
         print ""
         print "Installing latest npm..."
         npm install -g npm
+        print ""
         print "Updating global packages..."
         npm update -g
     }
@@ -67,6 +68,7 @@ def sysup [] {
         print ""
         print "Updating snapd..."
         sudo snap install core
+        print ""
         print "Updating all snaps..."
         sudo snap refresh
     }
@@ -80,6 +82,7 @@ def sysup [] {
         print ""
         print "Updating Flatpak..."
         flatpak update --appstream -y
+        print ""
         print "Updating Flatpak remotes..."
         flatpak update -y
     }
@@ -94,6 +97,7 @@ def sysup [] {
             print ""
             print "Updating Scoop..."
             scoop update scoop
+            print ""
             print "Updating all Scoop packages..."
             scoop update
         }
@@ -155,6 +159,7 @@ def sysup [] {
         print ""
         print "Updating all Homebrew packages..."
         brew upgrade
+        print ""
         print "Performing cleanup..."
         brew cleanup
     }
