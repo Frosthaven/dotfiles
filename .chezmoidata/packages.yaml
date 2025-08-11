@@ -312,6 +312,10 @@ packages:
         win: winget install --id Adobe.CreativeCloud
         mac: brew install adobe-creative-cloud
         lin: # n/a
+    desktop-adobe-acrobat-reader:
+        win: $pkg = "Adobe.Acrobat.Reader.64-bit"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
+        mac: # n/a
+        lin: # n/a
     desktop-microsoft-office: # office suite
         win: winget install --id Microsoft.Office
         mac: brew install microsoft-office
