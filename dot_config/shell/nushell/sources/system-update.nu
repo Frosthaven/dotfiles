@@ -154,6 +154,8 @@ def sysup [] {
         print "🔄 Updating Homebrew packages ---------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating Homebrew..."
+        brew update
         print "Updating all Homebrew packages..."
         brew upgrade
         print ""
