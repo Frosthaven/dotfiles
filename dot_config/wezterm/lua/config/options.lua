@@ -6,7 +6,9 @@ local M = {}
 M.setup = function()
     -- load priority: platform specific > common
     local opts = {
-        linux = {},
+        linux = {
+            font = wezterm.font({ family = "JetBrainsMono NF", weight = "Light", scale = 1 }),
+        },
         windows = {
             win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
         },
