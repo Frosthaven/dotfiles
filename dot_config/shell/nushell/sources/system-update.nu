@@ -32,7 +32,7 @@ def sysup [] {
         # nothing
     } else {
         print ""
-        print "🔄 Updating UV tools ------------------------------------------"
+        print "🔄 Updating UV (Python) tools ---------------------------------"
         print "---------------------------------------------------------------"
         print ""
         uv tool upgrade --all
