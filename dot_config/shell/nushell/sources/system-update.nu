@@ -132,6 +132,7 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         brew upgrade
+        print "Performing cleanup..."
         brew cleanup
     }
 
