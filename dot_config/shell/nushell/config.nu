@@ -81,7 +81,7 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Chocolatey packages -------------------------------"
-            powershell -Command "$p = Start-Process choco -ArgumentList 'upgrade','all','-y' -Verb RunAs -PassThru; $p.WaitForExit()"
+            powershell -Command "$p = Start-Process choco -ArgumentList 'upgrade','all','-y','--except=\"wsl\"', -Verb RunAs -PassThru; $p.WaitForExit()"
         }
 
         if (which winget | is-empty) {
@@ -91,7 +91,6 @@ def sysup [] {
             print "🔄 Updating winget packages -----------------------------------"
             powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
-
     }
 
     if (which brew | is-empty) {
