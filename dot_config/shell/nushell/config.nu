@@ -12,7 +12,7 @@ $env.config.show_banner = false
 
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
-soruce ./sources/fnm.nu
+source ./sources/fnm.nu
 source ./sources/uv.nu
 source ./sources/wezterm.nu
 source ./sources/homebrew.nu

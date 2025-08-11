@@ -54,3 +54,6 @@ if not (which fnm | is-empty) {
         }))
     }
 }
+
+# Ensure fnm is listed in path
+$env.PATH = ($env.PATH | append ($env.HOME + "/.local/share/fnm"))
