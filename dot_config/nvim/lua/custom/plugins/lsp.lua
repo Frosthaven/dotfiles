@@ -177,15 +177,6 @@ return {
                 lua_ls = { -- lua
                     settings = {
                         Lua = {
-                            runtime = {
-                                version = 'LuaJIT',
-                            },
-                            diagnostics = {
-                                globals = { 'vim' },
-                            },
-                            workspace = {
-                                library = vim.api.nvim_get_runtime_file('', true),
-                            },
                             completion = {
                                 callSnippet = 'Replace',
                             },
@@ -242,16 +233,16 @@ return {
             }
         end,
     },
-    -- {
-    --     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-    --     -- used for completion, annotations and signatures of Neovim apis
-    --     'folke/lazydev.nvim',
-    --     ft = 'lua',
-    --     opts = {
-    --         library = {
-    --             -- Load luvit types when the `vim.uv` word is found
-    --             { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-    --         },
-    --     },
-    -- },
+    {
+        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+        -- used for completion, annotations and signatures of Neovim apis
+        'folke/lazydev.nvim',
+        ft = 'lua',
+        opts = {
+            library = {
+                -- Load luvit types when the `vim.uv` word is found
+                { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+            },
+        },
+    },
 }
