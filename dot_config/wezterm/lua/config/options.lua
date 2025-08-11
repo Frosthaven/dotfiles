@@ -8,22 +8,21 @@ M.setup = function()
     local opts = {
         linux = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
-            cell_width = 1.1,
         },
         windows = {
             win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
+            window_background_opacity = 0.85,
         },
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
             font_size = 15, -- compensation for display scaling
             macos_window_background_blur = 50, -- 0-100
-            window_background_opacity = 0.94,
         },
         common = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             font_size = 10.5,
             line_height = 1.3,
-            window_background_opacity = 0.85,
+            window_background_opacity = 0.94,
 
             window_decorations = "TITLE | RESIZE",
             window_close_confirmation = "NeverPrompt",
