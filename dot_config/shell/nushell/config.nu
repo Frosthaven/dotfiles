@@ -84,7 +84,7 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Chocolatey packages -------------------------------"
-            powershell -Command "$p = Start-Process -FilePath choco -ArgumentList 'upgrade all -y' -Verb RunAs -PassThru; $p.WaitForExit()"
+            powershell -Command "$p = Start-Process -FilePath choco -ArgumentList 'upgrade all -y','--exclude Microsoft.WSL' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
 
         if (which winget | is-empty) {
