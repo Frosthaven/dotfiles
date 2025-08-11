@@ -43,7 +43,7 @@ def sysup [] {
         if ($nu.os-info.family == "windows") {
             print ""
             print "Cargo Rust updates are not supported on Windows at this time."
-        } else if ($nu.os-info.family == "macos") {
+        } else if ($nu.os-info.name == "macos") {
             print ""
             print "Cargo Rust updates are not supported on MacOS at this time."
         } else {
