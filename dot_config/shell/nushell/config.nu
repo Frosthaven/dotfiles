@@ -39,10 +39,13 @@ def sysup [] {
     if (which cargo | is-empty) {
         # nothing
     } else {
-        # check if windows
+        # check if windows or mac
         if ($nu.os-info.family == "windows") {
             print ""
             print "Cargo Rust updates are not supported on Windows at this time."
+        } else if ($nu.os-info.family == "macos") {
+            print ""
+            print "Cargo Rust updates are not supported on MacOS at this time."
         } else {
             print ""
             print "🔄 Updating Cargo Rust packages -------------------------------"
