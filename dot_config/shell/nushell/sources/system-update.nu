@@ -11,6 +11,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating APT packages --------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         sudo apt update;
         sudo apt upgrade -y;
         sudo apt autoremove -y;
@@ -29,6 +31,8 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Cargo Rust packages -------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
             bash -c "cargo install $(cargo install --list | egrep '^[a-z0-9_-]+ v[0-9.]+:$' | cut -f1 -d' ')";
         }
     }
@@ -38,6 +42,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating UV tools ------------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         uv tool upgrade --all
     }
 
@@ -46,6 +52,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating NPM packages --------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         npm install -g npm
         npm update -g
     }
@@ -55,6 +63,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating Snap packages -------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         sudo snap refresh
     }
 
@@ -63,6 +73,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating Flatpak packages ----------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         flatpak update -y
     }
 
@@ -72,6 +84,8 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Scoop packages ------------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
             scoop update
         }
 
@@ -80,6 +94,8 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Chocolatey packages -------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
             powershell -Command "$p = Start-Process -FilePath choco -ArgumentList 'upgrade all -y' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
 
@@ -88,6 +104,8 @@ def sysup [] {
         } else {
             print ""
             print "🔄 Updating Winget packages -----------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
             powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
     }
@@ -97,6 +115,8 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating Mac App Store packages ----------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         mas upgrade
     }
 
@@ -105,11 +125,13 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating Homebrew packages ---------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
         brew upgrade
         brew cleanup
     }
 
-
+    print ""
     print "--------------------------------------------------------------"
     print "✅ All system updates completed."
 }
