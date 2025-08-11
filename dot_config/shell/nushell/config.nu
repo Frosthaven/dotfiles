@@ -101,7 +101,6 @@ def sysup [] {
     } else {
         print ""
         print "🔄 Updating Homebrew packages ---------------------------------"
-        brew update
         brew upgrade
         brew cleanup
     }
