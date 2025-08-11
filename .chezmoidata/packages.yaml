@@ -361,7 +361,7 @@ packages:
         mac: brew install qbittorrent
         lin: flatpak install flathub com.transmissionbt.Transmission -y
     desktop-database-manager:
-        win: winget install --id DBeaver.DBeaver
+        win: sudo choco install dbeaver
         mac: brew install --cask dbeaver-community
         lin: flatpak install flathub io.dbeaver.DBeaverCommunity -y
     desktop-video-player:
