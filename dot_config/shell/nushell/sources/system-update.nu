@@ -95,10 +95,7 @@ def sysup [] {
             print "🔄 Updating Scoop packages ------------------------------------"
             print "---------------------------------------------------------------"
             print ""
-            print "Updating Scoop..."
             scoop update scoop
-            print ""
-            print "Updating all Scoop packages..."
             scoop update
         }
 
