@@ -13,8 +13,11 @@ def sysup [] {
         print "🔄 Updating APT packages --------------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating APT package lists..."
         sudo apt update;
+        print "Upgrading all APT packages..."
         sudo apt upgrade -y;
+        print "Performing cleanup..."
         sudo apt autoremove -y;
     }
 
@@ -25,6 +28,7 @@ def sysup [] {
         print "🔄 Updating Cargo Rust packages -------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating all Cargo packages..."
         cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
     }
 
@@ -35,6 +39,9 @@ def sysup [] {
         print "🔄 Updating UV (Python) tools ---------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating UV..."
+        uv self-update
+        print "Updating all UV tools..."
         uv tool upgrade --all
     }
 
@@ -45,7 +52,9 @@ def sysup [] {
         print "🔄 Updating NPM packages --------------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Installing latest npm..."
         npm install -g npm
+        print "Updating global packages..."
         npm update -g
     }
 
@@ -56,6 +65,9 @@ def sysup [] {
         print "🔄 Updating Snap packages -------------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating snapd..."
+        sudo snap install core
+        print "Updating all snaps..."
         sudo snap refresh
     }
 
@@ -66,6 +78,9 @@ def sysup [] {
         print "🔄 Updating Flatpak packages ----------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating Flatpak..."
+        flatpak update --appstream -y
+        print "Updating Flatpak remotes..."
         flatpak update -y
     }
 
@@ -77,6 +92,9 @@ def sysup [] {
             print "🔄 Updating Scoop packages ------------------------------------"
             print "---------------------------------------------------------------"
             print ""
+            print "Updating Scoop..."
+            scoop update scoop
+            print "Updating all Scoop packages..."
             scoop update
         }
 
@@ -87,6 +105,7 @@ def sysup [] {
             print "🔄 Updating Chocolatey packages -------------------------------"
             print "---------------------------------------------------------------"
             print ""
+            print "Updating all Chocolatey packages..."
             powershell -Command "$p = Start-Process -FilePath choco -ArgumentList 'upgrade all -y' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
 
@@ -97,6 +116,7 @@ def sysup [] {
             print "🔄 Updating Winget packages -----------------------------------"
             print "---------------------------------------------------------------"
             print ""
+            print "Updating all Winget packages..."
             powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
     }
@@ -108,6 +128,7 @@ def sysup [] {
         print "🔄 Updating Neovim plugins ------------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating Lazy/Mason plugins..."
         nvim --headless "+Lazy! update" "+MasonUpdate" +qa
         print ""
     }
@@ -121,6 +142,7 @@ def sysup [] {
         print "🔄 Updating Mac App Store packages ----------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating Mac App Store apps..."
         mas upgrade
     }
 
@@ -131,6 +153,7 @@ def sysup [] {
         print "🔄 Updating Homebrew packages ---------------------------------"
         print "---------------------------------------------------------------"
         print ""
+        print "Updating all Homebrew packages..."
         brew upgrade
         print "Performing cleanup..."
         brew cleanup
