@@ -45,7 +45,7 @@ M.setup = function()
     }
 
     if helpers.osTag() == "windows" then
-        opts.windows.default_prog = { os.getenv("LOCALAPPDATA") .. "/Programs/nu/bin/nu.exe" }
+        opts.windows.default_prog = { "C:\\Program Files\\nu\\bin\\nu.exe" }
     elseif helpers.osTag() == "macos" then
         opts.macos.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
         opts.set_environment_variables = {

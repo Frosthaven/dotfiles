@@ -35,7 +35,7 @@ packages:
         mac: brew install zig
         lin: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     2-language-rust:
-        win: winget install --id Rustlang.Rust.GNU
+        win: winget install --id Rustlang.Rust.GNU --accept-package-agreements --accept-source-agreements; choco install mingw -y; $mingwBin = "C:\ProgramData\mingw64\mingw64\bin"; $cargoBin = "$env:USERPROFILE\.cargo\bin"; if (Test-Path "$mingwBin\dlltool.exe") { $env:Path += ";$mingwBin;$cargoBin"; dlltool --version } else { Write-Error "dlltool.exe not found at $mingwBin" }
         mac: brew install rust
         lin: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
     2-language-python:
@@ -75,7 +75,7 @@ packages:
         mac: # n/a
         lin: # n/a
     shell-nushell: # structured data, used as sidekick
-        win: winget install --id Nushell.Nushell
+        win: cargo install nu --locked #winget install --id Nushell.Nushell
         mac: cargo install nu --locked
         lin: cargo install nu --locked
     shell-carapace: # shell autocomplete
@@ -107,7 +107,7 @@ packages:
         mac: brew install neovim
         lin: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
     cli-ripgrep: # search tool
-        win: winget install --id BurntSushi.ripgrep.MSVC
+        win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
         lin: cargo install ripgrep
     cli-fzf: # fuzzy finder
@@ -115,7 +115,7 @@ packages:
         mac: brew install fzf
         lin: sudo apt install fzf -y
     cli-fd: # alternative to find
-        win: winget install --id sharkdp.fd
+        win: cargo install fd-find #winget install --id sharkdp.fd
         mac: cargo install fd-find
         lin: cargo install fd-find
     cli-bat: # alternative to cat
@@ -131,7 +131,7 @@ packages:
         mac: brew install yq
         lin: sudo snap install yq -y
     cli-eza: # alternative to ls
-        win: winget install --id eza-community.eza
+        win: cargo install eza # winget install --id eza-community.eza
         mac: cargo install eza
         lin: cargo install eza
     cli-zoxide: # alternative to cd (has jumping)
@@ -143,7 +143,7 @@ packages:
         mac: brew install duf
         lin: sudo apt install duf -y
     cli-tokei: # code line counter
-        win: winget install --id XAMPPRocky.tokei
+        win: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei #winget install --id XAMPPRocky.tokei
         mac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
         lin: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
     cli-stripe-cli: # stripe cli
