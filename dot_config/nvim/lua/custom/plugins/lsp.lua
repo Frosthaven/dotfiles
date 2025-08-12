@@ -1,20 +1,28 @@
 local pluginLoader = require 'config.plugin-loader'
 
 local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7th/cmp-nvim-lsp')
+local root_dir = vim.fn.getcwd()
+
+-- check if there is a tailwind.style.2.admin.css file in the current working directory
+local configFile = {}
+local hasAdminCss = vim.fn.filereadable(root_dir .. '/tailwind.2.admin.css') == 1
+if hasAdminCss then
+    configFile = {
+        -- admin styles
+        ['tailwind.2.admin.css'] = {
+            'assets/local-assets/react/admin/**',
+            'templates/admin/**',
+            'templates/bundles/EasyAdminBundle/**',
+            'src/Controller/Admin/**',
+        },
+        -- main styles for everything else
+        ['tailwind.1.app.css'] = {
+            '**/*',
+        },
+    }
+end
 
 return {
-    {
-        'mrshmllow/document-color.nvim',
-        config = function()
-            -- This plugin provides a way to see colors in your code.
-            -- It works with LSP, so it requires an LSP server that supports
-            -- the `textDocument/documentColor` method.
-            -- For example, `lua_ls` and `ts_ls` support this method.
-            require('document-color').setup {
-                mode = 'background', -- or 'foreground'
-            }
-        end,
-    },
     {
         -- Main LSP Configuration
         'neovim/nvim-lspconfig',
@@ -112,9 +120,9 @@ return {
                         })
                     end
 
-                    if client.server_capabilities.colorProvider then
-                        require('document-color').buf_attach(event.buf)
-                    end
+                    -- if client.server_capabilities.colorProvider then
+                    --     require('document-color').buf_attach(event.buf)
+                    -- end
                 end,
             })
 
@@ -191,7 +199,7 @@ return {
 
                 -- templating & styling ---------------------------------------
                 twiggy_language_server = {}, -- twig
-                tailwindcss = {}, -- tailwind
+                -- tailwindcss = {}, -- tailwind -- congigured in `tailwind-tools.nvim`
 
                 -- configuration/data files -----------------------------------
                 jsonls = {}, -- json
@@ -216,6 +224,7 @@ return {
             local ensure_installed = vim.tbl_keys(servers or {})
             vim.list_extend(ensure_installed, {
                 'stylua', -- Used to format Lua code
+                'tailwindcss-language-server', -- Used for Tailwind CSS
             })
             require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -227,21 +236,91 @@ return {
                         -- by the server configuration above. Useful when disabling
                         -- certain features of an LSP (for example, turning off formatting for ts_ls)
                         server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-                        require('lspconfig')[server_name].setup(server)
+                        -- dont setup tailwindcss/tailwind-language-server - managed by tailwind-tools.nvim
+                        if server_name == 'tailwindcss' or server_name == 'tailwind-language-server' then
+                            -- do nothing
+                        else
+                            require('lspconfig')[server_name].setup(server)
+                        end
                     end,
                 },
             }
         end,
     },
     {
-        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-        -- used for completion, annotations and signatures of Neovim apis
+        -- AUTOMATIC lua language server configuration
         'folke/lazydev.nvim',
         ft = 'lua',
         opts = {
             library = {
                 -- Load luvit types when the `vim.uv` word is found
                 { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+            },
+        },
+    },
+    {
+        -- AUTOMATIC tailwind language server configuration
+        'luckasRanarison/tailwind-tools.nvim',
+        name = 'tailwind-tools',
+        build = ':UpdateRemotePlugins',
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter',
+        },
+        opts = {
+            server = {
+                override = true, -- setup the server from the plugin if true
+                settings = { -- shortcut for `settings.tailwindCSS`
+                    includeLanguages = {
+                        elixir = 'phoenix-heex',
+                        heex = 'phoenix-heex',
+                        html = 'html',
+                        javascript = 'javascript',
+                        javascriptreact = 'javascriptreact',
+                        typescript = 'typescript',
+                        typescriptreact = 'typescriptreact',
+                        svelte = 'svelte',
+                        vue = 'vue',
+                        twig = 'html',
+                    },
+                    experimental = {
+                        configFile = configFile,
+                        classRegex = {
+                            -- 1) Twig `{% set name = '...' %}`:
+                            --    first regex captures the whole RHS (container),
+                            --    second regex extracts the quoted string (single or double quotes)
+                            { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
+                        },
+                    },
+                },
+            },
+            document_color = {
+                enabled = true, -- can be toggled by commands
+                kind = 'inline', -- "inline" | "foreground" | "background"
+                inline_symbol = '󰝤 ', -- only used in inline mode
+                debounce = 200, -- in milliseconds, only applied in insert mode
+            },
+            conceal = {
+                enabled = false, -- can be toggled by commands
+                min_length = nil, -- only conceal classes exceeding the provided length
+                symbol = '󱏿', -- only a single character is allowed
+                highlight = { -- extmark highlight options, see :h 'highlight'
+                    fg = '#38BDF8',
+                },
+            },
+            keymaps = {
+                smart_increment = { -- increment tailwindcss units using <C-a> and <C-x>
+                    enabled = false,
+                    units = { -- see lua/tailwind/units.lua to see all the defaults
+                        {
+                            prefix = 'border',
+                            values = { '2', '4', '6', '8' },
+                        },
+                        -- ...
+                    },
+                },
+            },
+            cmp = {
+                highlight = 'foreground', -- color preview style, "foreground" | "background"
             },
         },
     },
