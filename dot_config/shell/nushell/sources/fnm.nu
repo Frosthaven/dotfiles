@@ -23,7 +23,7 @@ $env.PATH = $env.PATH | prepend (
 #     $env.config.hooks.env_change.PWD? | append {
 #         condition: {|| true }
 #         code: {||
-#             if ($env.PWD != $env.HOME) and (['.nvmrc' '.node-version' 'package.json'] | any {|el| $el | path exists}) {
+#             if (['.nvmrc' '.node-version' 'package.json'] | any {|el| $el | path exists}) {
 #                 ^fnm use --install-if-missing
 #             }
 #         }
