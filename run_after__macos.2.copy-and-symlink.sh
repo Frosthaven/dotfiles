@@ -3,8 +3,22 @@
 echo ""
 echo "Checking for symbolic links and integrations..."
 
-# Automatic Shell Integration
+# Automatic Shell Integration - Bash
+bashrc="$HOME/.bashrc"
+chezmoi_bash_profile="$HOME/.config/shell/bash/chezmoi-bash.sh"
+if [ ! -f "$bashrc" ]; then
+    touch "$bashrc"
+fi
+if ! grep -q "source \"$chezmoi_bash_profile\"" "$bashrc"; then
+  echo "# Load Chezmoi Bash Profile" >> "$bashrc"
+  echo "source \"$chezmoi_bash_profile\"" >> "$bashrc"
+fi
+
+# Automatic Shell Integration - ZSH
 zshrc="$HOME/.zshrc"
+if [ ! -f "$zshrc" ]; then
+    touch "$zshrc"
+fi
 chezmoi_zsh_profile="$HOME/.config/shell/zsh/chezmoi-zsh.sh"
 if ! grep -q "source \"$chezmoi_zsh_profile\"" "$zshrc"; then
   echo "# Load Chezmoi ZSH Profile" >> "$zshrc"
