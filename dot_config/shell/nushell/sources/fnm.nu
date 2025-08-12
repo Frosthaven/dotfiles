@@ -19,13 +19,13 @@ $env.PATH = $env.PATH | prepend (
 )
 
 # 5. Hook: auto-use Node version if file present and not in home directory
-$env.config.hooks.env_change.PWD = (
-    $env.config.hooks.env_change.PWD? | append {
-        condition: {|| true }
-        code: {||
-            if ($env.PWD != $env.HOME) and (['.nvmrc' '.node-version' 'package.json'] | any {|el| $el | path exists}) {
-                ^fnm use --install-if-missing
-            }
-        }
-    }
-)
+# $env.config.hooks.env_change.PWD = (
+#     $env.config.hooks.env_change.PWD? | append {
+#         condition: {|| true }
+#         code: {||
+#             if ($env.PWD != $env.HOME) and (['.nvmrc' '.node-version' 'package.json'] | any {|el| $el | path exists}) {
+#                 ^fnm use --install-if-missing
+#             }
+#         }
+#     }
+# )
