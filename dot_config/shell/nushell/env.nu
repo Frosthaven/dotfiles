@@ -17,3 +17,7 @@
 # You can remove these comments if you want or leave
 # them for future reference.
 # use gnome keyring
+
+use std "path add"
+fnm env --json | from json | load-env
+path add $env.FNM_MULTISHELL_PATH
