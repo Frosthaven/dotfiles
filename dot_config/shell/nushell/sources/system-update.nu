@@ -30,7 +30,7 @@ def sysup [] {
         print "🔄 Updating Cargo Rust packages -------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating all Cargo packages..."
+        print "Updating all global Cargo packages..."
         cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
     }
 
@@ -52,10 +52,10 @@ def sysup [] {
         print "🔄 Updating NPM packages --------------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Installing latest npm..."
+        print "Updating npm..."
         npm install -g npm
         print ""
-        print "Updating global packages..."
+        print "Updating all global packages..."
         npm update -g
     }
 
@@ -69,7 +69,7 @@ def sysup [] {
         print "Updating snapd..."
         sudo snap install core
         print ""
-        print "Updating all snaps..."
+        print "Updating all Snap packages..."
         sudo snap refresh
     }
 
@@ -83,7 +83,7 @@ def sysup [] {
         print "Updating Flatpak..."
         flatpak update --appstream -y
         print ""
-        print "Updating Flatpak remotes..."
+        print "Updating all Flatpak remotes..."
         flatpak update -y
     }
 
@@ -129,7 +129,7 @@ def sysup [] {
         print "🔄 Updating Neovim plugins ------------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating Lazy/Mason plugins..."
+        print "Updating all plugins..."
         nvim --headless "+Lazy! update" "+MasonUpdate" +qa
         print ""
     }
