@@ -33,7 +33,7 @@ packages:
     2-language-zig: # needed to auto-compile telescope in neovim cross-platform
         win: winget install --id zig.zig
         mac: brew install zig
-        lin: grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
+        lin: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
     2-language-rust:
         win: winget install --id Rustlang.Rust.GNU --accept-package-agreements --accept-source-agreements; choco install mingw -y; $mingwBin = "C:\ProgramData\mingw64\mingw64\bin"; $cargoBin = "$env:USERPROFILE\.cargo\bin"; if (Test-Path "$mingwBin\dlltool.exe") { $env:Path += ";$mingwBin;$cargoBin"; dlltool --version } else { Write-Error "dlltool.exe not found at $mingwBin" }
         mac: brew install rust
@@ -45,7 +45,7 @@ packages:
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
-        lin: GO_VERSION=1.22.2 && if ! command -v go >/dev/null 2>&1 || [[ "$(go version | awk '{print $3}')" != "go$GO_VERSION" ]]; then curl -LO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local && tar -C ~/.local -xzf go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local/bin && ln -sf ~/.local/go/bin/go ~/.local/bin/go && rm go${GO_VERSION}.linux-amd64.tar.gz && echo "Go $GO_VERSION installed."; else echo "Go $GO_VERSION is already installed."; fi && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        lin: GO_VERSION=1.22.2 && if ! command -v go >/dev/null 2>&1 || [[ "$(go version | awk '{print $3}')" != "go$GO_VERSION" ]]; then curl -LO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local && tar -C ~/.local -xzf go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local/bin && ln -sf ~/.local/go/bin/go ~/.local/bin/go && rm go${GO_VERSION}.linux-amd64.tar.gz && echo "Go $GO_VERSION installed."; else echo "Go $GO_VERSION is already installed."; fi
     2-language-lua:
         win: winget install --id DEVCOM.Lua
         mac: brew install lua
@@ -53,7 +53,7 @@ packages:
     2-language-php:
         win: winget install --id PHP.PHP.8.4
         mac: brew install php
-        lin: PHP_VERSION=8.4 && if ! command -v php >/dev/null 2>&1 || [[ "$(php -v | head -n1 | awk '{print $2}')" != "$PHP_VERSION" ]]; then sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository -y ppa:ondrej/php && sudo apt update && sudo apt install -y php$PHP_VERSION && sudo update-alternatives --set php /usr/bin/php$PHP_VERSION && echo "PHP $PHP_VERSION installed."; else echo "PHP $PHP_VERSION is already installed."; fi && mkdir -p ~/.local/bin && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        lin: PHP_VERSION=8.4 && if ! command -v php >/dev/null 2>&1 || [[ "$(php -v | head -n1 | awk '{print $2}')" != "$PHP_VERSION" ]]; then sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository -y ppa:ondrej/php && sudo apt update && sudo apt install -y php$PHP_VERSION && sudo update-alternatives --set php /usr/bin/php$PHP_VERSION && echo "PHP $PHP_VERSION installed."; else echo "PHP $PHP_VERSION is already installed."; fi && mkdir -p ~/.local/bin
 
     # terminal emulators ******************************************************
     # *************************************************************************
@@ -81,7 +81,7 @@ packages:
     shell-carapace: # shell autocomplete
         win: winget install --id rsteube.Carapace
         mac: brew install carapace
-        lin: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin && grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        lin: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && mkdir -p ~/.local/bin && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin
     shell-starship: # prompt
         win: choco install starship.portable
         mac: brew install starship

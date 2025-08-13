@@ -89,5 +89,8 @@ Set-Alias -Name lla -Value alias-lla -Force
 function alias-lga { docmd "eza --icons=always --group --header --group-directories-first --all --long --git --git-ignore" }
 Set-Alias -Name lga -Value alias-lga -Force
 
+# add $HOME/.local/bin binaries to PATH
+$env:Path += ";$env:USERPROFILE\.local\bin"
+
 # Add cargo to path
 $env:Path += ";$env:USERPROFILE\.cargo\bin"

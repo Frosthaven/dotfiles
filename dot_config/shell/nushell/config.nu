@@ -10,6 +10,7 @@
 # disable the welcome message
 $env.config.show_banner = false
 
+source ./sources/_env_path.nu
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
 try { source ./sources/fnm.nu } catch {ignore} # fnm might not be installed

@@ -11,6 +11,12 @@ if ! grep -q "source \"$chezmoi_bash_profile\"" "$bashrc"; then
   echo "source \"$chezmoi_bash_profile\"" >> "$bashrc"
 fi
 
+# Ensure $HOME/.local/bin is in PATH
+if ! grep -q "\$HOME/.local/bin" "$bashrc"; then
+    echo "# Ensure \$HOME/.local/bin is in PATH" >> "$bashrc"
+    echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$bashrc"
+fi
+
 # copy nushell files to $HOME/Library/Application Support/nushell/
 nushell_config_parent="$HOME/.config"
 chezmoi_nushell_dir="$HOME/.local/share/chezmoi/dot_config/shell/nushell"
