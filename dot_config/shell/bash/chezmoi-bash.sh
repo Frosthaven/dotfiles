@@ -1,3 +1,6 @@
+# add $HOME/.local/bin binaries to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
 # Starship prompt
 eval "$(starship init bash)"
 
