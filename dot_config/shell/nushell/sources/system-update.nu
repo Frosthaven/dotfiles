@@ -145,7 +145,7 @@ def sysup [] {
         brew update
         print ""
         print "Updating all Homebrew packages..."
-        brew upgrade
+        brew upgrade --greedy
         print ""
         print "Performing cleanup..."
         brew cleanup
