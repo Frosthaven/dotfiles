@@ -12,7 +12,7 @@ $env.config.show_banner = false
 
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
-source ./sources/fnm.nu
+try { source ./sources/fnm.nu } catch {ignore} # fnm might not be installed
 source ./sources/uv.nu
 source ./sources/wezterm.nu
 source ./sources/homebrew.nu
@@ -20,4 +20,3 @@ source ./sources/starship.nu
 source ./sources/zoxide.nu
 source ./sources/sf.nu
 source ./sources/system-update.nu
-try { source ./sources/fnm.nu } catch {ignore} # macos/nvim complains
