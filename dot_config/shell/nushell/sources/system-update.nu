@@ -151,6 +151,17 @@ def sysup [] {
         brew cleanup
     }
 
+    if (which chezmoi | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Chezmoi configuration -----------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating Chezmoi..."
+        chezmoi update
+    }
+
     if (which nvim | is-empty) {
         # nothing
     } else {
@@ -161,17 +172,6 @@ def sysup [] {
         print "Updating all plugins..."
         nvim --headless "+Lazy! update" "+MasonUpdate" +qa
         print ""
-    }
-
-    if (which chezmoi | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating Chezmoi configuration -----------------------------"
-        print "---------------------------------------------------------------"
-        print ""
-        print "Updating Chezmoi..."
-        chezmoi update
     }
 
     print ""
