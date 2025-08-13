@@ -259,68 +259,67 @@ return {
         },
     },
     {
-        -- AUTOMATIC tailwind language server configuration
-        'luckasRanarison/tailwind-tools.nvim',
-        name = 'tailwind-tools',
-        build = ':UpdateRemotePlugins',
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter',
-        },
-        opts = {
-            server = {
-                override = true, -- setup the server from the plugin if true
-                settings = { -- shortcut for `settings.tailwindCSS`
-                    includeLanguages = {
-                        elixir = 'phoenix-heex',
-                        heex = 'phoenix-heex',
-                        html = 'html',
-                        javascript = 'javascript',
-                        javascriptreact = 'javascriptreact',
-                        typescript = 'typescript',
-                        typescriptreact = 'typescriptreact',
-                        svelte = 'svelte',
-                        vue = 'vue',
-                        twig = 'html',
-                    },
-                    experimental = {
-                        configFile = configFile,
-                        classRegex = {
-                            -- 1) Twig `{% set name = '...' %}`:
-                            --    first regex captures the whole RHS (container),
-                            --    second regex extracts the quoted string (single or double quotes)
-                            { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
+        {
+            -- Automatic tailwind language server configuration
+            'luckasRanarison/tailwind-tools.nvim',
+            name = 'tailwind-tools',
+            build = ':UpdateRemotePlugins',
+            dependencies = {
+                'nvim-treesitter/nvim-treesitter',
+            },
+            opts = {
+                server = {
+                    override = true, -- setup the server from the plugin if true
+                    settings = { -- shortcut for `settings.tailwindCSS`
+                        includeLanguages = {
+                            elixir = 'phoenix-heex',
+                            heex = 'phoenix-heex',
+                            html = 'html',
+                            javascript = 'javascript',
+                            javascriptreact = 'javascriptreact',
+                            typescript = 'typescript',
+                            typescriptreact = 'typescriptreact',
+                            svelte = 'svelte',
+                            vue = 'vue',
+                            twig = 'html',
+                        },
+                        experimental = {
+                            configFile = configFile,
+                            classRegex = {
+                                -- 1) Twig `{% set name = '...' %}`:
+                                { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
+                            },
                         },
                     },
                 },
-            },
-            document_color = {
-                enabled = true, -- can be toggled by commands
-                kind = 'inline', -- "inline" | "foreground" | "background"
-                inline_symbol = '󰝤 ', -- only used in inline mode
-                debounce = 200, -- in milliseconds, only applied in insert mode
-            },
-            conceal = {
-                enabled = false, -- can be toggled by commands
-                min_length = nil, -- only conceal classes exceeding the provided length
-                symbol = '󱏿', -- only a single character is allowed
-                highlight = { -- extmark highlight options, see :h 'highlight'
-                    fg = '#38BDF8',
+                document_color = {
+                    enabled = true, -- can be toggled by commands
+                    kind = 'inline', -- "inline" | "foreground" | "background"
+                    inline_symbol = '󰝤 ', -- only used in inline mode
+                    debounce = 200, -- in milliseconds, only applied in insert mode
                 },
-            },
-            keymaps = {
-                smart_increment = { -- increment tailwindcss units using <C-a> and <C-x>
-                    enabled = false,
-                    units = { -- see lua/tailwind/units.lua to see all the defaults
-                        {
-                            prefix = 'border',
-                            values = { '2', '4', '6', '8' },
-                        },
-                        -- ...
+                conceal = {
+                    enabled = false, -- can be toggled by commands
+                    min_length = nil, -- only conceal classes exceeding the provided length
+                    symbol = '󱏿', -- only a single character is allowed
+                    highlight = { -- extmark highlight options, see :h 'highlight'
+                        fg = '#38BDF8',
                     },
                 },
-            },
-            cmp = {
-                highlight = 'foreground', -- color preview style, "foreground" | "background"
+                keymaps = {
+                    smart_increment = { -- increment tailwindcss units using <C-a> and <C-x>
+                        enabled = false,
+                        units = { -- see lua/tailwind/units.lua to see all the defaults
+                            {
+                                prefix = 'border',
+                                values = { '2', '4', '6', '8' },
+                            },
+                        },
+                    },
+                },
+                cmp = {
+                    highlight = 'foreground', -- color preview style, "foreground" | "background"
+                },
             },
         },
     },
