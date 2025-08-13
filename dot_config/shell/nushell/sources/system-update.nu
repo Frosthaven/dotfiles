@@ -164,6 +164,17 @@ def sysup [] {
         brew cleanup
     }
 
+    if (which chezmoi | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Chezmoi configuration -----------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating Chezmoi..."
+        chezmoi update
+    }
+
     print ""
     print "--------------------------------------------------------------"
     print "✅ All system updates completed."
