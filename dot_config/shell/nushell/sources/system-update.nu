@@ -27,8 +27,11 @@ def sysup [] {
         # nothing
     } else {
         print ""
-        print "🔄 Updating Cargo Rust packages -------------------------------"
+        print "🔄 Updating Rust & Cargo packages -----------------------------"
         print "---------------------------------------------------------------"
+        print ""
+        print "Updating Rust..."
+        rustup update
         print ""
         print "Updating all global Cargo packages..."
         cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
