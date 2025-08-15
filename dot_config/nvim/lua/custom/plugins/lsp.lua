@@ -196,6 +196,7 @@ return {
                 intelephense = {}, -- php
                 gopls = {}, -- go
                 pyright = {}, -- python
+                rust_analyzer = {}, -- rust
 
                 -- templating & styling ---------------------------------------
                 twiggy_language_server = {}, -- twig
