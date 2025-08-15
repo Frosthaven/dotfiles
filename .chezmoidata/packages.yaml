@@ -216,14 +216,6 @@ packages:
         win: winget install --id Bitwarden.Bitwarden
         mac: brew install bitwarden
         lin: flatpak install flathub com.bitwarden.desktop -y
-    toy-everything: # search tool
-        win: winget install --id voidtools.Everything
-        mac: # n/a
-        lin: # n/a
-    toy-flow-launcher: # launcher
-        win: winget install --id Flow-Launcher.Flow-Launcher
-        mac: # n/a
-        lin: # n/a
     toy-keka: # archive manager
         win: # n/a
         mac: brew install keka
