@@ -19,9 +19,6 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
 
     # Komorebi
 
-    Write-Host ""
-    Write-Host "Updating Komorebi Application Specific Configuration..."
-    komorebic fetch-asc
     if (-not [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')) {
         $value = Join-Path $env:USERPROFILE '.config\komorebi'
         Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile', '-Command', "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment' -Name 'KOMOREBI_CONFIG_HOME' -Value '$env:USERPROFILE\.config\komorebi'"
