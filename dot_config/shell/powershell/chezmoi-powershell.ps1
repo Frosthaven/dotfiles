@@ -10,14 +10,20 @@
 # Predictive Text Setup (REQUIRES powershell ^7.2)
 # First, run this in Admin session:
 # - Install-Module PSReadLine -Force
-Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -Colors @{ InlinePrediction = '#5A6374'}
+
+
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -Colors @{ InlinePrediction = '#5A6374'}
+}
 
 # Starship
 Invoke-Expression (&starship init powershell)
 
 # Module: CommandNotFound
-Import-Module -Name Microsoft.WinGet.CommandNotFound
+if (Get-Module -ListAvailable -Name Microsoft.WinGet.CommandNotFound) {
+    Import-Module Microsoft.WinGet.CommandNotFound
+}
 
 # Wezterm: Enable OC7 Escape Sequence Support
 # see: https://wezfurlong.org/wezterm/shell-integration.html#osc-7-on-windows-with-cmdexe
@@ -65,29 +71,29 @@ function docmd { cmd /c $args }
 
 # eza
 function alias-l { docmd "eza --icons=always" }
-Set-Alias -Name l -Value alias-l -Force
+New-Alias -Name l -Value alias-l -Force
 function alias-ls { docmd "eza --icons=always --group --header --group-directories-first" }
-Set-Alias -Name ls -Value alias-ls -Force
+Set-Alias -Name ls -Value alias-ls -Force -Option AllScope
 function alias-ll { docmd "eza --icons=always --long" }
-Set-Alias -Name ll -Value alias-ll -Force
+New-Alias -Name ll -Value alias-ll -Force
 function alias-lg { docmd "eza --icons=always --group --header --group-directories-first --long --git" }
-Set-Alias -Name lg -Value alias-lg -Force
+New-Alias -Name lg -Value alias-lg -Force
 function alias-le { docmd "eza --icons=always --group --header --group-directories-first --long --extended" }
-Set-Alias -Name le -Value alias-le -Force
+New-Alias -Name le -Value alias-le -Force
 function alias-lt { docmd "eza --icons=always --group --header --group-directories-first --tree --level 2" }
-Set-Alias -Name lt -Value alias-lt -Force
+New-Alias -Name lt -Value alias-lt -Force
 function alias-lc { docmd "eza --icons=always --group --header --group-directories-first --across" }
-Set-Alias -Name lc -Value alias-lc -Force
+New-Alias -Name lc -Value alias-lc -Force
 function alias-lo { docmd "eza --icons=always --group --header --group-directories-first --oneline" }
-Set-Alias -Name lo -Value alias-lo -Force
+New-Alias -Name lo -Value alias-lo -Force
 function alias-la { docmd "eza --icons=always --all" }
-Set-Alias -Name la -Value alias-la -Force
+New-Alias -Name la -Value alias-la -Force
 function alias-lsa { docmd "eza --icons=always --group --header --group-directories-first --all" }
-Set-Alias -Name lsa -Value alias-lsa -Force
+New-Alias -Name lsa -Value alias-lsa -Force
 function alias-lla { docmd "eza --icons=always --group --header --group-directories-first --all --long --git" }
-Set-Alias -Name lla -Value alias-lla -Force
+New-Alias -Name lla -Value alias-lla -Force
 function alias-lga { docmd "eza --icons=always --group --header --group-directories-first --all --long --git --git-ignore" }
-Set-Alias -Name lga -Value alias-lga -Force
+New-Alias -Name lga -Value alias-lga -Force
 
 # add $HOME/.local/bin binaries to PATH
 $env:Path += ";$env:USERPROFILE\.local\bin"

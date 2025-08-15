@@ -15,16 +15,12 @@ packages:
         mac: brew install uv
         lin: curl -LsSf https://astral.sh/uv/install.sh | sh
     1-package-manager-fnm: # node version manager + same-shell setup
-        win: winget install --id Schniz.fnm; if (-not $env:FNM_DIR) { $output = (fnm env | Out-String).Trim(); Invoke-Expression $output; if (-not (Get-Command node -ErrorAction SilentlyContinue)) { fnm install --lts; fnm use lts-latest } }
+        win: winget install --id Schniz.fnm -e --silent; $fnm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter fnm.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if ($fnm) { $env:FNM_DIR = "$env:USERPROFILE\AppData\Local\fnm"; $env:PATH += ";$env:FNM_DIR;$env:FNM_DIR\.bin"; Invoke-Expression (& $fnm env | Out-String); if (-not (Get-Command node -ErrorAction SilentlyContinue)) { & $fnm install --lts; & $fnm use lts-latest } } else { Write-Error "fnm.exe not found in WinGet packages folder." }
         mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
         lin: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
     1-package-manager-mas: # mac app store cli
         win: # n/a
         mac: brew install mas
-        lin: # n/a
-    1-wsl:
-        win: $pkg = "Microsoft.WSL"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
-        mac: # n/a
         lin: # n/a
 
     # programming languages ***************************************************
@@ -51,7 +47,7 @@ packages:
         mac: brew install lua
         lin: command -v lua >/dev/null || { echo "Installing lua5.4 and luarocks..."; sudo apt update -qq && sudo apt install -y lua5.4 luarocks; }
     2-language-php:
-        win: winget install --id PHP.PHP.8.4
+        win: choco install php -y
         mac: brew install php
         lin: PHP_VERSION=8.4 && if ! command -v php >/dev/null 2>&1 || [[ "$(php -v | head -n1 | awk '{print $2}')" != "$PHP_VERSION" ]]; then sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository -y ppa:ondrej/php && sudo apt update && sudo apt install -y php$PHP_VERSION && sudo update-alternatives --set php /usr/bin/php$PHP_VERSION && echo "PHP $PHP_VERSION installed."; else echo "PHP $PHP_VERSION is already installed."; fi && mkdir -p ~/.local/bin
 
@@ -83,21 +79,21 @@ packages:
         mac: brew install carapace
         lin: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && mkdir -p ~/.local/bin && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin
     shell-starship: # prompt
-        win: choco install starship.portable
+        win: choco install starship.portable -y
         mac: brew install starship
         lin: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
 
     # command line tools ******************************************************
     # *************************************************************************
 
-    cli-composer:
-        win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { Invoke-WebRequest -Uri https://getcomposer.org/Composer-Setup.exe -OutFile Composer-Setup.exe; Start-Process -Wait -FilePath Composer-Setup.exe }
-        mac: brew install composer
-        lin: sudo apt install composer -y
     cli-git:
         win: winget install --id Git.Git
         mac: brew install git
         lin: sudo apt install git -y
+    cli-composer:
+        win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { $p="$env:TEMP\Composer-Setup.exe"; Invoke-WebRequest https://getcomposer.org/Composer-Setup.exe -OutFile $p -UseBasicParsing; if (Test-Path $p) { Start-Process -Wait -FilePath $p } else { Write-Error "Download failed or file missing." } }
+        mac: brew install composer
+        lin: sudo apt install composer -y
     cli-yazi:
         win: winget install --id sxyazi.yazi
         mac: brew install yazi
@@ -187,7 +183,7 @@ packages:
     # *************************************************************************
 
     window-management-komorebi:
-        win: winget install --id LGUG2Z.komorebi
+        win: winget install --id=LGUG2Z.whkd -e; winget install --id LGUG2Z.komorebi
         mac: # n/a
         lin: # n/a
     window-management-aerospace:
@@ -365,7 +361,7 @@ packages:
         mac: brew install qbittorrent
         lin: flatpak install flathub com.transmissionbt.Transmission -y
     desktop-database-manager:
-        win: choco install dbeaver
+        win: choco install dbeaver -y
         mac: brew install --cask dbeaver-community
         lin: flatpak install flathub io.dbeaver.DBeaverCommunity -y
     desktop-video-player:
