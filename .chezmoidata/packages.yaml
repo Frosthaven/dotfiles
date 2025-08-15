@@ -308,6 +308,10 @@ packages:
     # desktop applications ****************************************************
     # *************************************************************************
 
+    desktop-steam: # gaming
+        win: winget install --id Valve.Steam
+        mac: brew install --cask steam
+        lin: flatpak install flathub com.valvesoftware.Steam -y
     desktop-adobe-creative-cloud: # creative suite
         win: winget install --id Adobe.CreativeCloud
         mac: brew install adobe-creative-cloud
