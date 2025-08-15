@@ -26,12 +26,10 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
 
         # Refresh environment variable in the current session
         $env:KOMOREBI_CONFIG_HOME = [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')
-        Write-Host "Refreshed KOMOREBI_CONFIG_HOME in current session: $env:KOMOREBI_CONFIG_HOME"
     } else {
         $current = [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')
-        Write-Host "KOMOREBI_CONFIG_HOME is already set to: $current"
     }
-    
+
     # Clink Scripts
     If (-Not (Test-Path $env:LOCALAPPDATA\clink)) {
         New-Item -Path $env:LOCALAPPDATA\clink -ItemType Directory | Out-Null

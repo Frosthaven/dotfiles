@@ -177,6 +177,16 @@ def sysup [] {
         print ""
     }
 
+    if (which komorebic | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Komorebic Application Rules -----------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        komorebic fetch-asc
+    }
+
     print ""
     print "--------------------------------------------------------------"
     print "✅ All system updates completed."
