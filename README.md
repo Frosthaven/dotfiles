@@ -2,6 +2,28 @@
 
 This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
 
+## Preparation
+
+### Windows
+
+1. Enable WSL
+
+2. Configure repository access as needed.
+
+3. Install chocolatey & set execution user script execution policy + symlink creation policy (admin shell):
+
+```ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')); Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d 1;
+```
+
+4. Run installation (non-admin shell):
+
+```ps1
+mkdir ~/.local/share/chezmoi; winget install Microsoft.DotNet.DesktopRuntime.8; winget install --id Git.Git -e --source winget; winget install twpayne.chezmoi;
+```
+
+5. Restart the PC
+
 ## Deployment
 
 1. Clone this repository into `~/.local/share/chezmoi`.
