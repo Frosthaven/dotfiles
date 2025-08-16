@@ -32,9 +32,6 @@ def sysup [] {
         print ""
         print "Updating Pacman package lists..."
         sudo pacman -Syu --noconfirm;
-        print ""
-        print "Performing cleanup..."
-        sudo pacman -Rns $(pacman -Qtdq) --noconfirm;
     }
 
     if (which yay | is-empty) {
