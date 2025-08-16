@@ -302,6 +302,10 @@ packages:
     # desktop applications ****************************************************
     # *************************************************************************
 
+    desktop-disk-usage-analyzer:
+        win: winget install -e --id AntibodySoftware.WizTree
+        mac: # n/a
+        lin: # n/a
     desktop-steam: # gaming
         win: winget install --id Valve.Steam
         mac: brew install --cask steam
