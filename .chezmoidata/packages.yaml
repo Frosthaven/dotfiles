@@ -6,8 +6,7 @@ packages:
         win: winget install --id DEVCOM.JetBrainsMonoNerdFont
         mac: brew install --cask font-jetbrains-mono-nerd-font
         apt: font_name="jetbrainsmono"; font_dir="$home/.local/share/fonts"; if fc-list | grep -qi "$font_name nerd font"; then echo "$font_name nerd font already installed."; else font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font_name}.zip"; temp_dir="/tmp/${font_name}-font"; mkdir -p "$temp_dir"; mkdir -p "$font_dir"; curl -l -o "$temp_dir/${font_name}.zip" "$font_url"; unzip -o "$temp_dir/${font_name}.zip" -d "$font_dir"; rm -rf "$temp_dir"; fc-cache -f -v; echo "$font_name nerd font installed successfully."; fi
-        pac: font_name="jetbrainsmono"; font_dir="$home/.local/share/fonts"; if fc-list | grep -qi "$font_name nerd font"; then echo "$font_name nerd font already installed."; else font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font_name}.zip"; temp_dir="/tmp/${font_name}-font"; mkdir -p "$temp_dir"; mkdir -p "$font_dir"; curl -l -o "$temp_dir/${font_name}.zip" "$font_url"; unzip -o "$temp_dir/${font_name}.zip" -d "$font_dir"; rm -rf "$temp_dir"; fc-cache -f -v; echo "$font_name nerd font installed successfully."; fi
- 
+        pac: font_name="jetbrainsmono"; font_dir="$HOME/.local/share/fonts"; if fc-list | grep -qi "$font_name nerd font"; then echo "$font_name nerd font already installed."; else font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font_name}.zip"; mkdir -p "$font_dir"; curl -L -o "${font_name}.zip" "$font_url"; unzip -o "${font_name}.zip" -d "$font_dir"; rm -f "${font_name}.zip"; fc-cache -f -v "$font_dir"; echo "$font_name nerd font installed successfully."; fi
 
     # package managers ********************************************************
     # *************************************************************************
@@ -20,8 +19,8 @@ packages:
     1-package-manager-fnm: # node version manager + same-shell setup
         win: winget install --id Schniz.fnm -e --silent; $fnm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter fnm.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if ($fnm) { $env:FNM_DIR = "$env:USERPROFILE\AppData\Local\fnm"; $env:PATH += ";$env:FNM_DIR;$env:FNM_DIR\.bin"; Invoke-Expression (& $fnm env | Out-String); if (-not (Get-Command node -ErrorAction SilentlyContinue)) { & $fnm install --lts; & $fnm use lts-latest } } else { Write-Error "fnm.exe not found in WinGet packages folder." }
         mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
-        apt: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash 
-        pac: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
+        apt: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
+        pac: command -v fnm >/dev/null 2>&1 || (curl -fsSL https://fnm.vercel.app/install | bash && export PATH="$HOME/.fnm:$PATH" && eval "$(fnm env)"); fnm install --lts && fnm use lts-latest
     1-package-manager-mas: # mac app store cli
         mac: brew install mas
     1-package-manager-appinstaller: # microsoft
@@ -49,10 +48,12 @@ packages:
         win: winget install --id GoLang.Go
         mac: brew install go
         apt: GO_VERSION=1.22.2 && if ! command -v go >/dev/null 2>&1 || [[ "$(go version | awk '{print $3}')" != "go$GO_VERSION" ]]; then curl -LO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local && tar -C ~/.local -xzf go${GO_VERSION}.linux-amd64.tar.gz && mkdir -p ~/.local/bin && ln -sf ~/.local/go/bin/go ~/.local/bin/go && rm go${GO_VERSION}.linux-amd64.tar.gz && echo "Go $GO_VERSION installed."; else echo "Go $GO_VERSION is already installed."; fi
+        pac: yes | sudo pacman -S --needed go
     2-language-lua:
         win: winget install --id DEVCOM.Lua
         mac: brew install lua
         apt: command -v lua >/dev/null || { echo "Installing lua5.4 and luarocks..."; sudo apt update -qq && sudo apt install -y lua5.4 luarocks; }
+        pac: yes | sudo pacman -S --needed lua
     2-dot-net:
         win: winget install --id Microsoft.DotNet.SDK.8; winget install --id Microsoft.DotNet.SDK.9
         mac: # n/a
@@ -61,6 +62,7 @@ packages:
         win: choco install php -y
         mac: brew install php
         apt: PHP_VERSION=8.4 && if ! command -v php >/dev/null 2>&1 || [[ "$(php -v | head -n1 | awk '{print $2}')" != "$PHP_VERSION" ]]; then sudo apt update && sudo apt install -y software-properties-common && sudo add-apt-repository -y ppa:ondrej/php && sudo apt update && sudo apt install -y php$PHP_VERSION && sudo update-alternatives --set php /usr/bin/php$PHP_VERSION && echo "PHP $PHP_VERSION installed."; else echo "PHP $PHP_VERSION is already installed."; fi && mkdir -p ~/.local/bin
+        pac: yes | sudo pacman -S --needed php
 
     # terminal emulators ******************************************************
     # *************************************************************************
@@ -68,7 +70,8 @@ packages:
     terminal-wezterm:
         win: winget install --id wez.wezterm
         mac: brew install wezterm
-        apt: flatpak install flathub org.wezfurlong.wezterm
+        apt: flatpak install flathub org.wezfurlong.wezterm -y
+        pac: flatpak install flathub org.wezfurlong.wezterm -y
 
     # shells ******************************************************************
     # *************************************************************************
@@ -77,22 +80,24 @@ packages:
         win: winget install --id Microsoft.PowerShell
         mac: brew install powershell
         apt: sudo snap install powershell --classic
+        pac: yay -S --noconfirm powershell-bin
     shell-clink: # spices up cmd.exe
         win: winget install --id chrisant996.Clink
-        mac: # n/a
-        apt: # n/a
     shell-nushell: # structured data, used as sidekick
         win: cargo install nu --locked #winget install --id Nushell.Nushell
         mac: cargo install nu --locked
         apt: cargo install nu --locked
+        pac: cargo install nu --locked
     shell-carapace: # shell autocomplete
         win: winget install --id rsteube.Carapace
         mac: brew install carapace
         apt: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && mkdir -p ~/.local/bin && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin
+        pac: yay -S --noconfirm carapace-bin
     shell-starship: # prompt
         win: choco install starship.portable -y
         mac: brew install starship
         apt: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
+        pac: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
 
     # command line tools ******************************************************
     # *************************************************************************
@@ -101,78 +106,97 @@ packages:
         win: winget install --id Git.Git
         mac: brew install git
         apt: sudo apt install git -y
+        pac: yes | sudo pacman -S --needed git
     cli-composer:
         win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { $p="$env:TEMP\Composer-Setup.exe"; Invoke-WebRequest https://getcomposer.org/Composer-Setup.exe -OutFile $p -UseBasicParsing; if (Test-Path $p) { Start-Process -Wait -FilePath $p } else { Write-Error "Download failed or file missing." } }
         mac: brew install composer
         apt: sudo apt install composer -y
+        pac: yay -S --noconfirm composer
     cli-yazi:
         win: winget install --id sxyazi.yazi
         mac: brew install yazi
         apt: sudo snap install yazi --classic
+        pac: sudo pacman -S --needed yazi ffmpeg p7zip jq poppler fd ripgrep fzf zoxide imagemagick
     cli-neovim: # text editor
         win: winget install --id Neovim.Neovim
         mac: brew install neovim
         apt: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
+        pac: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo pacman -S --neededy --noconfirm base-devel ninja cmake gettext unzip curl git && TMPDIR=$(mktemp -d) && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim "$TMPDIR" && cd "$TMPDIR" && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf "$TMPDIR")
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
         apt: cargo install ripgrep
+        pac: cargo install ripgrep
     cli-fzf: # fuzzy finder
         win: winget install --id junegunn.fzf
         mac: brew install fzf
         apt: sudo apt install fzf -y
+        pac: yes | sudo pacman -S --needed fzf
     cli-fd: # alternative to find
         win: cargo install fd-find #winget install --id sharkdp.fd
         mac: cargo install fd-find
         apt: cargo install fd-find
+        pac: cargo install fd-find
     cli-bat: # alternative to cat
         win: winget install --id sharkdp.bat
         mac: brew install bat
         apt: sudo apt install bat -y
+        pac: yes | pacman -S --needed bat
     cli-jq: # json processor
         win: winget install --id jqlang.jq
         mac: brew install jq
         apt: sudo apt install jq -y
+        pac: yes | sudo pacman -S --needed jq
     cli-yq: # yaml processor
         win: winget install --id MikeFarah.yq
         mac: brew install yq
         apt: sudo snap install yq -y
+        pac: yes | sudo pacman -S --needed yq
     cli-eza: # alternative to ls
         win: cargo install eza # winget install --id eza-community.eza
         mac: cargo install eza
         apt: cargo install eza
+        pac: cargo install eza
     cli-zoxide: # alternative to cd (has jumping)
         win: winget install --id ajeetdsouza.zoxide
         mac: brew install zoxide
         apt: sudo apt install zoxide -y
+        pac: yes | pacman -S --needed zoxide
     cli-duf: # alternative to du
         win: winget install --id muesli.duf
         mac: brew install duf
         apt: sudo apt install duf -y
+        pac: yes | pacman -S --needed duf
     cli-tokei: # code line counter
         win: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei #winget install --id XAMPPRocky.tokei
         mac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
         apt: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
+        pac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
     cli-stripe-cli: # stripe cli
         win: winget install --id Stripe.StripeCli
         mac: brew install stripe-cli
         apt: command -v stripe >/dev/null 2>&1 || curl -fsSL https://stripe.com/install-cli | bash
+        pac: yay -S --noconfirm stripe-cli
     cli-posting: # api tool
         win: uv tool install --python 3.12 posting
         mac: uv tool install --python 3.12 posting
         apt: uv tool install --python 3.12 posting
+        pac: uv tool install --python 3.12 posting
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
         mac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
+        pac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
     cli-prettier:
         win: npm install --global prettier
         mac: npm install --global prettier
         apt: npm install --global prettier
+        pac: npm install --global prettier
     cli-fastfetch:
         win: # n/a
         mac: brew install fastfetch
         apt: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
+        pac: yes | pacman -S --needed fastfetch
 
     # container management ****************************************************
     # *************************************************************************
@@ -181,6 +205,7 @@ packages:
         win: winget install --id Docker.DockerDesktop
         mac: # n/a
         apt: command -v docker >/dev/null 2>&1 || (curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$(whoami)" && echo "Docker installed. Log out/in to apply group changes.")
+        pac: yes | sudo pacman -S --needed docker
     containers-orbstack: # alternative to docker on mac
         win: # n/a
         mac: brew install --cask orbstack
@@ -189,6 +214,7 @@ packages:
         win: winget install --id DDEVFoundation.DDEV
         mac: brew install ddev/ddev/ddev; mkcert -install;
         apt: sudo apt-get update && sudo apt-get install -y curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings && curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/ddev.gpg >/dev/null && sudo chmod a+r /etc/apt/keyrings/ddev.gpg && echo "deb [signed-by=/etc/apt/keyrings/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null && sudo apt-get update && sudo apt-get install -y ddev && mkcert -install
+        pac: yay -S --noconfirm ddev-bin; mkcert -install
 
     # desktop window management ***********************************************
     # *************************************************************************
@@ -223,6 +249,7 @@ packages:
         win: winget install --id Bitwarden.Bitwarden
         mac: brew install bitwarden
         apt: flatpak install flathub com.bitwarden.desktop -y
+        pac: flatpak install flathub com.bitwarden.desktop -y
     toy-keka: # archive manager
         win: # n/a
         mac: brew install keka
@@ -315,6 +342,7 @@ packages:
         win: winget install --id Valve.Steam
         mac: brew install --cask steam
         apt: flatpak install flathub com.valvesoftware.Steam -y
+        pac: flatpak install flathub com.valvesoftware.Steam -y
     desktop-adobe-creative-cloud: # creative suite
         win: winget install --id Adobe.CreativeCloud
         mac: brew install adobe-creative-cloud
@@ -335,34 +363,42 @@ packages:
         win: winget install --id Obsidian.Obsidian
         mac: brew install obsidian
         apt: flatpak install flathub md.obsidian.Obsidian -y
+        pac: flatpak install flathub md.obsidian.Obsidian -y
     desktop-local-send: # file sharing
         win: winget install --id LocalSend.LocalSend
         mac: brew install --cask localsend
         apt: flatpak install flathub org.localsend.localsend_app -y
+        pac: flatpak install flathub org.localsend.localsend_app -y
     desktop-discord: # chat
         win: $pkg = "Discord.Discord"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
         mac: brew install discord
         apt: flatpak install flathub com.discordapp.Discord -y
+        pac: flatpak install flathub com.discordapp.Discord -y
     desktop-slack: # chat
         win: winget install --id SlackTechnologies.Slack
         mac: brew install slack
         apt: flatpak install flathub com.slack.Slack -y
+        pac: flatpak install flathub com.slack.Slack -y
     desktop-spotify: # music
         win: $pkg = "Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
         mac: brew install spotify
         apt: flatpak install flathub com.spotify.Client -y
+        pac: flatpak install flathub com.spotify.Client -y
     desktop-zoom:
         win: winget install --id Zoom.Zoom
         mac: brew install zoom
         apt: flatpak install flathub us.zoom.Zoom -y
+        pac: flatpak install flathub us.zoom.Zoom -y
     desktop-obs:
         win: winget install --id OBSProject.OBSStudio
         mac: brew install obs
         apt: flatpak install flathub com.obsproject.Studio -y
+        pac: flatpak install flathub com.obsproject.Studio -y
     desktop-web-browser:
         win: winget install --id Microsoft.Edge
         mac: brew install microsoft-edge
         apt: flatpak install flathub com.microsoft.Edge -y
+        pac: flatpak install flathub com.microsoft.Edge -y
     desktop-files-sftp:
         win: winget install --id WinSCP.WinSCP
         mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
@@ -371,14 +407,17 @@ packages:
         win: winget install --id Microsoft.VisualStudioCode
         mac: brew install --cask visual-studio-code
         apt: command -v code >/dev/null 2>&1 || (wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg && echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null && sudo apt update && sudo apt install -y code)
-    desktop-qbittorrent:
+        pac: yes | sudo pacman -S --needed code
+    desktop-torrent-tool:
         win: winget install --id qBittorrent.qBittorrent
         mac: brew install qbittorrent
         apt: flatpak install flathub com.transmissionbt.Transmission -y
+        pac: flatpak install flathub com.transmissionbt.Transmission -y
     desktop-database-manager:
         win: choco install dbeaver -y
         mac: brew install --cask dbeaver-community
         apt: flatpak install flathub io.dbeaver.DBeaverCommunity -y
+        pac: flatpak install flathub io.dbeaver.DBeaverCommunity -y
     desktop-video-player:
         win: winget install screenbox -s winget
         mac: brew install iina

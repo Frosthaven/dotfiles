@@ -23,6 +23,31 @@ def sysup [] {
         sudo apt autoremove -y;
     }
 
+    if (which pacman | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Pacman packages -----------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating Pacman package lists..."
+        sudo pacman -Syu --noconfirm;
+        print ""
+        print "Performing cleanup..."
+        sudo pacman -Rns $(pacman -Qtdq) --noconfirm;
+    }
+
+    if (which yay | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Yay packages --------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating all Yay packages..."
+        yay -Syu --noconfirm;
+    }
+
     if (which cargo | is-empty) {
         # nothing
     } else {

@@ -4,9 +4,6 @@
 
 sudo -v
 
-# FILEHASH ********************************************************************
-# *****************************************************************************
-
 fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml")
 
 # Detect package manager
@@ -19,9 +16,6 @@ else
     exit 1
 fi
 
-# SCRIPT **********************************************************************
-# *****************************************************************************
-
 echo ""
 if read -r -p "Do you want to install packages? (N/y) " REPLY && [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "$REPLY"
@@ -29,28 +23,40 @@ if read -r -p "Do you want to install packages? (N/y) " REPLY && [[ ! "$REPLY" =
     exit
 fi
 
-# Count total packages
 totalPackages=0
-{{ range $key, $value := .packages }}
-  {{- if (index $value $pkgmgr) }}
+currentPackage=0
+
+# Count total packages for detected pkgmgr
+{{- range $key, $value := .packages }}
+  {{- if or (index $value "pac") (index $value "apt") }}
     totalPackages=$((totalPackages + 1))
   {{- end }}
-{{ end }}
-currentPackage=0
+{{- end }}
 
 echo ""
 echo "Processing $totalPackages packages with '${pkgmgr}'..."
 echo ""
 
-# Process packages
-{{ range $key, $value := .packages -}}
-  {{- $cmd := index $value $pkgmgr }}
-  {{- if $cmd }}
+{{- range $key, $value := .packages }}
+
+case "$pkgmgr" in
+  pac)
+    {{- with index $value "pac" }}
     currentPackage=$((currentPackage + 1))
     echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
-    {{ $cmd }}
-  {{- end }}
-{{ end -}}
+    {{ . }}
+    {{- end }}
+    ;;
+  apt)
+    {{- with index $value "apt" }}
+    currentPackage=$((currentPackage + 1))
+    echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
+    {{ . }}
+    {{- end }}
+    ;;
+esac
+
+{{- end }}
 
 echo ""
 echo "Done!"
