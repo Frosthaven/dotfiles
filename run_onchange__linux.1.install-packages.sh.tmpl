@@ -7,16 +7,21 @@ sudo -v
 # FILEHASH ********************************************************************
 # *****************************************************************************
 
-# by embedding the file hash into this template, chezmoi will only detect
-# changes if the hashed file changes. This will prevent unnecessarily running
-# the script when the target file hasn't changed.
-
 fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml")
+
+# Detect package manager
+if command -v pacman &>/dev/null; then
+    pkgmgr="pac"
+elif command -v apt &>/dev/null; then
+    pkgmgr="apt"
+else
+    echo "❌ Unsupported package manager."
+    exit 1
+fi
 
 # SCRIPT **********************************************************************
 # *****************************************************************************
 
-# ask the user if they want to install packages, and if not then exit
 echo ""
 if read -r -p "Do you want to install packages? (N/y) " REPLY && [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "$REPLY"
@@ -24,26 +29,31 @@ if read -r -p "Do you want to install packages? (N/y) " REPLY && [[ ! "$REPLY" =
     exit
 fi
 
+# Count total packages
 totalPackages=0
 {{ range $key, $value := .packages }}
-  {{ if ne (index $value "lin") nil }}
+  {{- if (index $value $pkgmgr) }}
     totalPackages=$((totalPackages + 1))
-  {{ end }}
+  {{- end }}
 {{ end }}
 currentPackage=0
 
 echo ""
-echo "Processing $totalPackages Packages..."
+echo "Processing $totalPackages packages with '${pkgmgr}'..."
 echo ""
+
+# Process packages
 {{ range $key, $value := .packages -}}
-    {{ if .lin -}}
-        currentPackage=$((currentPackage + 1))
-        echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
-        {{ .lin }}
-    {{ end -}}
+  {{- $cmd := index $value $pkgmgr }}
+  {{- if $cmd }}
+    currentPackage=$((currentPackage + 1))
+    echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
+    {{ $cmd }}
+  {{- end }}
 {{ end -}}
 
 echo ""
 echo "Done!"
 
 {{ end -}}
+
