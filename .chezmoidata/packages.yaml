@@ -48,6 +48,10 @@ packages:
         win: winget install --id DEVCOM.Lua
         mac: brew install lua
         lin: command -v lua >/dev/null || { echo "Installing lua5.4 and luarocks..."; sudo apt update -qq && sudo apt install -y lua5.4 luarocks; }
+    2-dot-net:
+        win: winget install --id Microsoft.DotNet.SDK.8; winget install --id Microsoft.DotNet.SDK.9
+        mac: # n/a
+        lin: # n/a
     2-language-php:
         win: choco install php -y
         mac: brew install php
