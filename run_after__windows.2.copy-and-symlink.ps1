@@ -83,7 +83,7 @@ if (-Not (Test-Path $profile)) {
 }
 . $profile
 
-komorebic-no-console stop --whkd --bar; komorebic-no-console start --whkd;
+komorebic stop --whkd --bar; komorebic start --whkd;
 
 Write-Output ""
 Write-Output "------------------------------------------------------------------------"
