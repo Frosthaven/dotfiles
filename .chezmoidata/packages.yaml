@@ -5,7 +5,9 @@ packages:
     font-jetbrains-mono:
         win: winget install --id DEVCOM.JetBrainsMonoNerdFont
         mac: brew install --cask font-jetbrains-mono-nerd-font
-        apt: FONT_NAME="JetBrainsMono"; FONT_DIR="$HOME/.local/share/fonts"; if fc-list | grep -qi "$FONT_NAME Nerd Font"; then echo "$FONT_NAME Nerd Font already installed."; else FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${FONT_NAME}.zip"; TEMP_DIR="/tmp/${FONT_NAME}-font"; mkdir -p "$TEMP_DIR"; mkdir -p "$FONT_DIR"; curl -L -o "$TEMP_DIR/${FONT_NAME}.zip" "$FONT_URL"; unzip -o "$TEMP_DIR/${FONT_NAME}.zip" -d "$FONT_DIR"; rm -rf "$TEMP_DIR"; fc-cache -f -v; echo "$FONT_NAME Nerd Font installed successfully."; fi
+        apt: font_name="jetbrainsmono"; font_dir="$home/.local/share/fonts"; if fc-list | grep -qi "$font_name nerd font"; then echo "$font_name nerd font already installed."; else font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font_name}.zip"; temp_dir="/tmp/${font_name}-font"; mkdir -p "$temp_dir"; mkdir -p "$font_dir"; curl -l -o "$temp_dir/${font_name}.zip" "$font_url"; unzip -o "$temp_dir/${font_name}.zip" -d "$font_dir"; rm -rf "$temp_dir"; fc-cache -f -v; echo "$font_name nerd font installed successfully."; fi
+        pac: font_name="jetbrainsmono"; font_dir="$home/.local/share/fonts"; if fc-list | grep -qi "$font_name nerd font"; then echo "$font_name nerd font already installed."; else font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font_name}.zip"; temp_dir="/tmp/${font_name}-font"; mkdir -p "$temp_dir"; mkdir -p "$font_dir"; curl -l -o "$temp_dir/${font_name}.zip" "$font_url"; unzip -o "$temp_dir/${font_name}.zip" -d "$font_dir"; rm -rf "$temp_dir"; fc-cache -f -v; echo "$font_name nerd font installed successfully."; fi
+ 
 
     # package managers ********************************************************
     # *************************************************************************
@@ -14,14 +16,14 @@ packages:
         win: winget install --id astral-sh.uv
         mac: brew install uv
         apt: curl -LsSf https://astral.sh/uv/install.sh | sh
+        pac: curl -LsSf https://astral.sh/uv/install.sh | sh
     1-package-manager-fnm: # node version manager + same-shell setup
         win: winget install --id Schniz.fnm -e --silent; $fnm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter fnm.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if ($fnm) { $env:FNM_DIR = "$env:USERPROFILE\AppData\Local\fnm"; $env:PATH += ";$env:FNM_DIR;$env:FNM_DIR\.bin"; Invoke-Expression (& $fnm env | Out-String); if (-not (Get-Command node -ErrorAction SilentlyContinue)) { & $fnm install --lts; & $fnm use lts-latest } } else { Write-Error "fnm.exe not found in WinGet packages folder." }
         mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
-        apt: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
+        apt: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash 
+        pac: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
     1-package-manager-mas: # mac app store cli
-        win: # n/a
         mac: brew install mas
-        apt: # n/a
     1-package-manager-appinstaller: # microsoft
         win: $pkg = "Microsoft.AppInstaller"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
 
@@ -32,14 +34,17 @@ packages:
         win: winget install --id zig.zig
         mac: brew install zig
         apt: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
+        pac: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
     2-language-rust:
         win: winget install --id Rustlang.Rust.GNU --accept-package-agreements --accept-source-agreements; choco install mingw -y; $mingwBin = "C:\ProgramData\mingw64\mingw64\bin"; $cargoBin = "$env:USERPROFILE\.cargo\bin"; if (Test-Path "$mingwBin\dlltool.exe") { $env:Path += ";$mingwBin;$cargoBin"; dlltool --version } else { Write-Error "dlltool.exe not found at $mingwBin" }; winget install --id=Rustlang.Rustup;
         mac: brew install rust; brew install rustup;
         apt: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
+        pac: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
     2-language-python:
         win: uv python install --default
         mac: uv python install --default
         apt: uv python install --default
+        pac: uv python install --default
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
