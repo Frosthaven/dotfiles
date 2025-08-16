@@ -23,8 +23,8 @@
     "transparency": false,
     "transparency_alpha": 240,
     "animation": {
-        "enabled": true,
-        "duration": 80
+        "enabled": false,
+        "duration": 120
     },
     "border": true,
     "border_width": 5,
