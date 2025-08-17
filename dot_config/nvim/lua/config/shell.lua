@@ -34,8 +34,7 @@ M.shellConfigSets = {
     },
 }
 
--- in the event that the parent shell cannot be determined, the first shell in
--- the list that is found on the system will be used
+-- the first shell in the list that is found on the system will be used
 M.configuredShellPriority = {
     { 'nu', M.shellConfigSets['nu'] },
     { 'fish', M.shellConfigSets['posix'] },
@@ -48,64 +47,46 @@ M.configuredShellPriority = {
 -- SETUP ----------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
--- Loops through the provided shell configuration and sets the shell options
+-- loops through the provided shell configuration and sets the shell options
 M.applyShellConfigSet = function(shellConfig)
     for key, value in pairs(shellConfig) do
         vim.opt[key] = value
     end
 end
 
--- Looks for the shell from the priority list. If the shell is found on the system,
--- its configuration is applied; if not, defaults to posix or the first available shell.
-M.configureShell = function(currentShell)
-    local shellConfig = nil
-
-    -- First, check if the current shell is in the configured list
-    for _, shellEntry in ipairs(M.configuredShellPriority) do
-        if shellEntry[1] == currentShell then
-            shellConfig = shellEntry[2]
-            break
-        end
+-- looks for the first shell in the list that is found on the system, and sets
+-- the shell configuration to that shell. if no shell is found, the default
+-- shell configuration of neovim is used
+M.configureShell = function(shell)
+    if M.configuredShellPriority[shell] then
+        M.applyShellConfigSet(M.configuredShellPriority[shell][2])
+    else
+        M.applyShellConfigSet(M.shellConfigSets['posix'])
     end
-
-    -- If current shell not found, check the priority list for available shell
-    if not shellConfig then
-        for _, shellEntry in ipairs(M.configuredShellPriority) do
-            if vim.fn.executable(shellEntry[1]) == 1 then
-                shellConfig = shellEntry[2]
-                break
-            end
-        end
-    end
-
-    -- If no shell config found, fallback to posix
-    if not shellConfig then
-        shellConfig = M.shellConfigSets['posix']
-    end
-
-    M.applyShellConfigSet(shellConfig)
 end
 
--- Gets the current shell being used by Neovim (or system shell if required)
-M.getCurrentShell = function()
-    return vim.opt.shell:get() or os.getenv 'SHELL'
+M.getHighestPriorityAvailableShell = function()
+    for _, shell in ipairs(M.configuredShellPriority) do
+        if vim.fn.executable(shell[1]) == 1 then
+            return shell[1]
+        end
+    end
 end
 
--- Registers an auto command to update shell config when the shell option is changed
 M.registerAutoShellConfig = function()
     vim.api.nvim_create_autocmd('BufEnter', {
         pattern = '*',
         callback = function()
-            local currentShell = M.getCurrentShell()
-            M.configureShell(currentShell)
+            M.configureShell(vim.opt.shell:get())
         end,
     })
 end
 
--- Sets up the shell configuration immediately and updates configs when the shell option is changed
+-- sets up the shell configuration immediately, and update configs when the
+-- shell option is changed
 M.setup = function()
-    local currentShell = M.getCurrentShell()
-    M.configureShell(currentShell)
+    vim.opt.shell = M.getHighestPriorityAvailableShell()
+    M.configureShell(vim.opt.shell:get())
     M.registerAutoShellConfig()
 end
 
