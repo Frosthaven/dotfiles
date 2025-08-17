@@ -32,13 +32,43 @@ return {
             ]]
 
             -- notify wezterm when we enter a file buffer of the filename
+            -- get current folder from vim.fn.getcwd() - everything afte the last / (if any)
+            function GetCurrentFolder()
+                local currentPath = vim.fn.getcwd()
+                local lastSlashIndex = currentPath:find '/[^/]*$'
+                if lastSlashIndex then
+                    return currentPath:sub(lastSlashIndex + 1)
+                else
+                    return currentPath
+                end
+            end
+            function GetDefaultTabName()
+                return '   ' .. GetCurrentFolder()
+            end
+            function GetActiveFileName()
+                local fileName = vim.fn.expand '%:t'
+                if fileName == '' then
+                    return GetCurrentFolder()
+                else
+                    return fileName
+                end
+            end
+
             vim.cmd [[
                 augroup FileBufferGroup
                   au!
 
-                  au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
-                  au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
-                  au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
+                  au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p'), pwd = vim.fn.getcwd()})
+                  au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p'), pwd = vim.fn.getcwd()})
+                  au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = GetActiveFileName(), pwd = vim.fn.getcwd()})
+                augroup END
+            ]]
+
+            -- on neovim startup, send the current working directory
+            vim.cmd [[
+                augroup VimEnterGroup
+                  au!
+                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), title=GetDefaultTabName()})
                 augroup END
             ]]
 
