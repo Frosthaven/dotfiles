@@ -34,7 +34,7 @@ M.setup = function()
             cell_width = 1.1,
 
             window_padding = {
-                left = "2cell",
+                left = "5cell",
                 right = "2cell",
                 top = "0.5cell",
                 bottom = "0.5cell",
