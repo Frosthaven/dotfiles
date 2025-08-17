@@ -31,8 +31,19 @@ return {
                 augroup END
             ]]
 
-            -- notify wezterm when we enter a file buffer of the filename
-            -- get current folder from vim.fn.getcwd() - everything afte the last / (if any)
+            function GetDefaultTabName()
+                return '   ' .. GetCurrentFolder()
+            end
+
+            -- Helper function to get the filename or use default tab name
+            function GetFilenameOrDefault()
+                local filename = vim.fn.expand '%:p'
+                if filename == '' then
+                    return nil -- No filename, so we'll just omit the filename field
+                end
+                return filename
+            end
+
             function GetCurrentFolder()
                 local currentPath = vim.fn.getcwd()
                 local lastSlashIndex = currentPath:find '/[^/]*$'
@@ -42,25 +53,22 @@ return {
                     return currentPath
                 end
             end
-            function GetDefaultTabName()
-                return '   ' .. GetCurrentFolder()
-            end
-            function GetActiveFileName()
-                local fileName = vim.fn.expand '%:t'
-                if fileName == '' then
-                    return GetCurrentFolder()
-                else
-                    return fileName
+
+            function GetTitleIfNoFilename()
+                local filename = vim.fn.expand '%:p'
+                if filename == '' then
+                    return GetDefaultTabName() -- Only send title if no filename
                 end
+                return nil -- Do not send title if a filename is present
             end
 
             vim.cmd [[
                 augroup FileBufferGroup
-                  au!
+                    au!
 
-                  au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p'), pwd = vim.fn.getcwd()})
-                  au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p'), pwd = vim.fn.getcwd()})
-                  au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = GetActiveFileName(), pwd = vim.fn.getcwd()})
+                    au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
+                    au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
+                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
                 augroup END
             ]]
 
