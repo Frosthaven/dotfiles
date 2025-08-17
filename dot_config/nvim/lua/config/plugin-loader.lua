@@ -1,6 +1,6 @@
 local M = {}
 
-M.useBlinkCMP = true -- whether to use blink-cmp or not
+M.useBlinkCMP = false -- whether to use blink-cmp or not
 
 M.setup = function()
     -- [[ Install `lazy.nvim` plugin manager ]]
