@@ -5,6 +5,10 @@ local M = {}
 local isPadded = false
 local FocusedNeovimProcesses = {}
 
+local defaultTitle = "WezTerm - " .. wezterm.hostname()
+local maxTitleLength = 25 -- maximum length of the tab title
+local maxProjectLength = 15 -- maximum length of the project name
+
 local extensionToIcon = {
     -- common file types
     { extension = "bat", icon = "" }, -- Batch files
@@ -105,9 +109,6 @@ for _, entry in ipairs(extensionToIcon) do
     print(entry.extension, entry.icon)
 end
 
-local defaultTitle = "WezTerm - " .. wezterm.hostname()
-local maxTitleLength = 30 -- maximum length of the tab title
-
 M.setup = function(config)
     local function tab_title(tab)
         local title = tab.tab_title
@@ -206,8 +207,17 @@ M.setup = function(config)
             end
         end
 
-        -- update the tab title if there is a filename in the payload
-        if payload.filename and payload.filename ~= "" then
+        -- update the tab title
+        if payload.title and payload.title ~= "" then
+            local tab = window:active_tab()
+            if tab then
+                local title = tab.tab_title or ""
+                if title ~= payload.title then
+                    tab:set_title(payload.title)
+                    wezterm.log_info("Updated tab title to:", payload.title)
+                end
+            end
+        elseif payload.filename and payload.filename ~= "" then
             -- Extract the extension
             local ext = payload.filename:match("^.+(%..+)$")
             ext = ext and ext:sub(2) or nil
@@ -222,6 +232,22 @@ M.setup = function(config)
                         -- truncate the title if it is too long
                         if #payload.filename > maxTitleLength then
                             payload.filename = "..." .. payload.filename:sub(-maxTitleLength + 3)
+                        end
+                        if payload.pwd then
+                            -- truncate the project name if it is too long
+                            local projectName = payload.pwd
+                            -- get the last part of the path if there are slashes
+                            if projectName:find("/") then
+                                projectName = projectName:match("^.+/(.+)$")
+                            end
+                            if #projectName > maxProjectLength then
+                                -- projectName = projectName:sub(-maxProjectLength + 3)
+                                -- instead of removing from the start, remove it from the end
+                                projectName = projectName:sub(1, maxProjectLength - 3)
+                                payload.filename = projectName .. " " .. payload.filename
+                            end
+                        else
+                            icon = icon .. " "
                         end
                         if tab then
                             tab:set_title(icon .. "  " .. payload.filename)
