@@ -21,10 +21,41 @@ M.emit = function(event, ...)
 end
 
 wezterm.on("user-var-changed", function(window, pane, name, value)
-    if name == "NVIM_EVENT" then
+    if name == "NEOVIM_EVENT" then
         -- this is coming from our Neovim's wezterm-bridge.lua
-        -- wezterm.log_info(value.name)
-        M.emit("NVIM", window, pane, value.name, value)
+        -- value will be in the form of KEY=VALUE;KEY=VALUE;
+
+        -- ensure the value ends in ; for our parser
+        if not value:match(";$") then
+            value = value .. ";"
+        end
+
+        -- parse the key value pairs into a shallow table
+        local parsed = {}
+        local couldParse = true
+        for pair in value:gmatch("([^;]+);") do
+            local key, val = pair:match("([^=]+)=([^=]+)")
+            if key and val then
+                parsed[key] = val
+            else
+                couldParse = false
+            end
+        end
+
+        if not couldParse then
+            wezterm.log_warn("Failed to parse NEOVIM_EVENT value: " .. value)
+            return
+        end
+
+        -- ensure the value is a table
+        if type(parsed) ~= "table" then
+            wezterm.log_warn("Expected a table, got: " .. type(parsed))
+            return
+        end
+
+        -- emit the event with the window, pane, name, and value
+        wezterm.log_info("Emitting extra event: ", "NEOVIM", parsed)
+        M.emit("NEOVIM", window, pane, parsed)
     end
 end)
 

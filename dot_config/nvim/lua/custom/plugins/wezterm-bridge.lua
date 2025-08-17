@@ -5,35 +5,40 @@ return {
             --create_commands = false
         },
         config = function()
-            -- auto padding for wezterm and alacritty
             local wezterm = require 'wezterm'
 
-            local pid = vim.fn.getpid()
-
-            function FocusGained()
-                wezterm.set_user_var('FOCUS', 'on:' .. pid)
+            -- this function handles sending strings of KEY=VALUE;KEY=VALUE;
+            function DispatchWezTermEvent(object)
+                local stringified = ''
+                for key, value in pairs(object) do
+                    if stringified ~= '' then
+                        stringified = stringified .. ';'
+                    end
+                    stringified = stringified .. key .. '=' .. tostring(value)
+                end
+                wezterm.set_user_var('NEOVIM_EVENT', stringified)
             end
 
-            function FocusLost()
-                wezterm.set_user_var('FOCUS', 'off:' .. pid)
-            end
-
-            function DispatchWezTermEvent(name)
-                wezterm.set_user_var('NVIM_EVENT', name)
-            end
-
+            -- send focus events for padding reduction (only active in neovim)
             vim.cmd [[
                 augroup FocusChangeGroup
                   au!
-                  au FocusGained * lua FocusGained()
-                  au FocusLost * lua FocusLost()
-                  au VimLeavePre * lua FocusLost()
-                  au VimEnter * lua FocusGained()
 
-                  au FocusGained * lua DispatchWezTermEvent(vim.json.encode({name = 'FocusGained', pid = vim.fn.getpid()}))
-                  au FocusLost * lua DispatchWezTermEvent(vim.json.encode({name = 'FocusLost', pid = vim.fn.getpid()}))
-                  au VimEnter * lua DispatchWezTermEvent(vim.json.encode({name = 'VimEnter', pid = vim.fn.getpid()}))
-                  au VimLeavePre * lua DispatchWezTermEvent(vim.json.encode({name = 'VimLeavePre', pid = vim.fn.getpid()}))
+                  au FocusGained * lua DispatchWezTermEvent({name = 'FocusGained', pid = vim.fn.getpid()})
+                  au FocusLost * lua DispatchWezTermEvent({name = 'FocusLost', pid = vim.fn.getpid()})
+                  au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid()})
+                  au VimLeavePre * lua DispatchWezTermEvent({name = 'VimLeavePre', pid = vim.fn.getpid()})
+                augroup END
+            ]]
+
+            -- notify wezterm when we enter a file buffer of the filename
+            vim.cmd [[
+                augroup FileBufferGroup
+                  au!
+
+                  au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
+                  au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
+                  au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = vim.fn.expand('%:p')})
                 augroup END
             ]]
 
