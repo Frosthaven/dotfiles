@@ -20,10 +20,36 @@ M.emit = function(event, ...)
     end
 end
 
+local function remove_invalid_entries(str)
+    -- Initialize an empty table to store valid key-value pairs
+    local valid_pairs = {}
+
+    -- Iterate through each key-value pair in the string
+    for key, value in string.gmatch(str, "([^=;]*)=([^;]*)") do
+        -- Check if key is not empty and value is not empty (you can adjust conditions)
+        if key ~= "" and value ~= "" then
+            -- Rebuild the valid pair and store it in the table
+            table.insert(valid_pairs, key .. "=" .. value)
+        else
+            -- Log a warning for invalid entries
+            wezterm.log_warn("Invalid entry found: key='" .. key .. "', value='" .. value .. "'")
+        end
+    end
+
+    -- Rebuild the string from the valid pairs, join with semicolons
+    return table.concat(valid_pairs, ";") .. ";"
+end
+
 wezterm.on("user-var-changed", function(window, pane, name, value)
     if name == "NEOVIM_EVENT" then
         -- this is coming from our Neovim's wezterm-bridge.lua
         -- value will be in the form of KEY=VALUE;KEY=VALUE;
+
+        -- the filename could have empty keys, so if it does lets parse them out
+        -- this could show as key=;key2=value2;key=;key3=value3;
+        value = remove_invalid_entries(value)
+
+        wezterm.log_info("Received NEOVIM_EVENT: ", value)
 
         -- ensure the value ends in ; for our parser
         if not value:match(";$") then

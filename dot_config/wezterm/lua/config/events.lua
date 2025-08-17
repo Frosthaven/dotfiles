@@ -99,16 +99,6 @@ local extensionToIcon = {
     { extension = "opus", icon = "" },
 }
 
--- Sort the table by extension name (alphabetical order)
-table.sort(extensionToIcon, function(a, b)
-    return a.extension < b.extension
-end)
-
--- You can print the sorted table for confirmation:
-for _, entry in ipairs(extensionToIcon) do
-    print(entry.extension, entry.icon)
-end
-
 M.setup = function(config)
     local function tab_title(tab)
         local title = tab.tab_title
@@ -135,8 +125,6 @@ M.setup = function(config)
             end
         end
 
-        wezterm.log_info("Tab title:", formattedTitle)
-
         -- matches 1 space, followed by any non-space characters, and then 2 spaces
         if formattedTitle:match(".*%s%s") then
             -- Remove everything before and including the first occurrence of two spaces
@@ -145,10 +133,8 @@ M.setup = function(config)
                 -- matchText[2] is the part after the first set of two spaces
                 formattedTitle = matchText:match("^(.*%s%s)(.*)$"):match("^(.*)$")
             end
-            wezterm.log_info("Truncated title:", formattedTitle)
         end
 
-        wezterm.log_info("Formatted tab title:", formattedTitle)
         return formattedTitle
     end
 
@@ -167,7 +153,6 @@ M.setup = function(config)
                 -- Check for exact matches for file extension
                 for _, entry in ipairs(extensionToIcon) do
                     if entry.extension == file_extension then
-                        wezterm.log_info("Exact match for filename:", filename, " ->", file_extension)
                         return entry.icon
                     end
                 end
@@ -179,7 +164,6 @@ M.setup = function(config)
         if ext then
             for _, entry in ipairs(extensionToIcon) do
                 if ext == entry.extension then
-                    wezterm.log_info("Matched extension:", ext)
                     return entry.icon
                 end
             end
@@ -211,11 +195,8 @@ M.setup = function(config)
         if payload.title and payload.title ~= "" then
             local tab = window:active_tab()
             if tab then
-                local title = tab.tab_title or ""
-                if title ~= payload.title then
-                    tab:set_title(payload.title)
-                    wezterm.log_info("Updated tab title to:", payload.title)
-                end
+                tab:set_title(payload.title)
+                wezterm.log_info("Forcing tab title to:", payload.title)
             end
         elseif payload.filename and payload.filename ~= "" then
             -- Extract the extension
@@ -240,15 +221,18 @@ M.setup = function(config)
                             if projectName:find("/") then
                                 projectName = projectName:match("^.+/(.+)$")
                             end
+                            wezterm.log_info("Project name:", projectName)
                             if #projectName > maxProjectLength then
                                 -- projectName = projectName:sub(-maxProjectLength + 3)
                                 -- instead of removing from the start, remove it from the end
                                 projectName = projectName:sub(1, maxProjectLength - 3)
-                                payload.filename = projectName .. " " .. payload.filename
                             end
+                            payload.filename = projectName .. " " .. payload.filename
+                            wezterm.log_info("filename is now:", payload.filename)
                         else
                             icon = icon .. " "
                         end
+
                         if tab then
                             tab:set_title(icon .. "  " .. payload.filename)
                             wezterm.log_info("Updated tab title to:", payload.filename)
@@ -256,6 +240,8 @@ M.setup = function(config)
                     end
                 end
             end
+        elseif payload.pwd then
+            wezterm.log_error("No filename provided, but pwd is:", payload.pwd)
         end
 
         -- if wezterm is focused, update the window padding
