@@ -54,6 +54,7 @@ local extensionToIcon = {
     { extension = "tsx", icon = "" },
     { extension = "ts", icon = "" },
     { extension = "vagrantfile", icon = "" },
+    { extension = "xml", icon = "󰗀" },
     { extension = "yaml", icon = "" },
     { extension = "yml", icon = "" },
     { extension = "zprofile", icon = "" },
