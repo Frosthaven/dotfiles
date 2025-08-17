@@ -1,8 +1,8 @@
-# add $HOME/.local/bin binaries to PATH
-export PATH="$HOME/.local/bin:$PATH"
+# Add $HOME/.local/bin to PATH
+set -gx PATH $HOME/.local/bin $PATH
 
 # Starship prompt
-eval "$(starship init bash)"
+starship init fish | source
 
 # eza aliases
 alias l='eza --icons=always'
@@ -23,40 +23,39 @@ alias vim='nvim'
 alias vi='nvim'
 
 # Zoxide
-eval "$(zoxide init bash)"
+zoxide init fish | source
 alias cd='z'  # replace cd with zoxide
 
 # FNM (Fast Node Manager)
-if [ -z "$fnm_dir" ]; then
-    eval "$(fnm env)"
+if not set -q fnm_dir
+    fnm env | source
 
-    # install latest LTS if node not present
-    if ! command -v node >/dev/null 2>&1; then
+    # Install latest LTS if node is not available
+    if not type -q node
         fnm install --lts
         fnm use lts-latest
-    fi
-fi
+    end
+end
 
 # fzf file search helper (sf)
-sf() {
-    local file
-    file=$(fzf --preview "bat --color=always {}" \
-               --preview-window=right:50%:wrap \
-               --height 50% \
-               --border \
-               --prompt="search files: " \
-               --query="$*")
-    if [ -n "$file" ]; then
+function sf
+    set file (fzf --preview "bat --color=always {}" \
+                  --preview-window=right:50%:wrap \
+                  --height 50% \
+                  --border \
+                  --prompt="search files: " \
+                  --query="$argv")
+    if test -n "$file"
         nvim "$file"  # replace with preferred editor if desired
-    fi
-}
+    end
+end
 
-# Automatic Nushell
-# if [ -z "$NU" ] && [ -x "$HOME/.cargo/bin/nu" ]; then
-#   exec "$HOME/.cargo/bin/nu"
-# fi
+# Automatic Nushell (optional)
+# if not set -q NU; and test -x "$HOME/.cargo/bin/nu"
+#     exec "$HOME/.cargo/bin/nu"
+# end
 
-#  Add Cargo to PATH
-if [ -d "$HOME/.cargo/bin" ]; then
-    export PATH="$HOME/.cargo/bin:$PATH"
-fi
+# Add Cargo to PATH
+if test -d "$HOME/.cargo/bin"
+    set -gx PATH $HOME/.cargo/bin $PATH
+end
