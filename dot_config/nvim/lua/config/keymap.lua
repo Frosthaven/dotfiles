@@ -48,8 +48,25 @@ M.setup = function()
     end, { desc = '[D]iagnostic [D]isplay' })
 
     -- previous and next diagnostic
-    vim.keymap.set('n', '<leader>dn', next_diagnostic, { desc = 'Go to [N]ext diagnostic' })
-    vim.keymap.set('n', '<leader>dp', prev_diagnostic, { desc = 'Go to [P]revious diagnostic' })
+    local function show_diagnostic_float()
+        local diagnostics = vim.diagnostic.get(0) -- Get diagnostics for the current buffer
+        if #diagnostics > 0 then
+            -- Show the first diagnostic as a floating window
+            vim.diagnostic.open_float()
+        end
+    end
+
+    -- Next diagnostic
+    vim.keymap.set('n', '<leader>dn', function()
+        vim.diagnostic.goto_next() -- Move to the next diagnostic
+        show_diagnostic_float() -- Show the diagnostic float
+    end, { desc = 'Go to [N]ext diagnostic' })
+
+    -- Previous diagnostic
+    vim.keymap.set('n', '<leader>dp', function()
+        vim.diagnostic.goto_prev() -- Move to the previous diagnostic
+        show_diagnostic_float() -- Show the diagnostic float
+    end, { desc = 'Go to [P]revious diagnostic' })
 
     -- tiny terminal
     -- if on windows, use powershell
