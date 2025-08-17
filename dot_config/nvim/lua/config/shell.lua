@@ -36,8 +36,8 @@ M.shellConfigSets = {
 
 -- the first shell in the list that is found on the system will be used
 M.configuredShellPriority = {
-    { 'fish', M.shellConfigSets['posix'] },
     { 'nu', M.shellConfigSets['nu'] },
+    { 'fish', M.shellConfigSets['posix'] },
     { 'zsh', M.shellConfigSets['posix'] },
     { 'pwsh', M.shellConfigSets['powershell'] },
     { 'powershell', M.shellConfigSets['powershell'] },
