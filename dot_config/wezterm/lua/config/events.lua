@@ -16,10 +16,15 @@ M.setup = function(config)
             formattedTitle = tab.active_pane.title
         end
 
+        -- if the formatted title is ~, replace it with the current user's name
+        if formattedTitle == "~" then
+            formattedTitle = "WezTerm - " .. wezterm.hostname()
+        end
+
         if tab.is_active then
-            formattedTitle = "   " .. formattedTitle .. " "
+            formattedTitle = "   " .. formattedTitle .. "  "
         else
-            formattedTitle = "   " .. formattedTitle .. " "
+            formattedTitle = "   " .. formattedTitle .. "  "
         end
 
         return formattedTitle
