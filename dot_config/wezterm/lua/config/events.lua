@@ -10,6 +10,7 @@ local maxTitleLength = 25 -- maximum length of the tab title
 local maxProjectLength = 15 -- maximum length of the project name
 
 local extensionToIcon = {
+    { icon = "" }, -- Default icon for unknown extensions
     -- common file types
     { extension = "bat", icon = "" }, -- Batch files
     { extension = "bash_profile", icon = "" },
@@ -61,7 +62,6 @@ local extensionToIcon = {
     { extension = "zsh", icon = "" },
     { extension = "zshrc", icon = "" },
     { extension = ".envrc", icon = "" },
-    { extension = "", icon = "", __default = true }, -- Default icon for unknown extensions
 
     -- image types 󰋩
     { extension = "png", icon = "󰋩" },
@@ -151,12 +151,15 @@ M.setup = function(config)
                 -- Extract the part of the filename after the last dot (extension)
                 local file_extension = filename:sub(last_dot + 1):lower()
 
-                -- Check for exact matches for file extension
+                -- Check for exact matches for file extension, using the __default key as a fallback
                 for _, entry in ipairs(extensionToIcon) do
-                    if entry.extension == file_extension then
+                    if file_extension == entry.extension then
+                        wezterm.log_info("Found icon for extension:", file_extension, "->", entry.icon)
                         return entry.icon
                     end
                 end
+                -- If no exact match is found, use the first index's icon
+                return extensionToIcon[1].icon
             end
         end
 
@@ -192,6 +195,41 @@ M.setup = function(config)
             end
         end
 
+        local function prepareTabTitle(title, icon)
+            local tab = window:active_tab()
+            if tab then
+                local title = tab.tab_title or ""
+                if title ~= payload.filename then
+                    -- truncate the title if it is too long
+                    if #payload.filename > maxTitleLength then
+                        payload.filename = "..." .. payload.filename:sub(-maxTitleLength + 3)
+                    end
+                    if payload.pwd then
+                        -- truncate the project name if it is too long
+                        local projectName = payload.pwd
+                        -- get the last part of the path if there are slashes
+                        if projectName:find("/") then
+                            projectName = projectName:match("^.+/(.+)$")
+                        end
+                        wezterm.log_info("Project name:", projectName)
+                        if #projectName > maxProjectLength then
+                            -- projectName = projectName:sub(-maxProjectLength + 3)
+                            -- instead of removing from the start, remove it from the end
+                            projectName = projectName:sub(1, maxProjectLength - 3)
+                        end
+                        payload.filename = projectName .. " " .. payload.filename
+                        wezterm.log_info("filename is now:", payload.filename)
+                    else
+                        icon = icon .. " "
+                    end
+
+                    if tab then
+                        return (icon .. "  " .. payload.filename)
+                    end
+                end
+            end
+        end
+
         -- update the tab title
         if payload.title and payload.title ~= "" then
             local tab = window:active_tab()
@@ -207,42 +245,26 @@ M.setup = function(config)
             local icon = getIconForExtension(ext, payload.filename)
             if ext then
                 -- if the filename has an extension, then we can set the tab title
+                local title = prepareTabTitle(icon .. " " .. payload.filename, icon)
                 local tab = window:active_tab()
                 if tab then
-                    local title = tab.tab_title or ""
-                    if title ~= payload.filename then
-                        -- truncate the title if it is too long
-                        if #payload.filename > maxTitleLength then
-                            payload.filename = "..." .. payload.filename:sub(-maxTitleLength + 3)
-                        end
-                        if payload.pwd then
-                            -- truncate the project name if it is too long
-                            local projectName = payload.pwd
-                            -- get the last part of the path if there are slashes
-                            if projectName:find("/") then
-                                projectName = projectName:match("^.+/(.+)$")
-                            end
-                            wezterm.log_info("Project name:", projectName)
-                            if #projectName > maxProjectLength then
-                                -- projectName = projectName:sub(-maxProjectLength + 3)
-                                -- instead of removing from the start, remove it from the end
-                                projectName = projectName:sub(1, maxProjectLength - 3)
-                            end
-                            payload.filename = projectName .. " " .. payload.filename
-                            wezterm.log_info("filename is now:", payload.filename)
-                        else
-                            icon = icon .. " "
-                        end
-
-                        if tab then
-                            tab:set_title(icon .. "  " .. payload.filename)
-                            wezterm.log_info("Updated tab title to:", payload.filename)
-                        end
-                    end
+                    tab:set_title(title)
+                    wezterm.log_info("Updated tab title to:", title)
+                end
+            else
+                -- we still need to set the tab title
+                local icon = extensionToIcon[1].icon
+                local title = prepareTabTitle(icon .. " " .. payload.filename, icon)
+                local tab = window:active_tab()
+                if tab then
+                    tab:set_title(title)
+                    wezterm.log_info("Updated tab title to:", title)
                 end
             end
         elseif payload.pwd then
             wezterm.log_error("No filename provided, but pwd is:", payload.pwd)
+        else
+            wezterm.log_error("No filename or pwd provided")
         end
 
         -- if wezterm is focused, update the window padding
