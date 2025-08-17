@@ -47,12 +47,12 @@ M.setup = function()
     if helpers.osTag() == "windows" then
         opts.windows.default_prog = { "nu.exe" }
     elseif helpers.osTag() == "macos" then
-        opts.macos.default_prog = { os.getenv("HOME") .. "nu" }
+        opts.macos.default_prog = { "nu" }
         opts.set_environment_variables = {
             PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
     elseif helpers.osTag() == "linux" then
-        opts.linux.default_prog = { os.getenv("HOME") .. "nu" }
+        opts.linux.default_prog = { "nu" }
         opts.set_environment_variables = {
             PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
