@@ -4,7 +4,7 @@ local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7
 local root_dir = vim.fn.getcwd()
 
 -- check if there is a tailwind.style.2.admin.css file in the current working directory
-local configFile = {}
+local configFile = { 'tailwind.config.js' }
 local hasAdminCss = vim.fn.filereadable(root_dir .. '/tailwind.2.admin.css') == 1
 if hasAdminCss then
     configFile = {
@@ -40,7 +40,6 @@ return {
             cmpDependency, -- nvim-cmp completion engine
         },
         config = function()
-            vim.diagnostic.virtual_text = false
             -- Brief aside: **What is LSP?**
             --
             -- LSP is an initialism you've probably heard, but might not understand what it is.
