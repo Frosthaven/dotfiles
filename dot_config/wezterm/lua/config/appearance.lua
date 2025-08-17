@@ -81,7 +81,7 @@ M.setup = function(config)
             },
             inactive_tab = {
                 bg_color = "#11111D",
-                fg_color = "#656588",
+                fg_color = "#404063",
             },
             inactive_tab_hover = {
                 bg_color = "#1F1F2F",

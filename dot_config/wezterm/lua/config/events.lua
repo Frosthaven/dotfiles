@@ -17,15 +17,15 @@ M.setup = function(config)
         end
 
         if tab.is_active then
-            formattedTitle = " 󱓻 " .. formattedTitle .. " "
+            formattedTitle = "   " .. formattedTitle .. " "
         else
-            formattedTitle = " 󱓼 " .. formattedTitle .. " "
+            formattedTitle = "   " .. formattedTitle .. " "
         end
 
         return formattedTitle
     end
 
-    wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+    wezterm.on("format-tab-title", function(tab)
         return tab_title(tab)
     end)
 
