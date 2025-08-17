@@ -6,6 +6,29 @@ local isPadded = false
 local FocusedNeovimProcesses = {}
 
 M.setup = function(config)
+    local function tab_title(tab)
+        local title = tab.tab_title
+        local formattedTitle
+        -- if the tab title is explicitly set, take that
+        if title and #title > 0 then
+            formattedTitle = title
+        else
+            formattedTitle = tab.active_pane.title
+        end
+
+        if tab.is_active then
+            formattedTitle = " 󱓻 " .. formattedTitle .. " "
+        else
+            formattedTitle = " 󱓼 " .. formattedTitle .. " "
+        end
+
+        return formattedTitle
+    end
+
+    wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+        return tab_title(tab)
+    end)
+
     wezterm.on("user-var-changed", function(window, pane, name, value)
         if name == "FOCUS" then
             -- the value is in the format 'status:pid'. lets get both
@@ -16,10 +39,10 @@ M.setup = function(config)
             elseif status == "off" then
                 FocusedNeovimProcesses[tonumber(pid)] = nil
             end
-            -- if wezterm is focused, then we can trigger manually trigger the
-            -- event, which will update the padding. If weztern is not focused,
-            -- we want to prevent this from firing, as it will cause padding shifts
-            -- when users click away from the wezterm window
+            -- if wezterm is focused, then we can trigger the event to update
+            -- the padding. If weztern is not focused, we want to prevent this
+            -- from firing, as it will cause padding shifts when users click
+            -- away from the wezterm window
             if not window:is_focused() then
                 return
             end
@@ -52,7 +75,7 @@ M.setup = function(config)
             }
         end
 
-        -- window:set_config_overrides(overrides)
+        window:set_config_overrides(overrides)
     end)
     return config
 end

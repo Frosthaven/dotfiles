@@ -24,7 +24,7 @@ M.setup = function()
             line_height = 1.3,
             window_background_opacity = 0.94,
 
-            window_decorations = "TITLE | RESIZE",
+            window_decorations = "INTEGRATED_BUTTONS | RESIZE",
             window_close_confirmation = "NeverPrompt",
 
             webgpu_preferred_adapter = helpers.getIdealGPU(),

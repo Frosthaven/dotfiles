@@ -20,12 +20,13 @@ M.emit = function(event, ...)
     end
 end
 
--- wezterm.on("user-var-changed", function(window, pane, name, value)
---     if name == "NVIM_EVENT" then
---         wezterm.log_info(value.name)
---         M.emit("NVIM", window, pane, value.name, value)
---     end
--- end)
+wezterm.on("user-var-changed", function(window, pane, name, value)
+    if name == "NVIM_EVENT" then
+        -- this is coming from our Neovim's wezterm-bridge.lua
+        -- wezterm.log_info(value.name)
+        M.emit("NVIM", window, pane, value.name, value)
+    end
+end)
 
 wezterm.on("update-status", function(window, pane)
     local active_window_id = window:window_id()

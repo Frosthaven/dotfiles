@@ -40,6 +40,7 @@ return {
             cmpDependency, -- nvim-cmp completion engine
         },
         config = function()
+            vim.diagnostic.virtual_text = false
             -- Brief aside: **What is LSP?**
             --
             -- LSP is an initialism you've probably heard, but might not understand what it is.
@@ -69,6 +70,7 @@ return {
             --    That is to say, every time a new file is opened that is associated with
             --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
             --    function will be executed to configure the current buffer
+
             vim.api.nvim_create_autocmd('LspAttach', {
                 group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
                 callback = function(event)
@@ -126,22 +128,6 @@ return {
                 end,
             })
 
-            -- Configure diagnostic messages
-            vim.diagnostic.config {
-                virtual_lines = {
-                    current_line = true,
-                },
-                -- float = {
-                --     border = 'single',
-                --     format = function(diagnostic)
-                --         return string.format('%s (%s) [%s]', diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code)
-                --     end,
-                -- },
-                underline = true,
-                update_in_insert = true,
-                severity_sort = true,
-            }
-
             -- Change diagnostic symbols in the sign column (gutter)
             if vim.g.have_nerd_font then
                 local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
@@ -159,7 +145,7 @@ return {
 
             -- CHOOSE ONE: ----
             if pluginLoader.useBlinkCMP then
-                local capabilities = require('blink.cmp').get_lsp_capabilities()
+                Capabilities = require('blink.cmp').get_lsp_capabilities()
             else
                 local capabilities = vim.lsp.protocol.make_client_capabilities()
                 capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
@@ -167,7 +153,7 @@ return {
 
             -- ----------------
 
-            require('lspconfig').lua_ls.setup { capabilities = capabilities }
+            require('lspconfig').lua_ls.setup { Capabilities = Capabilities }
 
             -- ****************************************************************
 
@@ -236,7 +222,7 @@ return {
                         -- This handles overriding only values explicitly passed
                         -- by the server configuration above. Useful when disabling
                         -- certain features of an LSP (for example, turning off formatting for ts_ls)
-                        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+                        server.capabilities = vim.tbl_deep_extend('force', {}, Capabilities, server.capabilities or {})
                         -- dont setup tailwindcss/tailwind-language-server - managed by tailwind-tools.nvim
                         if server_name == 'tailwindcss' or server_name == 'tailwind-language-server' then
                             -- do nothing
@@ -245,6 +231,22 @@ return {
                         end
                     end,
                 },
+            }
+            -- Configure diagnostic messages
+            vim.diagnostic.config {
+                virtual_text = false,
+                virtual_lines = {
+                    current_line = false,
+                },
+                float = {
+                    border = 'single',
+                    format = function(diagnostic)
+                        return string.format('%s (%s) [%s]', diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code)
+                    end,
+                },
+                underline = true,
+                update_in_insert = true,
+                severity_sort = true,
             }
         end,
     },

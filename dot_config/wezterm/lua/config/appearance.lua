@@ -5,14 +5,15 @@ local M = {}
 M.setup = function(config)
     -- window framing
     config.window_frame = {
-        active_titlebar_bg = "#21252b",
-        inactive_titlebar_bg = "#21252b",
+        active_titlebar_bg = "#11111D",
+        inactive_titlebar_bg = "#11111D",
+        font = wezterm.font({ family = "JetBrains Mono", weight = "ExtraLight" }),
+        font_size = 10.0,
     }
 
-    --config.window_decorations = "RESIZE"
-
+    config.integrated_title_button_color = "#7777AA"
     -- tab bar
-    config.hide_tab_bar_if_only_one_tab = true
+    config.hide_tab_bar_if_only_one_tab = false
     config.use_fancy_tab_bar = true
 
     -- theming
@@ -72,25 +73,27 @@ M.setup = function(config)
         background = "#11111D",
         tab_bar = {
             background = "#21252b",
+            inactive_tab_edge = "#11111D",
             active_tab = {
-                bg_color = "#282c34",
-                fg_color = "#ffffff",
+                bg_color = "#1F1F2F",
+                fg_color = "#f8f8ff",
+                intensity = "Half",
             },
             inactive_tab = {
-                bg_color = "#21252b",
-                fg_color = "#767d88",
+                bg_color = "#11111D",
+                fg_color = "#656588",
             },
             inactive_tab_hover = {
-                bg_color = "#21252b",
-                fg_color = "#767d88",
+                bg_color = "#1F1F2F",
+                fg_color = "#656588",
             },
             new_tab = {
-                bg_color = "#21252b",
-                fg_color = "#767d88",
+                bg_color = "#11111D",
+                fg_color = "#656588",
             },
             new_tab_hover = {
-                bg_color = "#21252b",
-                fg_color = "#767d88",
+                bg_color = "#1F1F2F",
+                fg_color = "#656588",
             },
         },
     }

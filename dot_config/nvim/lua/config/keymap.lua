@@ -25,15 +25,27 @@ M.setup = function()
     end
 
     vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+    -- vim.keymap.set('n', '<leader>dt', function()
+    --     if vim.diagnostic.config().virtual_lines == true then
+    --         vim.diagnostic.config { virtual_lines = { current_line = true } }
+    --         vim.notify 'Global diagnostic virtual lines disabled'
+    --     else
+    --         vim.diagnostic.config { virtual_lines = true }
+    --         vim.notify 'Global diagnostic virtual lines enabled'
+    --     end
+    -- end, { desc = 'Toggle [D]iagnostic [T]oggle' })
+    -- create a diagnostic popup if you press leader d k
     vim.keymap.set('n', '<leader>dd', function()
-        if vim.diagnostic.config().virtual_lines == true then
-            vim.diagnostic.config { virtual_lines = { current_line = true } }
-            vim.notify 'Global diagnostic virtual lines disabled'
-        else
-            vim.diagnostic.config { virtual_lines = true }
-            vim.notify 'Global diagnostic virtual lines enabled'
-        end
-    end, { desc = 'Toggle [D]iagnostic [D]isplay' })
+        local opts = {
+            focusable = true,
+            close_events = { 'BufLeave', 'CursorMoved', 'InsertEnter' },
+            border = 'rounded',
+            source = 'always',
+            prefix = ' ',
+            scope = 'line',
+        }
+        vim.diagnostic.open_float(nil, opts)
+    end, { desc = '[D]iagnostic [D]isplay' })
 
     -- previous and next diagnostic
     vim.keymap.set('n', '<leader>dn', next_diagnostic, { desc = 'Go to [N]ext diagnostic' })
@@ -70,26 +82,31 @@ M.setup = function()
     --  Use CTRL+<hjkl> to switch between windows
     --
 
-    --  VIM Style Pane Management
+    -- Check if the quickfix list is open and has entries
+    local function is_quickfix_open()
+        local qflist = vim.fn.getqflist { id = 0 }
+        return #qflist > 0
+    end
+
+    -- VIM Style Pane Management
     vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
     vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
     vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
     vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-    vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
-    vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
+
+    -- Conditional quickfix or diagnostic navigation (M-j, M-k)
+    vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix or diagnostic item' })
+    vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix or diagnostic item' })
 
     -- Arrow Style Pane Management
     vim.keymap.set('n', '<C-Up>', '<C-w><Up>', { desc = 'Move focus to the upper window' })
     vim.keymap.set('n', '<C-Down>', '<C-w><Down>', { desc = 'Move focus to the lower window' })
     vim.keymap.set('n', '<C-Left>', '<C-w><Left>', { desc = 'Move focus to the left window' })
     vim.keymap.set('n', '<C-Right>', '<C-w><Right>', { desc = 'Move focus to the right window' })
+
+    -- quickfix navigation (M-Down, M-Up)
     vim.keymap.set('n', '<M-Down>', '<cmd>cnext<CR>', { desc = 'Move to the next quickfix item' })
     vim.keymap.set('n', '<M-Up>', '<cmd>cprev<CR>', { desc = 'Move to the previous quickfix item' })
-
-    vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-    vim.keymap.set('x', 'p', function()
-        return 'pgv"' .. vim.v.register .. 'y'
-    end, { remap = false, expr = true })
 end
 
 return M
