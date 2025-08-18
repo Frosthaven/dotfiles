@@ -120,20 +120,20 @@ M.setup = function(config)
             formattedTitle = defaultTitle
         end
 
-        -- set isIcon to true if the formatted title starts with two spaces
-        local isIcon = formattedTitle:sub(1, 2) == "  "
-        if not isIcon then
-            if tab.is_active then
-                formattedTitle = " " .. formattedTitle .. "  "
-            else
-                formattedTitle = " " .. formattedTitle .. "  "
-            end
-        end
-
         -- if the title is larger than maxFinalLength, only show the end of the title
         if #formattedTitle > maxFinalLength then
-            formattedTitle = "..." .. formattedTitle:sub(-maxFinalLength + 3)
+            local truncatedTitle = formattedTitle:sub(-maxFinalLength + 3)
+            -- remove any leading spaces
+            truncatedTitle = truncatedTitle:match("^%s*(.-)%s*$")
+            formattedTitle = "..." .. truncatedTitle
         end
+        -- ensure there is two spaces before and after the title
+        -- replace existing spaces on either side if necessary no matter how few or many they are
+        local trimmedTitle = formattedTitle:match("^%s*(.-)%s*$") -- trim leading and trailing spaces
+        formattedTitle = "  " .. trimmedTitle .. "  "
+
+        -- if there are spaces anywhere after ... remove them
+        formattedTitle = formattedTitle:gsub("%.%.%.%s+", "...")
         return formattedTitle
     end
 
@@ -200,7 +200,10 @@ M.setup = function(config)
                 if title ~= payload.filename then
                     -- truncate the title if it is too long
                     if #payload.filename > maxTitleLength then
-                        payload.filename = "..." .. payload.filename:sub(-maxTitleLength + 3)
+                        local truncatedFilename = payload.filename:sub(-maxTitleLength + 3)
+                        -- remove any leading spaces
+                        truncatedFilename = truncatedFilename:match("^%s*(.-)%s*$")
+                        payload.filename = "..." .. truncatedFilename
                     end
                     if payload.pwd then
                         -- truncate the project name if it is too long
@@ -252,7 +255,7 @@ M.setup = function(config)
             else
                 -- we still need to set the tab title
                 local icon = extensionToIcon[1].icon
-                local title = prepareTabTitle(icon .. " " .. payload.filename, icon)
+                local title = prepareTabTitle(icon .. " " .. payload.filename .. " ", icon)
                 local tab = window:active_tab()
                 if tab then
                     tab:set_title(title)

@@ -32,7 +32,7 @@ return {
             ]]
 
             function GetDefaultTabName()
-                return '   ' .. GetCurrentFolder()
+                return '   ' .. GetCurrentFolder() .. ' '
             end
 
             -- Helper function to get the filename or use default tab name
