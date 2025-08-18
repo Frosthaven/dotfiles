@@ -7,7 +7,7 @@ M.setup = function(config)
     config.window_frame = {
         active_titlebar_bg = "#11111D",
         inactive_titlebar_bg = "#11111D",
-        font = wezterm.font({ family = "JetBrains Mono", weight = "ExtraLight" }),
+        font = wezterm.font({ family = "JetBrains Mono", weight = "Medium" }),
         font_size = 10.0,
     }
 
