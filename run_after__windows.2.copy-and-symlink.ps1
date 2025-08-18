@@ -15,22 +15,39 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     }
 
     # Neovim
-    If ((Test-Path $env:LOCALAPPDATA\nvim) -and (Get-Item $env:LOCALAPPDATA\nvim).Attributes -ne "ReparsePoint") {
-        Remove-Item $env:LOCALAPPDATA\nvim -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue | Out-Null
-        New-Item -Path $env:LOCALAPPDATA\nvim -ItemType Junction -Value $env:USERPROFILE\.config/nvim | Out-Null
-    }
+$nvimLocal = Join-Path $env:LOCALAPPDATA 'nvim'
+$nvimConfig = Join-Path $env:USERPROFILE '.config\nvim'
 
-    # Komorebi
-    if (-not [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')) {
-        $value = Join-Path $env:USERPROFILE '.config\komorebi'
-        Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile', '-Command', "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment' -Name 'KOMOREBI_CONFIG_HOME' -Value '$env:USERPROFILE\.config\komorebi'"
-        Write-Host "KOMOREBI_CONFIG_HOME was not set, now set to: $value"
-
-        # Refresh environment variable in the current session
-        $env:KOMOREBI_CONFIG_HOME = [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')
+if (Test-Path $nvimLocal) {
+    $attributes = (Get-Item $nvimLocal).Attributes
+    if ($attributes -ne "ReparsePoint") {
+        Remove-Item $nvimLocal -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue | Out-Null
     } else {
-        $current = [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')
+        # It's a reparse point, remove it just in case
+        Remove-Item $nvimLocal -Force -Confirm:$false -ErrorAction SilentlyContinue | Out-Null
     }
+}
+if (-not (Test-Path $nvimLocal)) {
+    New-Item -Path $nvimLocal -ItemType Junction -Value $nvimConfig | Out-Null
+}
+
+
+# Komorebi
+if (-not [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')) {
+    $value = Join-Path $env:USERPROFILE '.config\komorebi'
+
+    # Set User environment variable (correctly)
+    [Environment]::SetEnvironmentVariable('KOMOREBI_CONFIG_HOME', $value, 'User')
+
+    Write-Host "KOMOREBI_CONFIG_HOME was not set, now set to: $value"
+
+    # Refresh environment variable in the current session
+    $env:KOMOREBI_CONFIG_HOME = $value
+} else {
+    $current = [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')
+    Write-Host "KOMOREBI_CONFIG_HOME is already set to: $current"
+}
+
 
     # Clink Scripts
     If (-Not (Test-Path $env:LOCALAPPDATA\clink)) {
@@ -41,7 +58,7 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     # Automatic Shell Integration
     $psProfilePath = Join-Path $env:USERPROFILE "Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
     If (-Not (Test-Path $psProfilePath)) {
-        New-Item -Path $psProfilePath -ItemType File | Out-Null
+        New-Item -Path $psProfilePath -ItemType File -Force | Out-Null
     }
     If (-Not (Select-String -Path $psProfilePath -Pattern "chezmoi-powershell.ps1")) {
         Add-Content -Path $psProfilePath -Value "# Load Chezmoi PowerShell profile" | Out-Null
@@ -60,19 +77,25 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
         New-Item -Path $env:APPDATA\nushell -ItemType Junction -Value $env:USERPROFILE\.config\shell\nushell | Out-Null
     }
 
-    # rainmeter skins in the Documents folder
-    $rainmeterSkinPath = Join-Path $env:USERPROFILE "Documents\Rainmeter\Skins\frost_hwinfo_black_white"
-    if (-Not (Test-Path $rainmeterSkinPath)) {
-        # the parent folders might not exist either, so create them if necessary
-        if (-Not (Test-Path (Join-Path $env:USERPROFILE "Documents\Rainmeter"))) {
-            New-Item -Path (Join-Path $env:USERPROFILE "Documents\Rainmeter") -ItemType Directory | Out-Null
-        }
-        if (-Not (Test-Path (Join-Path $env:USERPROFILE "Documents\Rainmeter\Skins"))) {
-            New-Item -Path (Join-Path $env:USERPROFILE "Documents\Rainmeter\Skins") -ItemType Directory | Out-Null
-        }
-        # now create the symlink to the skin folder
-        New-Item -Path $rainmeterSkinPath -ItemType SymbolicLink -Value "$env:USERPROFILE\.config\rainmeter\skins\frost_hwinfo_black_white" | Out-Null
+# Define Rainmeter skin path
+$rainmeterSkinPath = Join-Path $env:USERPROFILE "Documents\Rainmeter\Skins\frost_hwinfo_black_white"
+
+# Ensure parent folders exist
+if (-Not (Test-Path $rainmeterSkinPath)) {
+    $skinsDir = Join-Path $env:USERPROFILE "Documents\Rainmeter\Skins"
+    if (-Not (Test-Path $skinsDir)) {
+        New-Item -Path $skinsDir -ItemType Directory -Force | Out-Null
     }
+
+    # Run only the symlink creation with elevation
+    $targetPath = "$env:USERPROFILE\.config\rainmeter\skins\frost_hwinfo_black_white"
+    $createSymlinkScript = @"
+New-Item -Path `"$rainmeterSkinPath`" -ItemType SymbolicLink -Value `"$targetPath`" | Out-Null
+"@
+
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -Command `$ErrorActionPreference = 'Stop'; $createSymlinkScript"
+}
+
 
     # add chocolatey to the path
     [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\ProgramData\chocolatey\bin", [EnvironmentVariableTarget]::User)

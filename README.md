@@ -6,14 +6,37 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 ### Windows
 
-1. Enable WSL
-
-2. Configure repository access as needed.
-
-3. Install chocolatey & set execution user script execution policy + symlink creation policy (admin shell):
+setup script to install/configure dependencies and setup chezmoi folder
 
 ```ps1
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')); Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d 1;
+Set-ExecutionPolicy Bypass -Scope Process -Force
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+
+# Install Chocolatey
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Wait until choco is available
+$maxRetries = 20
+$retryCount = 0
+while (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+    Start-Sleep -Seconds 2
+    $retryCount++
+    if ($retryCount -ge $maxRetries) {
+        Write-Error "choco not found after waiting. Exiting."
+        exit 1
+    }
+}
+
+# Install packages
+choco install git chezmoi -y
+
+# Set execution policy again and enable developer mode
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d 1
+
+# Run chezmoi init as non-admin
+Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
+
 ```
 
 4. Run installation (non-admin shell):
