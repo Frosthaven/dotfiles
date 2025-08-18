@@ -117,3 +117,8 @@ lwin + alt + shift + right : komorebic resize-axis horizontal increase
 lwin + alt + shift + down  : komorebic resize-axis vertical decrease
 lwin + alt + shift + up    : komorebic resize-axis vertical increase
 
+# SYSTEM APPS *****************************************************************
+# *****************************************************************************
+
+lwin + b : start msedge
+lwin + t : powershell -c 'Start-Process -FilePath "wezterm-gui.exe" -NoNewWindow'
