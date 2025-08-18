@@ -77,11 +77,14 @@ def sysup [] {
         print "🔄 Updating NPM packages --------------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating npm..."
-        npm install -g npm
-        print ""
-        print "Updating all global packages..."
-        npm update -g
+        print "Updating npm packages..."
+        if ($nu.os-info.family == "windows") {
+            npm install -g npm
+            npm update -g
+        } else {
+            sudo npm install -g npm
+            sudo npm update -g
+        }
     }
 
     if (which snap | is-empty) {
