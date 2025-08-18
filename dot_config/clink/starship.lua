@@ -1,2 +1,3 @@
--- initialize starship prompt
+-- starship.lua
+os.setenv("STARSHIP_CONFIG", "$HOME\\.config\\starship\\starship.toml")
 load(io.popen("starship init cmd"):read("*a"))()

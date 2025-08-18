@@ -26,17 +26,6 @@ alias vi='nvim'
 zoxide init fish | source
 alias cd='z'  # replace cd with zoxide
 
-# FNM (Fast Node Manager)
-if not set -q fnm_dir
-    fnm env | source
-
-    # Install latest LTS if node is not available
-    if not type -q node
-        fnm install --lts
-        fnm use lts-latest
-    end
-end
-
 # fzf file search helper (sf)
 function sf
     set file (fzf --preview "bat --color=always {}" \

@@ -16,15 +16,15 @@ packages:
         mac: brew install uv
         apt: curl -LsSf https://astral.sh/uv/install.sh | sh
         pac: curl -LsSf https://astral.sh/uv/install.sh | sh
-    1-package-manager-fnm: # node version manager + same-shell setup
-        win: winget install --id Schniz.fnm -e --silent; $fnm = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter fnm.exe -File -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if ($fnm) { $env:FNM_DIR = "$env:USERPROFILE\AppData\Local\fnm"; $env:PATH += ";$env:FNM_DIR;$env:FNM_DIR\.bin"; Invoke-Expression (& $fnm env | Out-String); if (-not (Get-Command node -ErrorAction SilentlyContinue)) { & $fnm install --lts; & $fnm use lts-latest } } else { Write-Error "fnm.exe not found in WinGet packages folder." }
-        mac: '[[ -z "$FNM_DIR" ]] && brew install fnm && output=$(fnm env) && eval "$output" && (! command -v node &>/dev/null) && fnm install --lts && fnm use lts-latest'
-        apt: command -v fnm >/dev/null 2>&1 || curl -fsSL https://fnm.vercel.app/install | bash
-        pac: command -v fnm >/dev/null 2>&1 || (curl -fsSL https://fnm.vercel.app/install | bash && export PATH="$HOME/.fnm:$PATH" && eval "$(fnm env)"); fnm install --lts && fnm use lts-latest
     1-package-manager-mas: # mac app store cli
         mac: brew install mas
     1-package-manager-appinstaller: # microsoft
         win: $pkg = "Microsoft.AppInstaller"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
+    1-langauge-package-manager-nodejs:
+        win: winget install -e --id OpenJS.NodeJS
+        mac: brew install node
+        apt: sudo apt install nodejs npm
+        pac: yes | sudo pacman -S --needed nodejs npm
 
     # programming languages ***************************************************
     # *************************************************************************
@@ -189,9 +189,9 @@ packages:
         pac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
     cli-prettier:
         win: npm install --global prettier
-        mac: npm install --global prettier
-        apt: npm install --global prettier
-        pac: npm install --global prettier
+        mac: sudo npm install --global prettier
+        apt: sudo npm install --global prettier
+        pac: sudo npm install --global prettier
     cli-fastfetch:
         win: # n/a
         mac: brew install fastfetch

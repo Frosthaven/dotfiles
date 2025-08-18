@@ -3,15 +3,11 @@
 # ENSURE ADMINISTRATOR PRIVILEGES *********************************************
 # *****************************************************************************
 
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
-    exit
-}
 
 # FILEHASH ********************************************************************
 # *****************************************************************************
 
-$fileHash = CertUtil -hashfile "$HOME/.local/share/.chezmoidata/packages.yaml" SHA256
+$fileHash = CertUtil -hashfile "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml" SHA256
 
 # SCRIPT **********************************************************************
 # *****************************************************************************
@@ -20,8 +16,12 @@ $installPackages = $false
 Read-Host -Prompt "Install Packages? (y/n)" | ForEach-Object {
     if ($_ -eq 'n') {
         echo "Skipping package installation."
-        Read-Host -Prompt "Press Enter to exit"
         exit
+    } else {
+        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+            Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
+            exit
+        }
     }
 }
 

@@ -2,8 +2,11 @@
 # to continue using the same configuration files in the repository.
 
 If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
+
     Write-Host ""
     Write-Host "Checking for symbolic links and integrations..."
+
+    # CONFIG LINKING **********************************************************
 
     # Alacritty
     If ((Test-Path $env:APPDATA\Alacritty) -and (Get-Item $env:APPDATA\Alacritty).Attributes -ne "ReparsePoint") {
@@ -18,7 +21,6 @@ If ($PSVersionTable.PSVersion.Major -Le 5 -Or $isWindows) {
     }
 
     # Komorebi
-
     if (-not [Environment]::GetEnvironmentVariable('KOMOREBI_CONFIG_HOME', 'User')) {
         $value = Join-Path $env:USERPROFILE '.config\komorebi'
         Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile', '-Command', "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment' -Name 'KOMOREBI_CONFIG_HOME' -Value '$env:USERPROFILE\.config\komorebi'"
@@ -81,7 +83,7 @@ if (-Not (Test-Path $profile)) {
     New-Item -Path $profile -ItemType File -Force | Out-Null
     Write-Host "Created profile file at $profile"
 }
-. $profile
+
 
 komorebic stop --whkd --bar; komorebic start --whkd;
 
