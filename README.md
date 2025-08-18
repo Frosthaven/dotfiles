@@ -70,7 +70,7 @@ Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthav
 
     - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html) somewhere safe
     - Run the downloaded exe
-    - Enable `Strat with Windows`
+    - Enable `Start with Windows`
     - Enable `Hide when a key is pressed`
     - Set the timer range to `3 seconds`
     - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
@@ -89,6 +89,7 @@ Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthav
     - Open `System Settings` -> `Keyboard` -> `Keyboard Shortcuts` -> `Mission Control`
     - Disable or change all entries that use `ctrl + arrow` keys
     </details>
+
 
 
 
