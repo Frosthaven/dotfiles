@@ -36,10 +36,18 @@ return {
             end
 
             -- Helper function to get the filename or use default tab name
-            function GetFilenameOrDefault()
+            function GetFilenameOrNil()
                 local filename = vim.fn.expand '%:p'
                 if filename == '' then
                     return nil -- No filename, so we'll just omit the filename field
+                end
+                return filename
+            end
+
+            function GetFilenameOrDefault()
+                local filename = vim.fn.expand '%:p'
+                if filename == '' then
+                    return GetDefaultTabName() -- Use default tab name if no filename
                 end
                 return filename
             end
@@ -66,9 +74,9 @@ return {
                 augroup FileBufferGroup
                     au!
 
-                    au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
-                    au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
-                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = GetFilenameOrDefault(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
+                    au BufEnter * lua DispatchWezTermEvent({name = 'BufEnter', pid = vim.fn.getpid(), filename = GetFilenameOrNil(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
+                    au BufLeave * lua DispatchWezTermEvent({name = 'BufLeave', pid = vim.fn.getpid(), filename = GetFilenameOrNil(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
+                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename = GetFilenameOrNil(), title = GetTitleIfNoFilename(), pwd = vim.fn.getcwd()})
                 augroup END
             ]]
 
@@ -76,7 +84,7 @@ return {
             vim.cmd [[
                 augroup VimEnterGroup
                   au!
-                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), title=GetDefaultTabName()})
+                    au VimEnter * lua DispatchWezTermEvent({name = 'VimEnter', pid = vim.fn.getpid(), filename  = GetFilenameOrDefault(), title=GetTitleIfNoFilename()})
                 augroup END
             ]]
 
