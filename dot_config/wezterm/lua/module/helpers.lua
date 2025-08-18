@@ -46,7 +46,7 @@ M.attachIdealFrontend = function(config)
     local osTag = M.osTag()
     if osTag == "windows" then -- windows has issues with transparency + WebGpu
         if config.window_background_opacity == nil or config.window_background_opacity < 1 then
-            return M.mergeTables(config, { front_end = "WebGpu", webgpu_power_preference = "HighPerformance" }) -- transparency wont work here on windows unless OpenGL
+            return M.mergeTables(config, { front_end = "OpenGL", webgpu_power_preference = "HighPerformance" }) -- transparency wont work here on windows unless OpenGL
         else
             return M.mergeTables(config, { front_end = "WebGpu", webgpu_power_preference = "HighPerformance" })
         end

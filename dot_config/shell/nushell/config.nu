@@ -13,7 +13,6 @@ $env.config.show_banner = false
 source ./sources/_env_path.nu
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
-try { source ./sources/fnm.nu } catch {ignore} # fnm might not be installed
 source ./sources/uv.nu
 source ./sources/wezterm.nu
 source ./sources/homebrew.nu

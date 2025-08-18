@@ -26,17 +26,6 @@ alias vi='nvim'
 eval "$(zoxide init bash)"
 alias cd='z'  # replace cd with zoxide
 
-# FNM (Fast Node Manager)
-if [ -z "$fnm_dir" ]; then
-    eval "$(fnm env)"
-
-    # install latest LTS if node not present
-    if ! command -v node >/dev/null 2>&1; then
-        fnm install --lts
-        fnm use lts-latest
-    fi
-fi
-
 # fzf file search helper (sf)
 sf() {
     local file

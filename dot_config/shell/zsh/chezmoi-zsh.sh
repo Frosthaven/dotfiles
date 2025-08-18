@@ -26,19 +26,6 @@ alias vi='nvim'
 eval "$(zoxide init zsh)"
 alias cd=z # replace cd with zoxide
 
-# fnm
-if [[ -z "$fnm_dir" ]]; then
-    # setup environment
-    output=$(fnm env)
-    eval "$output"
-
-    # install the latest version
-    if ! command -v node &>/dev/null; then
-        fnm install --lts
-        fnm use lts-latest
-    fi
-fi
-
 # fzf - [s]earch [f]iles command (sf)
 # this will use the output of the fzf command to open the file in nvim. you can
 # change the editor launch command to whatever you want.

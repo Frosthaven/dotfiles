@@ -10,11 +10,11 @@ M.setup = function()
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
         },
         windows = {
-            font = wezterm.font({ family = "JetBrainsMono NF", weight = "Light", scale = 1 }),
-            -- win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
-            -- window_background_opacity = 0.85,
-            win32_system_backdrop = "Disable", -- Disable/Mica/Acrylic/Tabbed
+            font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
+            win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
             window_background_opacity = 0.85,
+            -- win32_system_backdrop = "Disable", -- Disable/Mica/Acrylic/Tabbed
+            -- window_background_opacity = 0.85,
         },
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
