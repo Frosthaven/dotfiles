@@ -8,6 +8,8 @@ This collection of personal dotfiles attempts to provide a consistant tiling win
 
 <summary>Windows</summary>
 
+Run the following in an Administrator Powershell terminal and reboot the machine afterward:
+
 ```ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -38,8 +40,6 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_D
 Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
 
 ```
-
-Reboot after running.
 
 </details>
 
@@ -93,5 +93,6 @@ Reboot after running.
 ### Todo
 
 - [ ] Add Linux
+
 
 
