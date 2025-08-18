@@ -2,11 +2,11 @@
 
 This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
 
-## Preparation
+## Installation
 
-### Windows
+<details>
 
-setup script to install/configure dependencies and setup chezmoi folder
+<summary>Windows</summary>
 
 ```ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
@@ -39,13 +39,9 @@ Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthav
 
 ```
 
-4. Run installation (non-admin shell):
+Reboot after running.
 
-```ps1
-mkdir ~/.local/share/chezmoi; winget install Microsoft.DotNet.DesktopRuntime.8; winget install --id Git.Git -e --source winget; winget install twpayne.chezmoi;
-```
-
-5. Restart the PC
+</details>
 
 ## Deployment
 
@@ -97,4 +93,5 @@ mkdir ~/.local/share/chezmoi; winget install Microsoft.DotNet.DesktopRuntime.8; 
 ### Todo
 
 - [ ] Add Linux
+
 
