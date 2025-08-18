@@ -63,6 +63,32 @@ install_with_apt() {
         fi
     done
 
+    # Install snapd and enable its service
+    if is_installed snap; then
+        sudo systemctl enable --now snapd.socket
+        sudo ln -sf /var/lib/snapd/snap /snap 2>/dev/null
+    else
+        sudo apt install -y snapd
+        sudo systemctl enable --now snapd.socket
+        sudo ln -sf /var/lib/snapd/snap /snap 2>/dev/null
+    fi
+
+    # Install Flatpak
+    if ! is_installed flatpak; then
+        echo "Installing flatpak..."
+        sudo apt install -y flatpak
+    else
+        echo "✔️ flatpak already installed."
+    fi
+
+    # Install flatseal via flatpak
+    if ! flatpak list | grep -q flatseal; then
+        echo "Installing Flatseal via flatpak..."
+        flatpak install -y flathub com.github.tchx84.Flatseal
+    else
+        echo "✔️ Flatseal already installed."
+    fi
+
     # Clipboard tools
     if [ "$1" = "wayland" ]; then
         if ! is_installed wl-copy; then
@@ -133,6 +159,14 @@ install_with_pacman() {
         sudo pacman -S --noconfirm flatpak
     else
         echo "✔️ flatpak already installed."
+    fi
+
+    # Install flatseal via flatpak
+    if ! flatpak list | grep -q flatseal; then
+        echo "Installing Flatseal via flatpak..."
+        flatpak install -y flathub com.github.tchx84.Flatseal
+    else
+        echo "✔️ Flatseal already installed."
     fi
 
     # Clipboard tools
