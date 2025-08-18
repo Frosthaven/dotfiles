@@ -7,12 +7,76 @@ if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
     Write-Host "Chocolatey installed successfully."
 }
 
-if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-    Write-Host "Scoop is not installed. Installing Scoop..."
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser;
-    iwr get.scoop.sh -useb | iex
-    Write-Host "Scoop installed successfully."
+# Install Rust GNU toolchain using winget
+if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) {
+    Write-Host "Rust is not installed. Installing Rust GNU toolchain via winget..."
+    winget install --id Rustlang.Rust.GNU --accept-package-agreements --accept-source-agreements
+    Write-Host "Rust GNU toolchain installed."
+
+if (-not (Get-Command mingw32-make -ErrorAction SilentlyContinue)) {
+    Write-Host "MinGW not found. Installing MinGW via Chocolatey with elevation..."
+
+    $mingwInstallCmd = 'choco install mingw -y'
+
+    Start-Process -FilePath "powershell.exe" `
+        -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $mingwInstallCmd `
+        -Verb RunAs -Wait
+
+    Write-Host "MinGW installation attempted."
+} else {
+    Write-Host "MinGW is already installed."
 }
+
+    # Update PATH for MinGW and Cargo bins for current session
+    $mingwBin = "C:\ProgramData\mingw64\mingw64\bin"
+    $cargoBin = "$env:USERPROFILE\.cargo\bin"
+    if (Test-Path "$mingwBin\dlltool.exe") {
+        $env:Path += ";$mingwBin;$cargoBin"
+        Write-Host "Added MinGW and Cargo bin to PATH for this session."
+        dlltool --version
+    } else {
+        Write-Error "dlltool.exe not found at $mingwBin"
+    }
+
+    # Install Rustup using winget
+    Write-Host "Installing Rustup via winget..."
+    winget install --id Rustlang.Rustup --accept-package-agreements --accept-source-agreements
+    Write-Host "Rustup installed."
+} else {
+    Write-Host "Rust is already installed."
+}
+
+# Ensure Node.js is installed via winget
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Host "Node.js is not installed. Installing Node.js using winget..."
+    winget install -e --id OpenJS.NodeJS.LTS --source winget
+    Write-Host "Node.js installed successfully."
+} else {
+    Write-Host "Node.js is already installed."
+}
+
+# Ensure uv is installed via winget
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    Write-Host "uv is not installed. Installing uv using winget..."
+    winget install -e --id astral-sh.uv --source winget
+    Write-Host "uv installed successfully."
+} else {
+    Write-Host "uv is already installed."
+}
+
+
+$scoopPath = Join-Path $env:USERPROFILE "scoop\shims\scoop.ps1"
+
+if (-not (Test-Path $scoopPath)) {
+    Write-Host "Scoop is not installed. Installing Scoop..."
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    iwr get.scoop.sh -UseBasicParsing | iex
+    Write-Host "Scoop installed successfully."
+} else {
+    Write-Host "scoop is already installed."
+}
+
+
 
 # PATH *********************************************************************
 # ensure that we have the following directories in the path variable:
