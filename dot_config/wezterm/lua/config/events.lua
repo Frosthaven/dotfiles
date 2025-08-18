@@ -209,8 +209,11 @@ M.setup = function(config)
                         -- truncate the project name if it is too long
                         local projectName = payload.pwd
                         -- get the last part of the path if there are slashes
+                        -- on windows
                         if projectName:find("/") then
                             projectName = projectName:match("^.+/(.+)$")
+                        elseif projectName:find("\\") then
+                            projectName = projectName:match("^.+\\(.+)$")
                         end
                         wezterm.log_info("Project name:", projectName)
                         if #projectName > maxProjectLength then
