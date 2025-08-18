@@ -6,8 +6,9 @@ local isPadded = false
 local FocusedNeovimProcesses = {}
 
 local defaultTitle = "WezTerm - " .. wezterm.hostname()
-local maxTitleLength = 25 -- maximum length of the tab title
-local maxProjectLength = 15 -- maximum length of the project name
+local maxTitleLength = 20 -- maximum length of the tab title
+local maxProjectLength = 5 -- maximum length of the project name
+local maxFinalLength = maxTitleLength + 14 -- the extra 14 is for the padding and icon length usage
 
 local extensionToIcon = {
     { icon = "" }, -- Default icon for unknown extensions
@@ -129,16 +130,10 @@ M.setup = function(config)
             end
         end
 
-        -- matches 1 space, followed by any non-space characters, and then 2 spaces
-        if formattedTitle:match(".*%s%s") then
-            -- Remove everything before and including the first occurrence of two spaces
-            local matchText = formattedTitle:match("^(.*%s%s)(.*)$")
-            if matchText then
-                -- matchText[2] is the part after the first set of two spaces
-                formattedTitle = matchText:match("^(.*%s%s)(.*)$"):match("^(.*)$")
-            end
+        -- if the title is larger than maxFinalLength, only show the end of the title
+        if #formattedTitle > maxFinalLength then
+            formattedTitle = "..." .. formattedTitle:sub(-maxFinalLength + 3)
         end
-
         return formattedTitle
     end
 
@@ -218,7 +213,7 @@ M.setup = function(config)
                         if #projectName > maxProjectLength then
                             -- projectName = projectName:sub(-maxProjectLength + 3)
                             -- instead of removing from the start, remove it from the end
-                            projectName = projectName:sub(1, maxProjectLength - 3)
+                            projectName = projectName:sub(1, maxProjectLength)
                         end
                         payload.filename = projectName .. " " .. payload.filename
                         wezterm.log_info("filename is now:", payload.filename)
