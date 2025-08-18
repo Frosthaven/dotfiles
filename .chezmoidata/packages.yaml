@@ -378,7 +378,7 @@ packages:
         win: winget install --id SlackTechnologies.Slack
         mac: brew install slack
         apt: flatpak install flathub com.slack.Slack -y
-        pac: flatpak install flathub com.slack.Slack -y
+        pac: yay -S --noconfirm slack-desktop
     desktop-spotify: # music
         win: $pkg = "Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
         mac: brew install spotify
