@@ -90,9 +90,5 @@ Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthav
     - Disable or change all entries that use `ctrl + arrow` keys
     </details>
 
-### Todo
-
-- [ ] Add Linux
-
 
 
