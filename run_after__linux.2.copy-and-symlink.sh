@@ -34,7 +34,8 @@ nushell_config_parent="$HOME/.config"
 chezmoi_nushell_dir="$HOME/.local/share/chezmoi/dot_config/shell/nushell"
 cp -r -f "$chezmoi_nushell_dir" "$nushell_config_parent"
 
-# secure winapps config
+# copy and secure winapps config
+cp -f ~/.config/winapps/winapps.conf.once ~/.config/winapps/winapps.conf
 chown $(whoami):$(whoami) ~/.config/winapps/winapps.conf
 chmod 600 ~/.config/winapps/winapps.conf
 
