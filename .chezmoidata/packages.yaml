@@ -15,7 +15,7 @@ packages:
         win: winget install --id astral-sh.uv
         mac: brew install uv
         apt: curl -LsSf https://astral.sh/uv/install.sh | sh
-        pac: curl -LsSf https://astral.sh/uv/install.sh | sh
+        pac: # dont
     1-package-manager-mas: # mac app store cli
         mac: brew install mas
     1-package-manager-appinstaller: # microsoft
@@ -43,7 +43,7 @@ packages:
         win: uv python install --default
         mac: uv python install --default
         apt: uv python install --default
-        pac: uv python install --default
+        pac: sudo pacman -Syu --needed python python-pip python-virtualenv python-pipenv
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
@@ -121,7 +121,7 @@ packages:
         win: winget install --id Neovim.Neovim
         mac: brew install neovim
         apt: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
-        pac: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo pacman -S --neededy --noconfirm base-devel ninja cmake gettext unzip curl git && TMPDIR=$(mktemp -d) && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim "$TMPDIR" && cd "$TMPDIR" && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf "$TMPDIR")
+        pac: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo pacman -S --needed --noconfirm base-devel ninja cmake gettext unzip curl git && TMPDIR=$(mktemp -d) && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim "$TMPDIR" && cd "$TMPDIR" && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf "$TMPDIR")
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
@@ -181,12 +181,12 @@ packages:
         win: uv tool install --python 3.12 posting
         mac: uv tool install --python 3.12 posting
         apt: uv tool install --python 3.12 posting
-        pac: uv tool install --python 3.12 posting
+        pac: # dont
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
         mac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
-        pac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
+        pac: # dont
     cli-prettier:
         win: npm install --global prettier
         mac: sudo npm install --global prettier
@@ -436,4 +436,4 @@ packages:
     desktop-inkscape:
         pac: sudo pacman -Syu --needed -y inkscape
     desktop-davinci-resolve:
-        pac: yay -S --noconfirm davinci-resolve # davinci-resolve / davinci-resolve-studio
+        pac: yay -S --noconfirm --needed davinci-resolve # davinci-resolve / davinci-resolve-studio
