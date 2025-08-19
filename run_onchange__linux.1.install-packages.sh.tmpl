@@ -2,6 +2,18 @@
 
 #!/bin/bash
 
+# FILEHASH ********************************************************************
+# *****************************************************************************
+
+# by embedding the file hash into this template, chezmoi will only detect
+# changes if the hashed file changes. This will prevent unnecessarily running
+# the script when the target file hasn't changed.
+
+fileHash=$(sha256sum "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml" | awk '{print $1}')
+
+# SCRIPT **********************************************************************
+# *****************************************************************************
+
 sudo -v
 
 # Detect package manager

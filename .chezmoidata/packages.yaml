@@ -204,8 +204,8 @@ packages:
     containers-docker:
         win: winget install --id Docker.DockerDesktop
         mac: # n/a
-        apt: command -v docker >/dev/null 2>&1 || (curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$(whoami)" && echo "Docker installed. Log out/in to apply group changes.")
-        pac: yes | sudo pacman -S --needed docker
+        apt: command -v docker >/dev/null 2>&1 || (curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$(whoami)" && echo "Docker installed. Log out/in to apply group changes." && sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose && echo "Docker Compose installed.")
+        pac: yes | sudo pacman -S --needed docker docker-compose
     containers-orbstack: # alternative to docker on mac
         win: # n/a
         mac: brew install --cask orbstack
@@ -425,5 +425,7 @@ packages:
         mac: brew install iina
         apt: # n/a
     desktop-winapps-dependencies:
-        lin: sudo apt install -y curl dialog freerdp3-x11 git iproute2 libnotify-bin netcat-openbsd
+        win: # n/a
+        mac: # n/a
+        lin: sudo apt install -y curl dialog freerdp3-x11 freerdp git iproute2 libnotify-bin netcat-openbsd
         pac: sudo pacman -Syu --needed -y curl dialog freerdp git iproute2 libnotify openbsd-netcat
