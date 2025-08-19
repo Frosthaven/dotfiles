@@ -12,7 +12,7 @@ M.setup = function()
         windows = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             win32_system_backdrop = "Acrylic", -- Disable/Mica/Acrylic/Tabbed
-            window_background_opacity = 0.85,
+            window_background_opacity = 0.88,
             -- win32_system_backdrop = "Disable", -- Disable/Mica/Acrylic/Tabbed
             -- window_background_opacity = 0.85,
         },
