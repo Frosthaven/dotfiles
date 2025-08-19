@@ -35,8 +35,16 @@ chezmoi_nushell_dir="$HOME/.local/share/chezmoi/dot_config/shell/nushell"
 cp -r -f "$chezmoi_nushell_dir" "$nushell_config_parent"
 
 # copy and secure winapps config
+mkdir -p "$HOME/.config/winapps"
+if [ ! -f "$HOME/.config/winapps/compose.yaml" ]; then
+    curl -fsSL https://raw.githubusercontent.com/winapps-org/winapps/main/compose.yaml -o "$HOME/.config/winapps/compose.yaml"
+    # inside this yaml file, change USERNAME and PASSWORD to winapps
+    sed -i -E 's/(USERNAME:\s*)".*"/\1"winapps"/; s/(PASSWORD:\s*)".*"/\1"winapps"/' ~/.config/winapps/compose.yaml
+    echo "WinApps compose.yaml file created and configured in $HOME/.config/winapps/compose.yaml - configure this as needed before creating the VM."
+fi
 cp -f ~/.config/winapps/winapps.conf.once ~/.config/winapps/winapps.conf
 chown $(whoami):$(whoami) ~/.config/winapps/winapps.conf
+chmod 644 ~/.config/winapps/compose.yaml
 chmod 600 ~/.config/winapps/winapps.conf
 
 # winapps installer script.
@@ -64,32 +72,64 @@ if [ ! -f "$HOME/.config/winapps_setup" ]; then
     echo ""
     echo "Please choose an option:"
     echo ""
-    echo "  1) My WinApps VM is running (https://github.com/winapps-org/winapps/blob/main/docs/docker.md)"
-    echo "  2) Do this later"
-    echo "  3) Don't ask again"
+    echo "  1) I'm ready to set up WinApps now"
+    echo "  2) Don't ask again"
     echo ""
-    read -p "Enter your choice (1/2/3): " winapps_choice
+    echo "  Enter) Do this later"
+    echo ""
+    read -p "Enter your choice (1/2/Enter): " winapps_choice
 
     case "$winapps_choice" in
         1)
-            echo "You chose to set up WinApps now."
+            if [ -n "$WAYLAND_DISPLAY" ]; then
+                echo "It looks like you are using Wayland. Please refer to the following discussion:"
+                echo "https://github.com/winapps-org/winapps/discussions/19"
+                echo ""
+                echo "WinApps can only be run in the browser on Wayland at this time. That may change when sdl-rdp is updated."
+                echo ""
+                read -p "Do you want to continue anyway? (y/N): " wayland_continue
+                case "$wayland_continue" in
+                    [Yy]*)
+                        ;;
+                    *)
+                        echo "Skipping WinApps setup for now due to Wayland. You won't be asked again. You can delete ~/.config/winapps_setup and rerun this script to be asked again."
+                        touch "$HOME/.config/winapps_setup"
+                        exit 0
+                        ;;
+                esac
+            fi
+
+            echo "Starting the WinApps Docker container..."
+            if command -v docker-compose >/dev/null 2>&1; then
+                docker-compose -f "$HOME/.config/winapps/compose.yaml" up -d
+            elif docker compose version >/dev/null 2>&1; then
+                docker compose --project-directory "$HOME/.config/winapps" up -d
+            else
+                echo "Error: Docker Compose is not installed. Please install it and try again."
+                exit 1
+            fi
+
             if command -v curl >/dev/null 2>&1; then
+                echo ""
+                echo "You can access WinApps at http://127.0.0.1:8006."
+                echo "Please finish setting up your Windows VM at that address before continuing."
+                echo ""
+                read -p "Press Enter to continue after setting up your Windows VM..."
+                echo "Running the WinApps setup script..."
                 bash -c "$(curl -fsSL https://raw.githubusercontent.com/winapps-org/winapps/main/setup.sh)"
+                touch "$HOME/.config/winapps_setup"
             else
                 echo "Error: curl is not installed. Please install curl and try again."
                 exit 1
             fi
             ;;
         2)
-            echo "You chose to do this later. You can run the WinApps setup script later."
-            ;;
-        3)
-            echo "You chose not to be asked again. The WinApps setup script will not run again."
+            echo "You chose not to be asked again. The WinApps setup script will not run again. You can delete ~/.config/winapps_setup and rerun this script to be asked again."
             mkdir -p "$HOME/.config"
             touch "$HOME/.config/winapps_setup"
             ;;
         *)
-            echo "Invalid choice. Please run the script again and choose a valid option."
+            echo "Skipping for now. You can run the script again and choose a valid option."
             ;;
     esac
 fi
