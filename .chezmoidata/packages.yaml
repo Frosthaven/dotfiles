@@ -429,3 +429,11 @@ packages:
         mac: # n/a
         lin: sudo apt install -y curl dialog freerdp3-x11 freerdp git iproute2 libnotify-bin netcat-openbsd
         pac: sudo pacman -Syu --needed -y curl dialog freerdp git iproute2 libnotify openbsd-netcat
+    desktop-gimp:
+        pac: sudo pacman -Syu --needed -y gimp
+    desktop-krita:
+        pac: sudo pacman -Syu --needed -y krita
+    desktop-inkscape:
+        pac: sudo pacman -Syu --needed -y inkscape
+    desktop-davinci-resolve:
+        pac: yay -S --noconfirm davinci-resolve # davinci-resolve / davinci-resolve-studio
