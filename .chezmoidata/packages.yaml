@@ -216,29 +216,31 @@ packages:
         apt: sudo apt-get update && sudo apt-get install -y curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings && curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/ddev.gpg >/dev/null && sudo chmod a+r /etc/apt/keyrings/ddev.gpg && echo "deb [signed-by=/etc/apt/keyrings/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null && sudo apt-get update && sudo apt-get install -y ddev && mkcert -install
         pac: yay -S --noconfirm ddev-bin; mkcert -install
 
-    # desktop window management ***********************************************
+    # desktop environment management ******************************************
     # *************************************************************************
 
-    window-management-komorebi:
+    desktop-environmen-komorebi:
         win: winget install --id=LGUG2Z.whkd -e; winget install --id LGUG2Z.komorebi; if (-Not (Test-Path "$env:USERPROFILE\.config\komorebi\applications.json")) { komorebic fetch-asc }
         mac: # n/a
         apt: # n/a
-    window-management-aerospace:
+    desktop-environmen-aerospace:
         win: # n/a
         mac: brew install nikitabobko/tap/aerospace
         apt: # n/a
-    window-management-aeroplace:
+    desktop-environmen-aeroplace:
         win: # n/a
         mac: brew tap frosthaven/aeroplace; brew install aeroplace;
         apt: # n/a
-    window-management-borders:
+    desktop-environmen-borders:
         win: # n/a
         mac: brew tap FelixKratz/formulae; brew install borders;
         apt: # n/a
-    window-management-sketchybar:
+    desktop-environmen-sketchybar:
         win: # n/a
         mac: brew tap FelixKratz/formulae; brew install sketchybar;
         apt: # n/a
+    desktop-environmen-flowlauncher:
+        win: winget install --id=voidtools.Everything; winget install --id=Flow-Launcher.Flow-Launcher
 
     # desktop toys ************************************************************
     # *************************************************************************
