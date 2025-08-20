@@ -186,10 +186,10 @@ packages:
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
         pac: pipx install mkdocs-material --include-deps
     cli-prettier:
-        win: npm install --global prettier
-        mac: npm install --global prettier
-        apt: npm install --global prettier
-        pac: npm install --global prettier
+        win: if (-not (npm list -g prettier -s 2>$null)) { npm install -g prettier }
+        mac: bash -c "npm list -g prettier || npm install -g prettier"
+        apt: bash -c "npm list -g prettier || npm install -g prettier"
+        pac: bash -c "npm list -g prettier || npm install -g prettier"
     cli-fastfetch:
         mac: brew install fastfetch
         apt: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
