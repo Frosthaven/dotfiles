@@ -242,14 +242,6 @@ packages:
         mac: brew install raycast
     toy-cursorcerer: # cursor manager
         mac: brew install cursorcerer
-    toy-logitune: # logitech mouse manager
-        mac: brew install logitune
-    toy-logi-options-plus: # logitech mouse manager
-        win: winget install --id Logitech.OptionsPlus
-        mac: brew install logi-options-plus
-    toy-logi-g-hub: # logitech mouse manager
-        win: $pkg = "Logitech.GHUB"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
-        mac: brew install --cask logitech-g-hub
     toy-paragon-ntfs: # ntfs driver
         mac: brew install paragon-ntfs
     toy-bartender: # menu bar manager
