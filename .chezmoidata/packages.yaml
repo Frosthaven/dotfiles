@@ -344,7 +344,7 @@ packages:
         win: winget install --id Valve.Steam
         mac: brew install --cask steam
         apt: flatpak install flathub com.valvesoftware.Steam -y
-        pac: flatpak install flathub com.valvesoftware.Steam -y
+        pac: sudo pacman -Syu --needed steam fuse
     desktop-adobe-creative-cloud: # creative suite
         win: winget install --id Adobe.CreativeCloud
         mac: brew install adobe-creative-cloud
