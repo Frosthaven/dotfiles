@@ -182,9 +182,9 @@ packages:
         pac: pipx install posting
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
-        mac: pip install mkdocs-material
+        mac: pipx install mkdocs-material --include-deps
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
-        pac: pip install mkdocs-material
+        pac: pipx install mkdocs-material --include-deps
     cli-prettier:
         win: npm install --global prettier
         mac: sudo npm install --global prettier
