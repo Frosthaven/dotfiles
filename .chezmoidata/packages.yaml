@@ -56,8 +56,6 @@ packages:
         pac: yes | sudo pacman -S --needed lua
     2-dot-net:
         win: winget install --id Microsoft.DotNet.SDK.8; winget install --id Microsoft.DotNet.SDK.9
-        mac: # n/a
-        apt: # n/a
     2-language-php:
         win: choco install php -y
         mac: brew install php
@@ -193,7 +191,6 @@ packages:
         apt: sudo npm install --global prettier
         pac: sudo npm install --global prettier
     cli-fastfetch:
-        win: # n/a
         mac: brew install fastfetch
         apt: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
         pac: yes | pacman -S --needed fastfetch
@@ -203,13 +200,10 @@ packages:
 
     containers-docker:
         win: winget install --id Docker.DockerDesktop
-        mac: # n/a
         apt: command -v docker >/dev/null 2>&1 || (curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$(whoami)" && echo "Docker installed. Log out/in to apply group changes." && sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose && echo "Docker Compose installed.")
         pac: yes | sudo pacman -S --needed docker docker-compose
     containers-orbstack: # alternative to docker on mac
-        win: # n/a
         mac: brew install --cask orbstack
-        apt: # n/a
     containers-ddev: # local development container management
         win: winget install --id DDEVFoundation.DDEV
         mac: brew install ddev/ddev/ddev; mkcert -install;
@@ -221,24 +215,14 @@ packages:
 
     desktop-environmen-komorebi:
         win: winget install --id=LGUG2Z.whkd -e; winget install --id LGUG2Z.komorebi; if (-Not (Test-Path "$env:USERPROFILE\.config\komorebi\applications.json")) { komorebic fetch-asc }
-        mac: # n/a
-        apt: # n/a
     desktop-environmen-aerospace:
-        win: # n/a
         mac: brew install nikitabobko/tap/aerospace
-        apt: # n/a
     desktop-environmen-aeroplace:
-        win: # n/a
         mac: brew tap frosthaven/aeroplace; brew install aeroplace;
-        apt: # n/a
     desktop-environmen-borders:
-        win: # n/a
         mac: brew tap FelixKratz/formulae; brew install borders;
-        apt: # n/a
     desktop-environmen-sketchybar:
-        win: # n/a
         mac: brew tap FelixKratz/formulae; brew install sketchybar;
-        apt: # n/a
     desktop-environmen-flowlauncher:
         win: winget install --id=voidtools.Everything; winget install --id=Flow-Launcher.Flow-Launcher
 
@@ -253,93 +237,53 @@ packages:
         apt: flatpak install flathub com.bitwarden.desktop -y
         pac: flatpak install flathub com.bitwarden.desktop -y
     toy-keka: # archive manager
-        win: # n/a
         mac: brew install keka
-        apt: # n/a
     toy-raycast: # launcher
-        win: # n/a
         mac: brew install raycast
-        apt: # n/a
     toy-cursorcerer: # cursor manager
-        win: # n/a
         mac: brew install cursorcerer
-        apt: # n/a
     toy-logitune: # logitech mouse manager
-        win: # n/a
         mac: brew install logitune
-        apt: # n/a
     toy-logi-options-plus: # logitech mouse manager
         win: winget install --id Logitech.OptionsPlus
         mac: brew install logi-options-plus
-        apt: # n/a
     toy-logi-g-hub: # logitech mouse manager
         win: $pkg = "Logitech.GHUB"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
         mac: brew install --cask logitech-g-hub
-        apt: # n/a
     toy-paragon-ntfs: # ntfs driver
-        win: # n/a
         mac: brew install paragon-ntfs
-        apt: # n/a
     toy-bartender: # menu bar manager
-        win: # n/a
         mac: brew install bartender
-        apt: # n/a
     toy-cleanshot: # screen capture
-        win: # n/a
         mac: brew install cleanshot
-        apt: # n/a
     toy-amphetamine: # keep mac awake
-        win: # n/a
         mac: mas install 937984704
-        apt: # n/a
     toy-colorslurp: # color picker
-        win: # n/a
         mac: mas install 1287239339
-        apt: # n/a
     toy-rainmeter: # desktop customization
         win: winget install --id Rainmeter.Rainmeter
-        mac: # n/a
-        apt: # n/a
     toy-nanazip: # archive manager
         win: winget install --id M2Team.NanaZip
-        mac: # n/a
-        apt: # n/a
     toy-sharex: # screen capture
         win: winget install --id ShareX.ShareX
-        mac: # n/a
-        apt: # n/a
     toy-hwinfo: # system monitor
         win: winget install --id REALiX.HWiNFO
-        mac: # n/a
-        apt: # n/a
     toy-powertoys: # system utilities
         win: winget install --id Microsoft.PowerToys
-        mac: # n/a
-        apt: # n/a
     toy-macrium-reflect: # backup
         win: echo "WARNING Cannot automatically install - Install from https://www.macrium.com/reflectfree"
-        mac: # n/a
-        apt: # n/a
     toy-istat-menus: # system monitor
-        win: # n/a
         mac: brew install istat-menus
-        apt: # n/a
     toy-jettison:
-        win: # n/a
         mac: brew install jettison
-        apt: # n/a
     toy-pixelsnap:
-        win: # n/a
         mac: brew install pixelsnap
-        apt: # n/a
 
     # desktop applications ****************************************************
     # *************************************************************************
 
     desktop-disk-usage-analyzer:
         win: winget install -e --id AntibodySoftware.WizTree
-        mac: # n/a
-        apt: # n/a
     desktop-steam: # gaming
         win: winget install --id Valve.Steam
         mac: brew install --cask steam
@@ -348,11 +292,8 @@ packages:
     desktop-adobe-creative-cloud: # creative suite
         win: winget install --id Adobe.CreativeCloud
         mac: brew install adobe-creative-cloud
-        apt: # n/a
     desktop-adobe-acrobat-reader:
         win: $pkg = "Adobe.Acrobat.Reader.64-bit"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
-        mac: # n/a
-        apt: # n/a
     desktop-microsoft-office: # office suite
         win: winget install --id Microsoft.Office
         mac: brew install microsoft-office
@@ -360,7 +301,6 @@ packages:
     desktop-jetbrains-toolbox: # jetbrains suite
         win: winget install --id JetBrains.Toolbox
         mac: brew install jetbrains-toolbox
-        apt: # n/a
     desktop-obsidian: # note taking
         win: winget install --id Obsidian.Obsidian
         mac: brew install obsidian
@@ -404,7 +344,6 @@ packages:
     desktop-files-sftp:
         win: winget install --id WinSCP.WinSCP
         mac: brew install forklift; defaults write -g NSFileViewer -string com.binarynights.ForkLift; defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.folder";LSHandlerRoleAll="com.binarynights.ForkLift";}'
-        apt: # n/a
     desktop-code:
         win: winget install --id Microsoft.VisualStudioCode
         mac: brew install --cask visual-studio-code
@@ -423,10 +362,7 @@ packages:
     desktop-video-player:
         win: winget install screenbox -s winget
         mac: brew install iina
-        apt: # n/a
     desktop-winapps-dependencies:
-        win: # n/a
-        mac: # n/a
         lin: sudo apt install -y curl dialog freerdp3-x11 freerdp git iproute2 libnotify-bin netcat-openbsd
         pac: sudo pacman -Syu --needed -y curl dialog freerdp git iproute2 libnotify openbsd-netcat
     desktop-gimp:
@@ -441,7 +377,5 @@ packages:
     # recovery applications ***************************************************
     # *************************************************************************
     recovery-snaphsots:
-        win: # n/a
-        mac: # n/a - uses time machine
         lin: sudo apt install snapper
         pac: sudo pacman -Syu --needed -y snapper;
