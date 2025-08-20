@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 echo ""
 echo "Checking for symbolic links and integrations..."
