@@ -1,0 +1,54 @@
+{{ if eq .chezmoi.os "darwin" -}}
+
+#!/bin/zsh
+
+sudo -v
+
+# FILEHASH ********************************************************************
+# *****************************************************************************
+
+# by embedding the file hash into this template, chezmoi will only detect
+# changes if the hashed file changes. This will prevent unnecessarily running
+# the script when the target file hasn't changed.
+
+fileHash=$(shasum -a 256 "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml")
+
+# SCRIPT **********************************************************************
+# *****************************************************************************
+
+# ask the user if they want to install packages, and if not then exit
+echo ""
+if read -qs "?Do you want to install packages? (N/y)"; then
+    >&2 echo $REPLY;
+else
+    >&2 echo $REPLY; echo "Skipping package installation."; chmod +x $HOME/.config/sketchybar/plugins/*; exit
+fi
+
+totalPackages=0
+{{ range $key, $value := .packages }}
+  {{ if hasKey $value "mac" }}
+    totalPackages=$((totalPackages + 1))
+  {{ end }}
+{{ end }}
+
+currentPackage=0
+
+echo ""
+echo "Processing $totalPackages Packages..."
+echo ""
+
+{{ range $key, $value := .packages -}}
+  {{ if hasKey $value "mac" -}}
+    currentPackage=$((currentPackage + 1))
+    echo -e "\033[35m----- [$currentPackage/$totalPackages] {{$key}} -----\033[0m"
+    {{ $value.mac }}
+  {{ end -}}
+{{ end -}}
+
+chmod +x $HOME/.config/sketchybar/plugins/*
+
+echo ""
+echo "Done!"
+
+{{ end -}}
+

@@ -1,0 +1,61 @@
+{{ if eq .chezmoi.os "windows" -}}
+
+# ENSURE ADMINISTRATOR PRIVILEGES *********************************************
+# *****************************************************************************
+
+
+# FILEHASH ********************************************************************
+# *****************************************************************************
+
+$fileHash = CertUtil -hashfile "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml" SHA256
+
+# SCRIPT **********************************************************************
+# *****************************************************************************
+
+$installPackages = $false
+Read-Host -Prompt "Install Packages? (y/n)" | ForEach-Object {
+    if ($_ -eq 'n') {
+        echo "Skipping package installation."
+        exit
+    } else {
+        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+            Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
+            exit
+        }
+    }
+}
+
+# Build list of packages with 'win' key
+$packages = @(
+{{- $withWin := dict -}}
+{{- range $key, $value := .packages -}}
+    {{- if (index $value "win") -}}
+        {{- $_ := set $withWin $key $value -}}
+    {{- end -}}
+{{- end -}}
+{{- $keys := keys $withWin -}}
+{{- $lastIndex := sub (len $keys) 1 -}}
+{{- range $i, $key := $keys }}
+    @{ Name = "{{$key}}"; Script = @'
+{{ index (index $withWin $key) "win" | replace "'" "''" }}
+'@ }{{ if ne $i $lastIndex }},{{ end }}
+{{ end -}}
+)
+
+$totalPackages = $packages.Count
+$currentPackage = 0
+
+echo ""
+echo "Processing $totalPackages Packages..."
+echo ""
+
+foreach ($pkg in $packages) {
+    $currentPackage++
+    Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
+    Invoke-Expression $pkg.Script
+}
+
+echo ""
+Read-Host -Prompt "Done! Press Enter to exit the package installer."
+
+{{ end -}}

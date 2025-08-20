@@ -2,19 +2,19 @@ README.md
 **/history.txt
 
 {{ if ne .chezmoi.os "windows" }}
-**/*windows.*
+**/*windows_*
 .config/komorebi
 .config/whkdrc
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
-**/*darwin.*
-**/*macos.*
+**/*darwin_*
+**/*macos_*
 .config/aerospace
 .config/borders
 .config/sketchybar
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
-**/*linux.*
+**/*linux_*
 {{ end }}

@@ -11,6 +11,10 @@ M.setup = function(config)
         font_size = 10.0,
     }
 
+    if helpers.osTag() == "macos" then
+        config.window_frame.font_size = 12.0
+    end
+
     config.integrated_title_button_color = "#7777AA"
     -- tab bar
     config.hide_tab_bar_if_only_one_tab = false
