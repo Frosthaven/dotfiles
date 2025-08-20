@@ -26,23 +26,20 @@ def sysup [] {
     if (which pacman | is-empty) {
         # nothing
     } else {
-        print ""
-        print "🔄 Updating Pacman packages -----------------------------------"
-        print "---------------------------------------------------------------"
-        print ""
-        print "Updating Pacman package lists..."
-        sudo pacman -Syu --noconfirm;
-    }
-
-    if (which yay | is-empty) {
-        # nothing
-    } else {
-        print ""
-        print "🔄 Updating Yay packages --------------------------------------"
-        print "---------------------------------------------------------------"
-        print ""
-        print "Updating all Yay packages..."
-        yay -Syu --noconfirm;
+        # check if we have yay installed
+        if (which yay | is-empty) {
+            print ""
+            print "🔄 Updating Arch packages -------------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
+            sudo pacman -Syu --noconfirm;
+        } else {
+            print ""
+            print "🔄 Updating Arch + AUR packages -------------------------------"
+            print "---------------------------------------------------------------"
+            print ""
+            yay -Syu --noconfirm;
+        }
     }
 
     if (which cargo | is-empty) {
