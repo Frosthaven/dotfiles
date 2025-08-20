@@ -161,7 +161,7 @@ packages:
         win: winget install --id ajeetdsouza.zoxide
         mac: brew install zoxide
         apt: sudo apt install zoxide -y
-        pac: yes | pacman -S --needed zoxide
+        pac: yes | sudo pacman -S --needed zoxide
     cli-duf: # alternative to du
         win: winget install --id muesli.duf
         mac: brew install duf
@@ -356,7 +356,7 @@ packages:
     desktop-microsoft-office: # office suite
         win: winget install --id Microsoft.Office
         mac: brew install microsoft-office
-        apt: # n/a
+        apt: yay -Sy --noconfirm onlyoffice-bin
     desktop-jetbrains-toolbox: # jetbrains suite
         win: winget install --id JetBrains.Toolbox
         mac: brew install jetbrains-toolbox
@@ -437,3 +437,11 @@ packages:
         pac: sudo pacman -Syu --needed -y inkscape
     desktop-davinci-resolve:
         pac: yay -S --noconfirm --needed davinci-resolve # davinci-resolve / davinci-resolve-studio
+
+    # recovery applications ***************************************************
+    # *************************************************************************
+    recovery-snaphsots:
+        win: # n/a
+        mac: # n/a - uses time machine
+        lin: sudo apt install snapper
+        pac: sudo pacman -Syu --needed -y snapper;
