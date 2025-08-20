@@ -187,9 +187,9 @@ packages:
         pac: pipx install mkdocs-material --include-deps
     cli-prettier:
         win: npm install --global prettier
-        mac: sudo npm install --global prettier
-        apt: sudo npm install --global prettier
-        pac: sudo npm install --global prettier
+        mac: npm install --global prettier
+        apt: npm install --global prettier
+        pac: npm install --global prettier
     cli-fastfetch:
         mac: brew install fastfetch
         apt: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
