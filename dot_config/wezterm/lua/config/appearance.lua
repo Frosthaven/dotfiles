@@ -12,7 +12,7 @@ M.setup = function(config)
     }
 
     if helpers.osTag() == "macos" then
-        config.window_frame.font_size = 12.0
+        config.window_frame.font_size = 14.0
     end
 
     config.integrated_title_button_color = "#7777AA"
