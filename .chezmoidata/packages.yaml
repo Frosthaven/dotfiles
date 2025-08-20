@@ -41,9 +41,9 @@ packages:
         pac: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
     2-language-python:
         win: uv python install --default
-        mac: uv python install --default
+        mac: brew install python pipx
         apt: uv python install --default
-        pac: sudo pacman -Syu --needed python python-pip python-virtualenv python-pipenv
+        pac: sudo pacman -Syu --needed python python-pip python-pipx python-virtualenv python-pipenv
     2-language-go:
         win: winget install --id GoLang.Go
         mac: brew install go
@@ -177,14 +177,14 @@ packages:
         pac: yay -S --noconfirm stripe-cli
     cli-posting: # api tool
         win: uv tool install --python 3.12 posting
-        mac: uv tool install --python 3.12 posting
+        mac: pipx install posting
         apt: uv tool install --python 3.12 posting
-        pac: # dont
+        pac: pipx install posting
     cli-mkdocs:
         win: uv tool install --python 3.12 mkdocs-material
-        mac: uv tool install --python 3.12 mkdocs-material 2>/dev/null
+        mac: pipx install mkdocs-material
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
-        pac: # dont
+        pac: pipx install mkdocs-material
     cli-prettier:
         win: npm install --global prettier
         mac: sudo npm install --global prettier
