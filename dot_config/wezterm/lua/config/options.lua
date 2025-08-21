@@ -22,7 +22,7 @@ M.setup = function()
             macos_window_background_blur = 50, -- 0-100
         },
         common = {
-            font_size = 10,
+            font_size = 10.5,
             line_height = 1.3,
             window_background_opacity = 0.94,
 
