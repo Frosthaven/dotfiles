@@ -46,7 +46,7 @@ def cosmic-shutdown [] {
 # -----------------------------------------------------------------------------
 
 
-def rsl [] {
+def rr [] {
     let options = [
         "Reboot",
         "Logout",
