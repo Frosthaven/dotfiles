@@ -14,8 +14,8 @@ return {
             -- and #11111D for the virt column
             vim.api.nvim_set_hl(0, 'LineNr', { fg = '#656588', bg = '#11111D' })
             vim.api.nvim_set_hl(0, 'VirtColumn', { fg = '#252548' })
-            vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#11111D' })
-            vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#202037' })
+            -- vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#11111D' })
+            -- vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#202037' })
         end,
     },
     {
