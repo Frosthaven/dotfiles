@@ -8,7 +8,7 @@ M.setup = function(config)
         active_titlebar_bg = "#11111D",
         inactive_titlebar_bg = "#11111D",
         font = wezterm.font({ family = "JetBrains Mono", weight = "Medium" }),
-        font_size = 10.0,
+        font_size = 9,
     }
 
     if helpers.osTag() == "macos" then
