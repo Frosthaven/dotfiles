@@ -42,3 +42,67 @@ def cosmic-shutdown [] {
         shutdown now
     }
 }
+
+# -----------------------------------------------------------------------------
+
+
+def rsl [] {
+    let options = [
+        "Reboot",
+        "Logout",
+        "Shutdown",
+        "Resolution (5120x1440 @ 120Hz)",
+        "Resolution Safe (3840x1080 @ 120Hz)",
+        "Cancel"
+    ]
+
+    let last_index = ($options | length) - 1
+    for i in 0..$last_index {
+        let label = $options | get $i
+        print $"($i + 1). ($label)"
+    }
+
+    # Read choice
+    print ""
+    print "Select an option (1-6): "
+    let choice = (input | str trim)
+
+    match $choice {
+        "1" => {
+            print "Are you sure you want to reboot? (y/n): "
+            let confirm = (input | str trim)
+            if $confirm in ["y", "Y"] {
+                cosmic-reboot
+            } else {
+                print "Reboot cancelled."
+            }
+        },
+        "2" => {
+            print "Are you sure you want to logout? (y/n): "
+            let confirm = (input | str trim)
+            if $confirm in ["y", "Y"] {
+                cosmic-logout
+            } else {
+                print "Logout cancelled."
+            }
+        },
+        "3" => {
+            print "Are you sure you want to shutdown? (y/n): "
+            let confirm = (input | str trim)
+            if $confirm in ["y", "Y"] {
+                cosmic-shutdown
+            } else {
+                print "Shutdown cancelled."
+            }
+        },
+        "4" => {
+            cosmic-res
+        },
+        "5" => {
+            cosmic-res-safe
+        },
+        _ => {
+            print "Cancelled."
+        }
+    }
+}
