@@ -238,8 +238,9 @@ packages:
         pac: flatpak install flathub com.bitwarden.desktop -y
     toy-keka: # archive manager
         mac: brew install keka
-    toy-raycast: # launcher
+    toy-selector: # launcher
         mac: brew install raycast
+        pac: flatpak install it.mijorus.smile -y
     toy-cursorcerer: # cursor manager
         mac: brew install cursorcerer
     toy-paragon-ntfs: # ntfs driver
