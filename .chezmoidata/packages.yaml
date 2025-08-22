@@ -365,7 +365,13 @@ packages:
     desktop-inkscape:
         pac: sudo pacman -Syu --needed -y inkscape
     desktop-davinci-resolve:
-        pac: yay -S --noconfirm --needed davinci-resolve # davinci-resolve / davinci-resolve-studio
+        pac: yay -S --needed davinci-resolve # davinci-resolve / davinci-resolve-studio
+
+    # utility *****************************************************************
+    # *************************************************************************
+    utility-readonly-filesystem-apfs:
+        lin: sudop apt install -y linux-apfs-rw-dkms
+        pac: yay -S --needed linux-apfs-rw-dkms
 
     # recovery applications ***************************************************
     # *************************************************************************
