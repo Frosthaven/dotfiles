@@ -69,31 +69,16 @@ def rr [] {
 
     match $choice {
         "1" => {
-            print "Are you sure you want to reboot? (y/n): "
-            let confirm = (input | str trim)
-            if $confirm in ["y", "Y"] {
-                cosmic-reboot
-            } else {
-                print "Reboot cancelled."
-            }
+            cosmic-res-safe
+            cosmic-reboot
         },
         "2" => {
-            print "Are you sure you want to logout? (y/n): "
-            let confirm = (input | str trim)
-            if $confirm in ["y", "Y"] {
-                cosmic-logout
-            } else {
-                print "Logout cancelled."
-            }
+            cosmic-res-safe
+            cosmic-logout
         },
         "3" => {
-            print "Are you sure you want to shutdown? (y/n): "
-            let confirm = (input | str trim)
-            if $confirm in ["y", "Y"] {
-                cosmic-shutdown
-            } else {
-                print "Shutdown cancelled."
-            }
+            cosmic-res-safe
+            cosmic-shutdown
         },
         "4" => {
             cosmic-res
