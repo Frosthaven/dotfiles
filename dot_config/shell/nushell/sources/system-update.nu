@@ -75,12 +75,10 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         print "Updating npm packages..."
-        if ($nu.os-info.family == "windows") {
-            npm install -g npm
-            npm update -g
+        if ($nu.os-info.family == "windows" or $nu.os-info.family == "darwin") {
+            npm upgrade --global
         } else {
-            sudo npm install -g npm
-            sudo npm update -g
+            sudo npm upgrade --global
         }
     }
 
