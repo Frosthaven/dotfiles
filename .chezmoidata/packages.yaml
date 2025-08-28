@@ -170,6 +170,11 @@ packages:
         mac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
         apt: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
         pac: cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
+    cli-rclone:
+        win: winget install --id=Rclone.Rclone -e
+        mac: curl https://rclone.org/install.sh | sudo bash
+        apt: curl https://rclone.org/install.sh | sudo bash
+        pac: yes | sudo pacman -S --needed rclone
     cli-stripe-cli: # stripe cli
         win: winget install --id Stripe.StripeCli
         mac: brew install stripe-cli
