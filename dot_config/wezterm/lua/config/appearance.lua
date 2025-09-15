@@ -17,7 +17,7 @@ M.setup = function(config)
 
     config.integrated_title_button_color = "#7777AA"
     -- tab bar
-    config.hide_tab_bar_if_only_one_tab = true
+    config.hide_tab_bar_if_only_one_tab = false
     config.use_fancy_tab_bar = true
 
     -- theming
