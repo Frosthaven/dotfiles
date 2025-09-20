@@ -1,93 +1,36 @@
-def cosmic-res [] {
-    if (which cosmic-randr | is-empty) {
-        echo "cosmic-randr not found, skipping resolution change"
+# -----------------------------
+# Docker helper functions for NuShell
+# -----------------------------
+
+# Stop all Docker containers and power off DDEV
+def docker-off [] {
+    # Detect OS
+    let os = (bash -c "uname" | str trim | str downcase)
+
+    # Power off DDEV
+    if $os == "linux" or $os == "darwin" {
+        bash -c "ddev poweroff"
     } else {
-        cosmic-randr mode DP-1 5120 1440 --refresh 119.999
+        powershell -c "ddev poweroff"
     }
-}
 
-def cosmic-res-safe [] {
-    if (which cosmic-randr | is-empty) {
-        echo "cosmic-randr not found, skipping resolution change"
+    # Get running container names
+    let containers = if $os == "linux" or $os == "darwin" {
+        (bash -c "docker ps --format '{{.Names}}'" | lines)
+    } else if $os == "windows_nt" or $os == "windows" {
+        (powershell -c "docker ps --format '{{.Names}}'" | lines)
     } else {
-        cosmic-randr mode DP-1 3840 1080 --refresh 119.974
-    }
-}
-
-# -----------------------------------------------------------------------------
-
-def cosmic-reboot [] {
-    if (which cosmic-randr | is-empty) {
-        echo "cosmic-randr not found, skipping resolution change"
-    } else {
-        cosmic-res-safe
-        reboot
-    }
-}
-
-def cosmic-logout [] {
-    if (which cosmic-randr | is-empty) {
-        echo "cosmic-randr not found, skipping resolution change"
-    } else {
-        cosmic-res-safe
-        pkill cosmic-session
-    }
-}
-
-def cosmic-shutdown [] {
-    if (which cosmic-randr | is-empty) {
-        echo "cosmic-randr not found, skipping resolution change"
-    } else {
-        cosmic-res-safe
-        shutdown now
-    }
-}
-
-# -----------------------------------------------------------------------------
-
-
-def rr [] {
-    let options = [
-        "Reboot",
-        "Logout",
-        "Shutdown",
-        "Resolution (5120x1440 @ 120Hz)",
-        "Resolution Safe (3840x1080 @ 120Hz)",
-        "Cancel"
-    ]
-
-    let last_index = ($options | length) - 1
-    for i in 0..$last_index {
-        let label = $options | get $i
-        print $"($i + 1). ($label)"
+        echo "Unsupported OS: $os"
+        []
     }
 
-    # Read choice
-    print ""
-    print "Select an option (1-6): "
-    let choice = (input | str trim)
-
-    match $choice {
-        "1" => {
-            cosmic-res-safe
-            cosmic-reboot
-        },
-        "2" => {
-            cosmic-res-safe
-            cosmic-logout
-        },
-        "3" => {
-            cosmic-res-safe
-            cosmic-shutdown
-        },
-        "4" => {
-            cosmic-res
-        },
-        "5" => {
-            cosmic-res-safe
-        },
-        _ => {
-            print "Cancelled."
+    # Stop containers if any
+    if ($containers | length) > 0 {
+        let cmd = $containers | str join ' '
+        if $os == "linux" or $os == "darwin" {
+            bash -c "docker stop $cmd" | ignore
+        } else {
+            powershell -c "docker stop $cmd" | ignore
         }
     }
 }
