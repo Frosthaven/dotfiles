@@ -1,10 +1,5 @@
-# -----------------------------
-# Docker helper functions for NuShell
-# -----------------------------
-
 # Stop all Docker containers and power off DDEV
 def docker-off [] {
-    # Detect OS
     let os = (bash -c "uname" | str trim | str downcase)
 
     # Power off DDEV
@@ -14,7 +9,7 @@ def docker-off [] {
         powershell -c "ddev poweroff"
     }
 
-    # Get running container names
+    # Get running containers
     let containers = if $os == "linux" or $os == "darwin" {
         (bash -c "docker ps --format '{{.Names}}'" | lines)
     } else if $os == "windows_nt" or $os == "windows" {
@@ -24,13 +19,13 @@ def docker-off [] {
         []
     }
 
-    # Stop containers if any
-    if ($containers | length) > 0 {
-        let cmd = $containers | str join ' '
+    # Only run docker stop if the list isn’t empty
+    if not ($containers | is-empty) {
+        let cmd = ($containers | str join ' ')
         if $os == "linux" or $os == "darwin" {
-            bash -c "docker stop $cmd" | ignore
+            bash -c $"docker stop ($cmd)" | ignore
         } else {
-            powershell -c "docker stop $cmd" | ignore
+            powershell -c $"docker stop ($cmd)" | ignore
         }
     }
 }
