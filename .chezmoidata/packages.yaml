@@ -25,6 +25,11 @@ packages:
         mac: brew install node
         apt: sudo apt install nodejs npm
         pac: yes | sudo pacman -S --needed nodejs npm
+    1-language-package-manager-pnpm:
+        win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression }
+        mac: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
+        apt: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
+        pac: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
 
     # programming languages ***************************************************
     # *************************************************************************
@@ -69,7 +74,7 @@ packages:
         win: winget install --id wez.wezterm
         mac: brew install wezterm
         apt: flatpak install flathub org.wezfurlong.wezterm -y
-        pac: flatpak install flathub org.wezfurlong.wezterm -y
+        pac: sudo pacman -Syu --needed wezterm
 
     # shells ******************************************************************
     # *************************************************************************
