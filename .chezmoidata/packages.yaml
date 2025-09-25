@@ -23,8 +23,8 @@ packages:
     1-langauge-package-manager-nodejs:
         win: winget install -e --id OpenJS.NodeJS
         mac: brew install node
-        apt: sudo apt install nodejs
-        pac: yes | sudo pacman -S --needed nodejs
+        apt: sudo apt install nodejs npm
+        pac: yes | sudo pacman -S --needed nodejs npm
     1-language-package-manager-pnpm:
         win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression }
         mac: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
@@ -195,6 +195,11 @@ packages:
         mac: pipx install mkdocs-material --include-deps
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
         pac: pipx install mkdocs-material --include-deps
+    cli-prettier:
+        win: if (-not (npm list -g prettier -s 2>$null)) { npm install -g prettier }
+        mac: bash -c "npm list -g prettier || npm install -g prettier"
+        apt: bash -c "npm list -g prettier || npm install -g prettier"
+        pac: bash -c "npm list -g prettier || npm install -g prettier"
     cli-fastfetch:
         mac: brew install fastfetch
         apt: sudo add-apt-repository ppa:zhangsongcui3371/fastfetch -y; sudo apt update; sudo apt install fastfetch -y;
