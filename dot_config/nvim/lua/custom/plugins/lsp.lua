@@ -270,13 +270,14 @@ return {
                             -- new project layout
                             ['assets/app.tailwind.css'] = {
                                 'assets/react/web/**',
-                                'templates/web/**',
                                 'src/Controller/Web/**',
+                                'templates/web/**',
                             },
                             ['assets/admin.tailwind.css'] = {
                                 'assets/react/admin/**',
-                                'templates/admin/**',
                                 'src/Controller/Admin/**',
+                                'templates/admin/**',
+                                'templates/bundles/EasyAdminBundle/**',
                             },
                         },
                         classRegex = {
