@@ -180,33 +180,4 @@ return {
             },
         },
     },
-
-    -- Tailwind CSS tools
-    {
-        'luckasRanarison/tailwind-tools.nvim',
-        name = 'tailwind-tools',
-        build = ':UpdateRemotePlugins',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        opts = {
-            server = { override = true },
-            document_color = {
-                enabled = true,
-                kind = 'inline',
-                inline_symbol = '󰝤 ',
-                debounce = 200,
-            },
-            conceal = {
-                enabled = false,
-                symbol = '󱏿',
-                highlight = { fg = '#38BDF8' },
-            },
-            keymaps = {
-                smart_increment = {
-                    enabled = false,
-                    units = { { prefix = 'border', values = { '2', '4', '6', '8' } } },
-                },
-            },
-            cmp = { highlight = 'foreground' },
-        },
-    },
 }
