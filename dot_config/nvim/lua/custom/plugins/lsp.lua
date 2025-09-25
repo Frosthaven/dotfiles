@@ -181,7 +181,18 @@ return {
                 rust_analyzer = {}, -- rust
 
                 -- templating & styling ---------------------------------------
-                twiggy_language_server = {}, -- twig
+                twiggy_language_server = {
+                    settings = {
+                        namespaces = {
+                            root = 'templates',
+                            admin = 'templates/admin',
+                            site = 'templates/site',
+                            shared = 'templates/shared',
+                            PageTypes = 'src/Controller/Site/PageTypes',
+                            SectionTypes = 'src/Controller/Site/SectionTypes',
+                        },
+                    },
+                }, -- twig
                 -- tailwindcss = {},
 
                 -- configuration/data files -----------------------------------
@@ -213,16 +224,14 @@ return {
             require('mason-lspconfig').setup {
                 handlers = {
                     function(server_name)
-                        local server = servers[server_name] or {}
-                        -- This handles overriding only values explicitly passed
-                        -- by the server configuration above. Useful when disabling
-                        -- certain features of an LSP (for example, turning off formatting for ts_ls)
-                        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-                        -- dont setup tailwindcss/tailwind-language-server - managed by tailwind-tools.nvim
-                        if server_name == 'tailwindcss' or server_name == 'tailwind-language-server' then
-                            -- do nothing
-                        else
-                            require('lspconfig')[server_name].setup(server)
+                        local server_opts = servers[server_name] or {}
+
+                        -- Merge capabilities
+                        server_opts.capabilities = vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), server_opts.capabilities or {})
+
+                        -- Don't setup tailwindcss if you manage it separately
+                        if server_name ~= 'tailwindcss' and server_name ~= 'tailwind-language-server' then
+                            require('lspconfig')[server_name].setup(server_opts)
                         end
                     end,
                 },
@@ -269,9 +278,9 @@ return {
                         configFile = {
                             -- new project layout
                             ['assets/app.tailwind.css'] = {
-                                'assets/react/web/**',
-                                'src/Controller/Web/**',
-                                'templates/web/**',
+                                'assets/react/site/**',
+                                'src/Controller/Site/**',
+                                'templates/site/**',
                             },
                             ['assets/admin.tailwind.css'] = {
                                 'assets/react/admin/**',
