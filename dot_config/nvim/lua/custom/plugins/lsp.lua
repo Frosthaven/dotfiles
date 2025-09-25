@@ -4,24 +4,6 @@ local cmpDependency = (pluginLoader.useBlinkCMP and 'saghen/blink.cmp' or 'hrsh7
 local root_dir = vim.fn.getcwd()
 
 -- check if there is a tailwind.style.2.admin.css file in the current working directory
-local configFile = {}
-local hasAdminCss = vim.fn.filereadable(root_dir .. '/tailwind.2.admin.css') == 1
-if hasAdminCss then
-    configFile = {
-        -- admin styles
-        ['tailwind.2.admin.css'] = {
-            'assets/local-assets/react/admin/**',
-            'templates/admin/**',
-            'templates/bundles/EasyAdminBundle/**',
-            'src/Controller/Admin/**',
-        },
-        -- main styles for everything else
-        ['tailwind.1.app.css'] = {
-            '**/*',
-        },
-    }
-end
-
 return {
     {
         -- Main LSP Configuration
@@ -200,7 +182,7 @@ return {
 
                 -- templating & styling ---------------------------------------
                 twiggy_language_server = {}, -- twig
-                -- tailwindcss = {}, -- tailwind -- congigured in `tailwind-tools.nvim`
+                -- tailwindcss = {},
 
                 -- configuration/data files -----------------------------------
                 jsonls = {}, -- json
@@ -225,7 +207,6 @@ return {
             local ensure_installed = vim.tbl_keys(servers or {})
             vim.list_extend(ensure_installed, {
                 'stylua', -- Used to format Lua code
-                'tailwindcss-language-server', -- Used for Tailwind CSS
             })
             require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -259,68 +240,79 @@ return {
             },
         },
     },
+
     {
-        {
-            -- Automatic tailwind language server configuration
-            'luckasRanarison/tailwind-tools.nvim',
-            name = 'tailwind-tools',
-            build = ':UpdateRemotePlugins',
-            dependencies = {
-                'nvim-treesitter/nvim-treesitter',
+        -- Automatic tailwind language server configuration
+        'luckasRanarison/tailwind-tools.nvim',
+        name = 'tailwind-tools',
+        build = ':UpdateRemotePlugins',
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter',
+        },
+        opts = {
+            server = {
+                override = true, -- setup the server from the plugin if true
+                settings = { -- shortcut for `settings.tailwindCSS`
+                    includeLanguages = {
+                        elixir = 'phoenix-heex',
+                        heex = 'phoenix-heex',
+                        html = 'html',
+                        javascript = 'javascript',
+                        javascriptreact = 'javascriptreact',
+                        typescript = 'typescript',
+                        typescriptreact = 'typescriptreact',
+                        svelte = 'svelte',
+                        vue = 'vue',
+                        twig = 'html',
+                    },
+                    experimental = {
+                        configFile = {
+                            -- new project layout
+                            ['assets/app.tailwind.css'] = {
+                                'assets/react/**',
+                                'templates/**',
+                                'src/Controller/**',
+                            },
+                            --[[ note: if we want to also include admin
+                                --specifics, we have to completely segregate
+                                     the target paths to not overlap (adding a
+                                     lot of /web/ or /admin/ to paths in the
+                                     directory tree) ]]
+                        },
+                        classRegex = {
+                            -- 1) Twig `{% set name = '...' %}`:
+                            { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
+                        },
+                    },
+                },
             },
-            opts = {
-                server = {
-                    override = true, -- setup the server from the plugin if true
-                    settings = { -- shortcut for `settings.tailwindCSS`
-                        includeLanguages = {
-                            elixir = 'phoenix-heex',
-                            heex = 'phoenix-heex',
-                            html = 'html',
-                            javascript = 'javascript',
-                            javascriptreact = 'javascriptreact',
-                            typescript = 'typescript',
-                            typescriptreact = 'typescriptreact',
-                            svelte = 'svelte',
-                            vue = 'vue',
-                            twig = 'html',
-                        },
-                        experimental = {
-                            configFile = configFile,
-                            classRegex = {
-                                -- 1) Twig `{% set name = '...' %}`:
-                                { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
-                            },
-                        },
-                    },
+            document_color = {
+                enabled = true, -- can be toggled by commands
+                kind = 'inline', -- "inline" | "foreground" | "background"
+                inline_symbol = '󰝤 ', -- only used in inline mode
+                debounce = 200, -- in milliseconds, only applied in insert mode
+            },
+            conceal = {
+                enabled = false, -- can be toggled by commands
+                min_length = nil, -- only conceal classes exceeding the provided length
+                symbol = '󱏿', -- only a single character is allowed
+                highlight = { -- extmark highlight options, see :h 'highlight'
+                    fg = '#38BDF8',
                 },
-                document_color = {
-                    enabled = true, -- can be toggled by commands
-                    kind = 'inline', -- "inline" | "foreground" | "background"
-                    inline_symbol = '󰝤 ', -- only used in inline mode
-                    debounce = 200, -- in milliseconds, only applied in insert mode
-                },
-                conceal = {
-                    enabled = false, -- can be toggled by commands
-                    min_length = nil, -- only conceal classes exceeding the provided length
-                    symbol = '󱏿', -- only a single character is allowed
-                    highlight = { -- extmark highlight options, see :h 'highlight'
-                        fg = '#38BDF8',
-                    },
-                },
-                keymaps = {
-                    smart_increment = { -- increment tailwindcss units using <C-a> and <C-x>
-                        enabled = false,
-                        units = { -- see lua/tailwind/units.lua to see all the defaults
-                            {
-                                prefix = 'border',
-                                values = { '2', '4', '6', '8' },
-                            },
+            },
+            keymaps = {
+                smart_increment = { -- increment tailwindcss units using <C-a> and <C-x>
+                    enabled = false,
+                    units = { -- see lua/tailwind/units.lua to see all the defaults
+                        {
+                            prefix = 'border',
+                            values = { '2', '4', '6', '8' },
                         },
                     },
                 },
-                cmp = {
-                    highlight = 'foreground', -- color preview style, "foreground" | "background"
-                },
+            },
+            cmp = {
+                highlight = 'foreground', -- color preview style, "foreground" | "background"
             },
         },
     },
