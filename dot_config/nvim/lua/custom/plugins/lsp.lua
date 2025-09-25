@@ -269,15 +269,15 @@ return {
                         configFile = {
                             -- new project layout
                             ['assets/app.tailwind.css'] = {
-                                'assets/react/**',
-                                'templates/**',
-                                'src/Controller/**',
+                                'assets/react/web/**',
+                                'templates/web/**',
+                                'src/Controller/Web/**',
                             },
-                            --[[ note: if we want to also include admin
-                                --specifics, we have to completely segregate
-                                     the target paths to not overlap (adding a
-                                     lot of /web/ or /admin/ to paths in the
-                                     directory tree) ]]
+                            ['assets/admin.tailwind.css'] = {
+                                'assets/react/admin/**',
+                                'templates/admin/**',
+                                'src/Controller/Admin/**',
+                            },
                         },
                         classRegex = {
                             -- 1) Twig `{% set name = '...' %}`:
