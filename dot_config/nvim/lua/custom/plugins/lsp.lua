@@ -277,7 +277,7 @@ return {
                     experimental = {
                         configFile = {
                             -- new project layout
-                            ['assets/app.tailwind.css'] = {
+                            ['assets/site.tailwind.css'] = {
                                 'assets/react/site/**',
                                 'src/Controller/Site/**',
                                 'templates/site/**',
