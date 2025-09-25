@@ -67,18 +67,36 @@ def sysup [] {
         uv tool upgrade --all
     }
 
-    if (which npm | is-empty) {
-        # nothing
+    # Determine which package manager to use: prefer pnpm > npm > yarn
+    let pkg_manager = if (which pnpm | default null) != null {
+        "pnpm"
+    } else if (which npm | default null) != null {
+        "npm"
+    } else if (which yarn | default null) != null {
+        "yarn"
+    } else {
+        ""
+    }
+    # If none found, do nothing
+    if ($pkg_manager == "") {
+        print "⚠️  No package manager (pnpm, npm, or yarn) found in PATH."
     } else {
         print ""
-        print "🔄 Updating NPM packages --------------------------------------"
-        print "---------------------------------------------------------------"
+        print $"🔄 Updating Node packages ---------------------------------------"
+        print "------------------------------------------------------------------"
         print ""
-        print "Updating npm packages..."
-        if ($nu.os-info.family == "windows") {
-            npm upgrade --global --force
-        } else {
-            sudo npm upgrade --global --force
+        print $"Updating ($pkg_manager) packages..."
+
+        match $pkg_manager {
+            "pnpm" => { pnpm up -g },
+            "npm" => {
+                if ($nu.os-info.family == "windows") {
+                    npm upgrade --global --force
+                } else {
+                    sudo npm upgrade --global --force
+                }
+            },
+            "yarn" => { yarn global upgrade }
         }
     }
 
