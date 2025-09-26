@@ -117,15 +117,8 @@ vim.keymap.set(
     { desc = 'Move to previous list item' }
 )
 
--- Diagnostics ----------------------------------------------------------------
+-- Diagnostic Virtual Text ----------------------------------------------------
 
--- quickfix list
-vim.keymap.set(
-    'n', '<leader>dq', vim.diagnostic.setloclist,
-    { desc = 'Open diagnostic [Q]uickfix list' }
-)
-
--- toggle virtual text
 vim.keymap.set('n', '<leader>dt', function()
     if vim.diagnostic.config().virtual_text == true then
         vim.diagnostic.config { virtual_text = false, virtual_lines = false }
@@ -136,7 +129,15 @@ vim.keymap.set('n', '<leader>dt', function()
     end
 end, { desc = 'Toggle [D]iagnostic [T]oggle' })
 
--- create a diagnostic popup if you press leader d k
+-- Diagnostic Quickfix List ---------------------------------------------------
+
+vim.keymap.set(
+    'n', '<leader>dq', vim.diagnostic.setloclist,
+    { desc = 'Open diagnostic [Q]uickfix list' }
+)
+
+-- Floating diagnostic display ------------------------------------------------
+
 vim.keymap.set('n', '<leader>dd', function()
     local opts = {
         focusable = true,
@@ -149,28 +150,97 @@ vim.keymap.set('n', '<leader>dd', function()
     vim.diagnostic.open_float(nil, opts)
 end, { desc = '[D]iagnostic [D]isplay' })
 
--- yank diagnostic messages on line
+-- Yank diagnostic messages for current line ----------------------------------
+
 vim.keymap.set('n', '<leader>dy', function()
     local bufnr = vim.api.nvim_get_current_buf()
-    local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local diagnostics = vim.diagnostic.get(bufnr, { lnum = lnum })
+    local lnum0 = vim.api.nvim_win_get_cursor(0)[1] - 1 -- 0-indexed
+    local lnum1 = lnum0 + 1                             -- 1-indexed
+    local diagnostics = vim.diagnostic.get(bufnr, { lnum = lnum0 })
 
     if vim.tbl_isempty(diagnostics) then
         vim.notify('No diagnostics on current line', vim.log.levels.INFO)
         return
     end
 
-    local messages = {}
+    local lines = vim.api.nvim_buf_get_lines(bufnr, lnum0, lnum0 + 1, false)
+    local line_content = lines[1] or ""
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+    local basename = vim.fn.fnamemodify(filename, ":t")
+
+    -- Combine all diagnostic messages together
+    local error_messages = {}
     for _, diag in ipairs(diagnostics) do
-        table.insert(messages, diag.message)
+        table.insert(error_messages, diag.message)
+    end
+    local all_errors = table.concat(error_messages, "\n") -- one per line
+
+    -- Indent the code line
+    local indented_line = "    " .. line_content
+
+    -- Final formatted string with extra spacing
+    local formatted = string.format(
+        "Error:\n\n%s\n\n%s:%d:\n\n%s",
+        all_errors,
+        basename,
+        lnum1,
+        indented_line
+    )
+
+    vim.fn.setreg('+', formatted) -- copy to system clipboard
+    vim.notify(
+        'Yanked diagnostic line information to clipboard',
+        vim.log.levels.INFO
+    )
+end, { desc = '[D]iagnostic line information [Y]ank' })
+
+-- Yank diagnostic messages for selected lines --------------------------------
+
+vim.keymap.set('v', '<leader>dy', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local start_line = vim.fn.line("'<") - 1 -- 0-indexed
+    local end_line = vim.fn.line("'>") - 1   -- 0-indexed
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+    local basename = vim.fn.fnamemodify(filename, ":t")
+
+    local all_error_messages = {}
+    local code_lines = {}
+
+    for lnum = start_line, end_line do
+        local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
+        if not vim.tbl_isempty(diags) then
+            for _, diag in ipairs(diags) do
+                table.insert(all_error_messages, diag.message)
+            end
+        end
+        local line_content = vim.api.nvim_buf_get_lines(
+            bufnr, lnum, lnum + 1, false
+        )[1] or ""
+        table.insert(code_lines, "    " .. line_content)
     end
 
-    local all_messages = table.concat(messages, '\n')
-    vim.fn.setreg('+', all_messages) -- use system clipboard
-    vim.notify('Yanked diagnostic message(s) to system clipboard', vim.log.levels.INFO)
-end, { desc = '[D]iagnostic [Y]ank' })
+    if #all_error_messages == 0 then
+        vim.notify('No diagnostics in selected lines', vim.log.levels.INFO)
+        return
+    end
 
--- previous and next diagnostic
+    local formatted = string.format(
+        "Error:\n\n%s\n\n%s:%d:\n\n%s",
+        table.concat(all_error_messages, "\n"),
+        basename,
+        start_line + 1,
+        table.concat(code_lines, "\n")
+    )
+
+    vim.fn.setreg('+', formatted) -- copy to system clipboard
+    vim.notify(
+        'Yanked diagnostic messages with selected lines to system clipboard',
+        vim.log.levels.INFO
+    )
+end, { desc = '[D]iagnostic + [Y]ank selected lines', noremap = true })
+
+-- Navigate diagnostics and show floating window ------------------------------
+
 local function show_diagnostic_float()
     local diagnostics = vim.diagnostic.get(0) -- Get diagnostics for the buffer
     if #diagnostics > 0 then
@@ -196,33 +266,41 @@ end, { desc = 'Go to [P]revious diagnostic' })
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
     callback = function(event)
-        -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-        -- to define small helper and utility functions so you don't have to repeat yourself.
-        --
-        -- In this case, we create a function that lets us more easily define mappings specific
-        -- for LSP related items. It sets the mode, buffer and description for us each time.
+        -- mapping helper function
         local map = function(keys, func, desc, mode)
             mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+            vim.keymap.set(
+                mode, keys, func,
+                { buffer = event.buf, desc = 'LSP: ' .. desc }
+            )
         end
-
-        -- Jump to the definition of the word under your ursor.
-        --  This is where a variable was first declared, or where a function is defined, etc.
-        --  To jump back, press <C-t>.
 
         -- Find references for the word under your cursor.
         map('<leader>ln', vim.lsp.buf.rename, 'Re[n]ame')
         map('<leader>la', vim.lsp.buf.code_action, 'Code [A]ction')
-        map('<leader>lA', vim.lsp.buf.code_action, 'Code [A]ction (extra)', { 'n', 'x' })
+        map(
+            '<leader>lA',
+            vim.lsp.buf.code_action,
+            'Code [A]ction (extra)',
+            { 'n', 'x' }
+        )
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
-        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+        if client and client:supports_method(
+                vim.lsp.protocol.Methods.textDocument_inlayHint
+            ) then
             map('<leader>lh', function()
-                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+                vim.lsp.inlay_hint.enable(
+                    not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }
+                )
             end, 'Inlay [H]ints')
         end
-        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-            local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
+        if client and client:supports_method(
+                vim.lsp.protocol.Methods.textDocument_documentHighlight
+            ) then
+            local highlight_augroup = vim.api.nvim_create_augroup(
+                'lsp-highlight', { clear = false }
+            )
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
                 buffer = event.buf,
                 group = highlight_augroup,
@@ -236,10 +314,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
             })
 
             vim.api.nvim_create_autocmd('LspDetach', {
-                group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+                group = vim.api.nvim_create_augroup(
+                    'lsp-detach', { clear = true }
+                ),
                 callback = function(event2)
                     vim.lsp.buf.clear_references()
-                    vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
+                    vim.api.nvim_clear_autocmds {
+                        group = 'lsp-highlight', buffer = event2.buf
+                    }
                 end,
             })
         end
