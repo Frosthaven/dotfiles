@@ -221,14 +221,31 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
 
     -- Check for unpushed commits for this file
     local unpushed = vim.fn.systemlist(string.format('git log %s --not --remotes -- %s', branch, vim.fn.shellescape(relpath)))
+
+    -- Check for unstaged or staged changes
     local status = vim.fn.systemlist(string.format('git status --porcelain %s', vim.fn.shellescape(relpath)))
+
     if #unpushed > 0 or #status > 0 then
-        vim.notify('Cannot copy GitHub URL: there are unpushed changes for this file!', vim.log.levels.WARN)
+        local msg_parts = {}
+        if #unpushed > 0 then
+            table.insert(msg_parts, 'unpushed commits')
+        end
+        if #status > 0 then
+            table.insert(msg_parts, 'uncommit changes')
+        end
+        local msg = table.concat(msg_parts, ' and ')
+        vim.notify('Cannot copy GitHub URL: file has ' .. msg .. '!', vim.log.levels.WARN)
         return
     end
 
     -- Build GitHub URL
     local url = string.format('%s/blob/%s/%s', remote_url, branch, relpath)
+
+    -- Append timestamp
+    local ts = os.time()
+    url = url .. '?t=' .. ts
+
+    -- Append line numbers
     if start_line == end_line then
         url = url .. '#L' .. start_line
     else
