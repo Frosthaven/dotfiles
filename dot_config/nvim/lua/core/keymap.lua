@@ -191,7 +191,7 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
     local messages = {}
     for _, diag in ipairs(selected_diags) do
         local line_num = diag.lnum + 1 -- convert 0-index to 1-index
-        table.insert(messages, string.format("%d: %s", line_num, diag.message))
+        table.insert(messages, string.format("`%d`: %s", line_num, diag.message))
     end
     local all_messages = table.concat(messages, "\n")
 
