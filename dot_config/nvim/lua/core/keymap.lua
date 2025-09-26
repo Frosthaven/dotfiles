@@ -239,7 +239,7 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
 
     -- Build final string
     local out = string.format(
-        "Diagnostic:\n\n%s\n\n\n%s:\n\n```%s\n%s\n```",
+        "Diagnostic:\n\n%s\n\n%s:\n\n```%s\n%s\n```",
         all_messages,
         line_info,
         lang,
