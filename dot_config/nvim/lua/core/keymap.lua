@@ -64,25 +64,52 @@ vim.keymap.set(
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 
--- Quickfix Lists -------------------------------------------------------------
+-- Contact aware list navigation ----------------------------------------------
+-- works on location list if it exists, otherwise quickfix list
+
+local function move_list(next)
+    local wininfo_list = vim.fn.getwininfo()
+    local loc_winid = nil
+
+    -- Find first visible location list window
+    for _, win in ipairs(wininfo_list) do
+        if win.loclist == 1 and #vim.fn.getloclist(win.winid) > 0 then
+            loc_winid = win.winid
+            break
+        end
+    end
+
+    if loc_winid then
+        -- Jump to the location list window
+        vim.api.nvim_set_current_win(loc_winid)
+        if next then
+            pcall(function() vim.cmd('lnext') end)
+        else
+            pcall(function() vim.cmd('lprev') end)
+        end
+    elseif #vim.fn.getqflist() > 0 then
+        if next then
+            pcall(function() vim.cmd('cnext') end)
+        else
+            pcall(function() vim.cmd('cprev') end)
+        end
+    else
+        print("No location list or quickfix list found")
+    end
+end
+
+-- Mappings
+vim.keymap.set('n', '<M-j>', function() move_list(true) end, { desc = 'Move to next list item' })
+vim.keymap.set('n', '<M-k>', function() move_list(false) end, { desc = 'Move to previous list item' })
+vim.keymap.set('n', '<M-Down>', function() move_list(true) end, { desc = 'Move to next list item' })
+vim.keymap.set('n', '<M-Up>', function() move_list(false) end, { desc = 'Move to previous list item' })
 
 -- hjkl
-vim.keymap.set(
-    'n', '<M-j>', '<cmd>cnext<CR>',
-    { desc = 'Move to the next quickfix or diagnostic item' }
-)
-vim.keymap.set(
-    'n', '<M-k>', '<cmd>cprev<CR>',
-    { desc = 'Move to the previous quickfix or diagnostic item' })
+vim.keymap.set('n', '<M-j>', function() move_list(true) end, { desc = 'Move to next list item' })
+vim.keymap.set('n', '<M-k>', function() move_list(false) end, { desc = 'Move to previous list item' })
 -- arrows
-vim.keymap.set(
-    'n', '<M-Down>', '<cmd>cnext<CR>',
-    { desc = 'Move to the next quickfix item' }
-)
-vim.keymap.set(
-    'n', '<M-Up>', '<cmd>cprev<CR>',
-    { desc = 'Move to the previous quickfix item' }
-)
+vim.keymap.set('n', '<M-Down>', function() move_list(true) end, { desc = 'Move to next list item' })
+vim.keymap.set('n', '<M-Up>', function() move_list(false) end, { desc = 'Move to previous list item' })
 
 -- Diagnostics ----------------------------------------------------------------
 
