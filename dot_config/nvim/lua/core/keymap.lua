@@ -250,10 +250,7 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
     vim.fn.setreg("+", out)
 
     -- Notify user
-    vim.notify(
-        "Yanked diagnostic(s) + code to clipboard",
-        vim.log.levels.WARN
-    )
+    vim.notify("Yanked diagnostic(s) + code to clipboard", vim.log.levels.INFO)
 end, { desc = "[D]iagnostic [Y]ank" })
 
 -- Navigate diagnostics and show floating window ------------------------------
