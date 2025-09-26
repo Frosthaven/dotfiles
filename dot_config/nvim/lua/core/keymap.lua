@@ -150,94 +150,92 @@ vim.keymap.set('n', '<leader>dd', function()
     vim.diagnostic.open_float(nil, opts)
 end, { desc = '[D]iagnostic [D]isplay' })
 
--- Yank diagnostic messages for current line ----------------------------------
+-- Yank diagnostic messaging --------------------------------------------------
 
-vim.keymap.set('n', '<leader>dy', function()
+vim.keymap.set({ "n", "v" }, "<leader>dy", function()
     local bufnr = vim.api.nvim_get_current_buf()
-    local lnum0 = vim.api.nvim_win_get_cursor(0)[1] - 1 -- 0-indexed
-    local lnum1 = lnum0 + 1                             -- 1-indexed
-    local diagnostics = vim.diagnostic.get(bufnr, { lnum = lnum0 })
+    local mode = vim.fn.mode()
+    local start_line, end_line
 
-    if vim.tbl_isempty(diagnostics) then
-        vim.notify('No diagnostics on current line', vim.log.levels.INFO)
-        return
+    if mode:match("[vV]") then
+        -- Visual mode: use selection
+        start_line = vim.fn.getpos("v")[2] - 1
+        end_line = vim.fn.getpos(".")[2] - 1
+        if start_line > end_line then start_line, end_line = end_line, start_line end
+    else
+        -- Normal mode: current line only
+        start_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+        end_line = start_line
     end
 
-    local lines = vim.api.nvim_buf_get_lines(bufnr, lnum0, lnum0 + 1, false)
-    local line_content = lines[1] or ""
-    local filename = vim.api.nvim_buf_get_name(bufnr)
-    local basename = vim.fn.fnamemodify(filename, ":t")
-
-    -- Combine all diagnostic messages together
-    local error_messages = {}
-    for _, diag in ipairs(diagnostics) do
-        table.insert(error_messages, diag.message)
-    end
-    local all_errors = table.concat(error_messages, "\n") -- one per line
-
-    -- Indent the code line
-    local indented_line = "    " .. line_content
-
-    -- Final formatted string with extra spacing
-    local formatted = string.format(
-        "Error:\n\n%s\n\n%s:%d:\n\n%s",
-        all_errors,
-        basename,
-        lnum1,
-        indented_line
-    )
-
-    vim.fn.setreg('+', formatted) -- copy to system clipboard
-    vim.notify(
-        'Yanked diagnostic line information to clipboard',
-        vim.log.levels.INFO
-    )
-end, { desc = '[D]iagnostic line information [Y]ank' })
-
--- Yank diagnostic messages for selected lines --------------------------------
-
-vim.keymap.set('v', '<leader>dy', function()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local start_line = vim.fn.line("'<") - 1 -- 0-indexed
-    local end_line = vim.fn.line("'>") - 1   -- 0-indexed
-    local filename = vim.api.nvim_buf_get_name(bufnr)
-    local basename = vim.fn.fnamemodify(filename, ":t")
-
-    local all_error_messages = {}
-    local code_lines = {}
-
-    for lnum = start_line, end_line do
-        local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
-        if not vim.tbl_isempty(diags) then
-            for _, diag in ipairs(diags) do
-                table.insert(all_error_messages, diag.message)
-            end
+    -- Collect all diagnostics in buffer
+    local all_diags = vim.diagnostic.get(bufnr)
+    local selected_diags = {}
+    for _, diag in ipairs(all_diags) do
+        local d_start = diag.lnum
+        local d_end = diag.end_lnum or diag.lnum
+        -- Include any diagnostic that overlaps selection
+        if d_end >= start_line and d_start <= end_line then
+            table.insert(selected_diags, diag)
         end
-        local line_content = vim.api.nvim_buf_get_lines(
-            bufnr, lnum, lnum + 1, false
-        )[1] or ""
-        table.insert(code_lines, "    " .. line_content)
     end
 
-    if #all_error_messages == 0 then
-        vim.notify('No diagnostics in selected lines', vim.log.levels.INFO)
+    if vim.tbl_isempty(selected_diags) then
+        vim.notify("No diagnostics found in selection", vim.log.levels.INFO)
         return
     end
 
-    local formatted = string.format(
-        "Error:\n\n%s\n\n%s:%d:\n\n%s",
-        table.concat(all_error_messages, "\n"),
-        basename,
-        start_line + 1,
-        table.concat(code_lines, "\n")
+    -- Combine diagnostic messages
+    local messages = {}
+    for _, diag in ipairs(selected_diags) do
+        table.insert(messages, diag.message)
+    end
+    local all_messages = table.concat(messages, "\n")
+
+    -- Get file + line range
+    local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":t")
+    local line_info = filename .. ":" .. (start_line + 1)
+    if end_line > start_line then
+        line_info = line_info .. "-" .. (end_line + 1)
+    end
+
+    -- Detect language from extension
+    local ext = filename:match("^.+%.(.+)$")
+    local lang_map = { ts = "ts", tsx = "ts", js = "js", jsx = "js", lua = "lua", php = "php", rs = "rs" }
+    local lang = lang_map[ext] or ext or ""
+
+    -- Soft wrap helper (≤ 80 chars)
+    local function soft_wrap(line, width)
+        local out, cur = {}, line
+        while #cur > width do
+            local break_at = cur:sub(1, width):match("^.*()%s")
+            if not break_at or break_at < 1 then break_at = width end
+            table.insert(out, cur:sub(1, break_at))
+            cur = vim.trim(cur:sub(break_at + 1))
+        end
+        if #cur > 0 then table.insert(out, cur) end
+        return out
+    end
+
+    -- Collect code lines with soft wrap
+    local code_lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line + 1, false)
+    local wrapped_code = {}
+    for _, line in ipairs(code_lines) do
+        vim.list_extend(wrapped_code, soft_wrap(line, 80))
+    end
+
+    -- Build final string
+    local out = string.format(
+        "Diagnostic:\n\n%s\n\n\n%s:\n\n```%s\n%s\n```",
+        all_messages,
+        line_info,
+        lang,
+        table.concat(wrapped_code, "\n")
     )
 
-    vim.fn.setreg('+', formatted) -- copy to system clipboard
-    vim.notify(
-        'Yanked diagnostic messages with selected lines to system clipboard',
-        vim.log.levels.INFO
-    )
-end, { desc = '[D]iagnostic + [Y]ank selected lines', noremap = true })
+    vim.fn.setreg("+", out)
+    vim.notify("Yanked diagnostic(s) + code to clipboard", vim.log.levels.INFO)
+end, { desc = "[D]iagnostic [Y]ank" })
 
 -- Navigate diagnostics and show floating window ------------------------------
 
