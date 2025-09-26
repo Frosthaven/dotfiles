@@ -161,7 +161,9 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
         -- Visual mode: use selection
         start_line = vim.fn.getpos("v")[2] - 1
         end_line = vim.fn.getpos(".")[2] - 1
-        if start_line > end_line then start_line, end_line = end_line, start_line end
+        if start_line > end_line then
+            start_line, end_line = end_line, start_line
+        end
     else
         -- Normal mode: current line only
         start_line = vim.api.nvim_win_get_cursor(0)[1] - 1
@@ -185,10 +187,11 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
         return
     end
 
-    -- Combine diagnostic messages
+    -- Combine diagnostic messages with line numbers
     local messages = {}
     for _, diag in ipairs(selected_diags) do
-        table.insert(messages, diag.message)
+        local line_num = diag.lnum + 1 -- convert 0-index to 1-index
+        table.insert(messages, string.format("%d: %s", line_num, diag.message))
     end
     local all_messages = table.concat(messages, "\n")
 
@@ -201,7 +204,15 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
 
     -- Detect language from extension
     local ext = filename:match("^.+%.(.+)$")
-    local lang_map = { ts = "ts", tsx = "ts", js = "js", jsx = "js", lua = "lua", php = "php", rs = "rs" }
+    local lang_map = {
+        ts = "ts",
+        tsx = "ts",
+        js = "js",
+        jsx = "js",
+        lua = "lua",
+        php = "php",
+        rs = "rs"
+    }
     local lang = lang_map[ext] or ext or ""
 
     -- Soft wrap helper (≤ 80 chars)
@@ -218,7 +229,9 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
     end
 
     -- Collect code lines with soft wrap
-    local code_lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line + 1, false)
+    local code_lines = vim.api.nvim_buf_get_lines(
+        bufnr, start_line, end_line + 1, false
+    )
     local wrapped_code = {}
     for _, line in ipairs(code_lines) do
         vim.list_extend(wrapped_code, soft_wrap(line, 80))
