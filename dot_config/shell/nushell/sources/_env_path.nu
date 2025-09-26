@@ -7,3 +7,6 @@ if ($nu.os-info.family == "windows") {
 
 # $HOME/.local/bin is used by several binaries - zig, go, php, etc.
 path add ($env.HOME | path join ".local" "bin")
+
+# $HOME/.local/share/pnpm is where pnpm installs global packages
+path add ($env.HOME | path join ".local" "share" "pnpm")
