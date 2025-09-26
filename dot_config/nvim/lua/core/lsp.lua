@@ -1,4 +1,4 @@
--- LANGUAGE SERVERS -----------------------------------------------------------
+-- LSP SETUP ------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
 --[[
@@ -21,12 +21,59 @@ Here are some examples of how to install language servers globally:
 
 --]]
 
--- local lsp servers are automatically installed with mason-lspconfig.
--- Uncomment the below to manually enable servers.
--- vim.lsp.enable({
+-- You can move lsp server starting from the Mason plugin to here if you want
+-- to manage it yourself.
+--
+-- vim.lsp.enable {
 --     'ts_ls',
 --     'lua_ls',
 --     'tailwindcss',
 --     'twiggy_language_server',
 --     'intelephense',
--- })
+-- }
+
+-- REFRESH ON ATTACH ----------------------------------------------------------
+-------------------------------------------------------------------------------
+
+-- some language servers don't properly refresh diagnostics on initial
+-- attachment. This function forces a refresh once per buffer for the
+-- specified servers.
+
+local force_refresh_wait = 250 -- ms
+local force_refresh_servers = {
+    'twiggy_language_server',
+}
+
+-- setup the helper
+local refreshed = {}
+local function force_refresh(bufnr, client, servers)
+    if not vim.tbl_contains(servers, client.name) then
+        return
+    end
+    if refreshed[bufnr] then
+        return
+    end
+    refreshed[bufnr] = true
+
+    vim.defer_fn(function()
+        if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified then
+            vim.cmd 'edit'
+        end
+    end, force_refresh_wait)
+end
+
+-- create the autocommand
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(ev)
+        if not ev.data or not ev.data.client_id then
+            return
+        end
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        if not client then
+            return
+        end
+
+        -- Force refresh for servers in the list
+        force_refresh(ev.buf, client, force_refresh_servers)
+    end,
+})
