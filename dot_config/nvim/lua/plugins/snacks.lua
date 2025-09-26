@@ -24,7 +24,9 @@ return {
                 '<leader>sa',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker()
+                    Snacks.picker({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[A]ll Pickers',
             },
@@ -32,7 +34,9 @@ return {
                 '<leader>sf',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.smart()
+                    Snacks.picker.smart({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[F]iles',
             },
@@ -40,7 +44,9 @@ return {
                 '<leader>sg',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.grep()
+                    Snacks.picker.grep({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[G]rep',
             },
@@ -48,7 +54,9 @@ return {
                 '<leader>sb',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.buffers()
+                    Snacks.picker.buffers({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[B]uffers',
             },
@@ -56,7 +64,9 @@ return {
                 '<leader>sh',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.help()
+                    Snacks.picker.help({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[H]elp Tags',
             },
@@ -64,7 +74,9 @@ return {
                 '<leader>sr',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.recent()
+                    Snacks.picker.recent({
+                        filter = { cwd = true }
+                    })
                 end,
                 desc = '[R]ecent',
             },
