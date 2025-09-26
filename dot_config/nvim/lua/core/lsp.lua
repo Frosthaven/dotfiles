@@ -21,10 +21,12 @@ Here are some examples of how to install language servers globally:
 
 --]]
 
-vim.lsp.enable({
-    'typescript-language-server',
-    'lua-language-server',
-    'tailwindcss-language-server',
-    'twiggy-language-server',
-    'intelephense',
-})
+-- local lsp servers are automatically installed with mason-lspconfig.
+-- Uncomment the below to manually enable servers.
+-- vim.lsp.enable({
+--     'ts_ls',
+--     'lua_ls',
+--     'tailwindcss',
+--     'twiggy_language_server',
+--     'intelephense',
+-- })
