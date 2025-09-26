@@ -99,11 +99,23 @@ local function move_list(next)
 end
 
 -- hjkl
-vim.keymap.set('n', '<M-j>', function() move_list(true) end, { desc = 'Move to next list item' })
-vim.keymap.set('n', '<M-k>', function() move_list(false) end, { desc = 'Move to previous list item' })
+vim.keymap.set(
+    'n', '<M-j>', function() move_list(true) end,
+    { desc = 'Move to next list item' }
+)
+vim.keymap.set(
+    'n', '<M-k>', function() move_list(false) end,
+    { desc = 'Move to previous list item' }
+)
 -- arrows
-vim.keymap.set('n', '<M-Down>', function() move_list(true) end, { desc = 'Move to next list item' })
-vim.keymap.set('n', '<M-Up>', function() move_list(false) end, { desc = 'Move to previous list item' })
+vim.keymap.set(
+    'n', '<M-Down>', function() move_list(true) end,
+    { desc = 'Move to next list item' }
+)
+vim.keymap.set(
+    'n', '<M-Up>', function() move_list(false) end,
+    { desc = 'Move to previous list item' }
+)
 
 -- Diagnostics ----------------------------------------------------------------
 
