@@ -249,21 +249,11 @@ vim.keymap.set({ "n", "v" }, "<leader>dy", function()
     -- clipboard copy
     vim.fn.setreg("+", out)
 
-    -- Flash selection using extmarks (non-deprecated)
-    local ns = vim.api.nvim_create_namespace("DiagnosticYankFlash")
-    for l = start_line, end_line do
-        vim.api.nvim_buf_set_extmark(bufnr, ns, l, 0, {
-            end_line = l,
-            hl_group = "Visual",
-            hl_eol = true,
-        })
-    end
-    vim.defer_fn(function()
-        vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-    end, 200) -- highlight lasts 200ms
-
     -- Notify user
-    vim.notify("Yanked diagnostic(s) + code to clipboard", vim.log.levels.INFO)
+    vim.notify(
+        "Yanked diagnostic(s) + code to clipboard",
+        vim.log.levels.WARN
+    )
 end, { desc = "[D]iagnostic [Y]ank" })
 
 -- Navigate diagnostics and show floating window ------------------------------
