@@ -168,6 +168,78 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', function()
     vim.notify('Yanked diagnostic readout', vim.log.levels.INFO)
 end, { desc = '[Y]ank [D]iagnostic readout' })
 
+-- Yank github url to selection -----------------------------------------------
+
+vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+
+    -- Get repo root
+    local repo_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
+    if repo_root == '' or vim.fn.isdirectory(repo_root) == 0 then
+        vim.notify('Not inside a Git repository', vim.log.levels.WARN)
+        return
+    end
+
+    -- Get current branch
+    local branch = vim.fn.systemlist('git rev-parse --abbrev-ref HEAD')[1]
+    if branch == '' or branch == 'HEAD' then
+        vim.notify('Could not determine Git branch', vim.log.levels.WARN)
+        return
+    end
+
+    -- Get remote URL
+    local remote_url = vim.fn.systemlist('git config --get remote.origin.url')[1]
+    if not remote_url or remote_url == '' then
+        vim.notify('No Git remote found', vim.log.levels.WARN)
+        return
+    end
+
+    -- Convert SSH to HTTPS
+    if remote_url:match '^git@' then
+        remote_url = remote_url:gsub(':', '/')
+        remote_url = remote_url:gsub('git@', 'https://')
+    end
+    remote_url = remote_url:gsub('%.git$', '')
+
+    -- File path relative to repo
+    local relpath = vim.fn.fnamemodify(filename, ':.' .. repo_root)
+
+    -- Get line numbers
+    local mode = vim.fn.mode()
+    local start_line, end_line
+    if mode:match '[vV]' then
+        start_line = vim.fn.getpos('v')[2]
+        end_line = vim.fn.getpos('.')[2]
+        if start_line > end_line then
+            start_line, end_line = end_line, start_line
+        end
+    else
+        start_line = vim.api.nvim_win_get_cursor(0)[1]
+        end_line = start_line
+    end
+
+    -- Check for unpushed commits for this file
+    local unpushed = vim.fn.systemlist(string.format('git log %s --not --remotes -- %s', branch, vim.fn.shellescape(relpath)))
+    local status = vim.fn.systemlist(string.format('git status --porcelain %s', vim.fn.shellescape(relpath)))
+    if #unpushed > 0 or #status > 0 then
+        vim.notify('Cannot copy GitHub URL: there are unpushed changes for this file!', vim.log.levels.WARN)
+        return
+    end
+
+    -- Build GitHub URL
+    local url = string.format('%s/blob/%s/%s', remote_url, branch, relpath)
+    if start_line == end_line then
+        url = url .. '#L' .. start_line
+    else
+        url = url .. '#L' .. start_line .. '-L' .. end_line
+    end
+
+    -- Copy to clipboard
+    vim.fn.setreg('+', url)
+    vim.notify('Yanked GitHub URL', vim.log.levels.INFO)
+end, { desc = '[Y]ank [G]itHub URL for current line(s)' })
+
 -- Center screen when jumping -------------------------------------------------
 
 vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
