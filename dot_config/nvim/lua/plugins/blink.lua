@@ -1,18 +1,17 @@
 -- Color Hack For Autocompletion Icons ----------------------------------------
 -------------------------------------------------------------------------------
 -- this will force colored icons if an entry's documentation contains a hex
--- color
+-- code
 local function color_swatch_icon_component()
     return {
         text = function(ctx)
             local doc = ctx.item.documentation
-            local doc_str = type(doc) == "string" and doc
-                or (doc and doc.value) or ""
-            local hex_color = doc_str:match("#%x%x%x%x%x%x")
+            local doc_str = type(doc) == 'string' and doc or (doc and doc.value) or ''
+            local hex_color = doc_str:match '#%x%x%x%x%x%x'
 
             if hex_color then
                 -- Build unique highlight group for color
-                local hl_name = "BlinkTailwindColor_" .. hex_color:gsub("#", "")
+                local hl_name = 'ColorSwatchIcon' .. hex_color:gsub('#', '')
                 if vim.fn.hlID(hl_name) == 0 then
                     vim.api.nvim_set_hl(0, hl_name, { fg = hex_color })
                 end
@@ -21,7 +20,7 @@ local function color_swatch_icon_component()
             end
 
             if hex_color then
-                return ""
+                return ''
             else
                 return ctx.kind_icon .. ctx.icon_gap
             end
@@ -29,7 +28,7 @@ local function color_swatch_icon_component()
 
         highlight = function(ctx)
             -- Return custom highlight for color, or force default for others
-            return ctx.tailwind_hl or ("BlinkCmpKind" .. ctx.kind)
+            return ctx.tailwind_hl or ('BlinkCmpKind' .. ctx.kind)
         end,
     }
 end
@@ -58,7 +57,7 @@ return {
                     gap = 2,
                     components = {
                         kind_icon = color_swatch_icon_component(),
-                    }
+                    },
                 },
             },
         },
@@ -67,6 +66,7 @@ return {
         },
         signature = { enabled = true },
         fuzzy = { implementation = 'prefer_rust_with_warning' },
+        fallback = { 'lua' },
     },
     opts_extend = { 'sources.default' },
 }
