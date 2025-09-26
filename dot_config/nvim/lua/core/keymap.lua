@@ -67,7 +67,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yc', function()
     -- Copy to clipboard
     vim.fn.setreg('+', out)
     vim.notify('Yanked code block', vim.log.levels.INFO)
-end, { desc = '[Y]ank [C]ode block with file path' })
+end, { desc = '[Y]ank as [C]ode block' })
 
 -- Yank file path -------------------------------------------------------------
 
@@ -80,14 +80,14 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yr', function()
     end
     vim.fn.setreg('+', filepath)
     vim.notify 'Yanked relative file path'
-end, { desc = '[Y]ank [R]elative path' })
+end, { desc = '[Y]ank [R]elative path of file' })
 
 -- absolute path including filename
 vim.keymap.set({ 'n', 'v' }, '<leader>ya', function()
     local filepath = vim.fn.expand '%:p'
     vim.fn.setreg('+', filepath)
     vim.notify 'Yanked absolute file path'
-end, { desc = '[Y]ank [A]bsolute path' })
+end, { desc = '[Y]ank [A]bsolute path of file' })
 
 -- Yank diagnostic messaging --------------------------------------------------
 
@@ -165,8 +165,8 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', function()
     vim.fn.setreg('+', out)
 
     -- Notify user
-    vim.notify('Yanked diagnostic readout', vim.log.levels.INFO)
-end, { desc = '[Y]ank [D]iagnostic readout' })
+    vim.notify('Yanked diagnostic code block', vim.log.levels.INFO)
+end, { desc = '[Y]ank [D]iagnostic code block' })
 
 -- Yank github url to selection -----------------------------------------------
 
