@@ -77,12 +77,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
         -- Force refresh for servers in the list
         force_refresh(ev.buf, client, force_refresh_servers)
 
-        -- Enable documentColor if supported by the server.
-        -- TODO: this is not yet enabled. Wait for nvim 0.12
-        -- @see https://github.com/neovim/neovim/pull/33440
-        -- if client:supports_method 'textDocument/documentColor' then
-        --     vim.lsp.document_color.enable(true, ev.buf, { style = 'virtual' })
-        -- end
+        -- Enable documentColor if supported
+        -- @TODO: remove the version guard when neovim 0.12 is more common
+        local version = vim.version()
+        if version and version.minor > 11 and client:supports_method 'textDocument/documentColor' then
+            -- attach document color to buffer
+            require('vim.lsp._internal').document_color_attach(ev.buf, client.id)
+        end
 
         -- Enable document highlight if supported by the server. Document
         -- highlight will highlight other uses of the symbol under the cursor.
