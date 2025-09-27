@@ -116,53 +116,21 @@ vim.api.nvim_create_autocmd('FileType', {
 -- LSP Attach Keymaps ---------------------------------------------------------
 
 vim.api.nvim_create_autocmd('LspAttach', {
-    group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+    group = vim.api.nvim_create_augroup('lsp-attach-keymaps', { clear = true }),
     callback = function(event)
-        -- mapping helper function
-        local map = function(keys, func, desc, mode)
-            mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
-        end
+        -- set generic lsp keymaps
+        vim.keymap.set('n', '<leader>ln', vim.lsp.buf.rename, { buffer = event.buf, desc = 'LSP: Re[n]ame' })
+        vim.keymap.set('n', '<leader>la', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'LSP: Code [A]ction' })
+        vim.keymap.set({ 'n', 'x' }, '<leader>lA', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'LSP: Code [A]ction (extra)' })
 
-        -- Find references for the word under your cursor.
-        map('<leader>ln', vim.lsp.buf.rename, 'Re[n]ame')
-        map('<leader>la', vim.lsp.buf.code_action, 'Code [A]ction')
-        map('<leader>lA', vim.lsp.buf.code_action, 'Code [A]ction (extra)', { 'n', 'x' })
-
+        -- Enable inlay hints keymap if supported by the server. Inlay hints are
+        -- the inline annotations that show argument values, inferred types,
+        -- etc.
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            map('<leader>lh', function()
+            vim.keymap.set('n', '<leader>lh', function()
                 vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, 'Inlay [H]ints')
+            end, { buffer = event.buf, desc = 'LSP: Inlay [H]ints' })
         end
-        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-            local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-                buffer = event.buf,
-                group = highlight_augroup,
-                callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-                buffer = event.buf,
-                group = highlight_augroup,
-                callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-                group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
-                callback = function(event2)
-                    vim.lsp.buf.clear_references()
-                    vim.api.nvim_clear_autocmds {
-                        group = 'lsp-highlight',
-                        buffer = event2.buf,
-                    }
-                end,
-            })
-        end
-
-        -- if client.server_capabilities.colorProvider then
-        --     require('document-color').buf_attach(event.buf)
-        -- end
     end,
 })
