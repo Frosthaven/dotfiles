@@ -66,7 +66,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yc', function()
 
     -- Copy to clipboard
     vim.fn.setreg('+', out)
-    vim.notify(' Yanked code block', vim.log.levels.INFO)
+    vim.notify({ ' Yanked code block' }, vim.log.levels.INFO, { title = ' Keymap' })
 end, { desc = '[Y]ank as [C]ode block' })
 
 -- Yank file path -------------------------------------------------------------
@@ -79,14 +79,14 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yr', function()
         filepath = filepath:sub(#cwd + 1)
     end
     vim.fn.setreg('+', filepath)
-    vim.notify ' Yanked relative file path'
+    vim.notify(' Yanked relative file path', vim.log.levels.INFO, { title = ' Keymap' })
 end, { desc = '[Y]ank [R]elative path of file' })
 
 -- absolute path including filename
 vim.keymap.set({ 'n', 'v' }, '<leader>ya', function()
     local filepath = vim.fn.expand '%:p'
     vim.fn.setreg('+', filepath)
-    vim.notify ' Yanked absolute file path'
+    vim.notify(' Yanked absolute file path', vim.log.levels.INFO, { title = ' Keymap' })
 end, { desc = '[Y]ank [A]bsolute path of file' })
 
 -- Yank diagnostic messaging --------------------------------------------------
@@ -165,7 +165,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', function()
     vim.fn.setreg('+', out)
 
     -- Notify user
-    vim.notify(' Yanked diagnostic code block', vim.log.levels.INFO)
+    vim.notify(' Yanked diagnostic code block', vim.log.levels.INFO, { title = ' Keymap' })
 end, { desc = '[Y]ank [D]iagnostic code block' })
 
 -- Yank github url to selection -----------------------------------------------
@@ -177,21 +177,21 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
     -- Get repo root
     local repo_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
     if repo_root == '' or vim.fn.isdirectory(repo_root) == 0 then
-        vim.notify(' Not inside a Git repository', vim.log.levels.WARN)
+        vim.notify(' Not inside a Git repository', vim.log.levels.WARN, { title = ' Keymap' })
         return
     end
 
     -- Get current branch
     local branch = vim.fn.systemlist('git rev-parse --abbrev-ref HEAD')[1]
     if branch == '' or branch == 'HEAD' then
-        vim.notify(' Could not determine Git branch', vim.log.levels.WARN)
+        vim.notify(' Could not determine Git branch', vim.log.levels.WARN, { title = ' Keymap' })
         return
     end
 
     -- Get remote URL
     local remote_url = vim.fn.systemlist('git config --get remote.origin.url')[1]
     if not remote_url or remote_url == '' then
-        vim.notify(' No Git remote found', vim.log.levels.WARN)
+        vim.notify(' No Git remote found', vim.log.levels.WARN, { title = ' Keymap' })
         return
     end
 
@@ -234,7 +234,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
             table.insert(msg_parts, 'uncommit changes')
         end
         local msg = table.concat(msg_parts, '/')
-        vim.notify(' Cannot copy GitHub URL: file has ' .. msg .. '!', vim.log.levels.WARN)
+        vim.notify(' Cannot copy GitHub URL: file has ' .. msg .. '!', vim.log.levels.WARN, { title = ' Keymap' })
         return
     end
 
@@ -254,7 +254,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
 
     -- Copy to clipboard
     vim.fn.setreg('+', url)
-    vim.notify(' Yanked GitHub URL', vim.log.levels.INFO)
+    vim.notify(' Yanked GitHub URL', vim.log.levels.INFO, { title = ' Keymap' })
 end, { desc = '[Y]ank [G]itHub URL for current line(s)' })
 
 -- Center screen when jumping -------------------------------------------------
@@ -355,10 +355,10 @@ end, { desc = 'Move to previous list item' })
 vim.keymap.set('n', '<leader>dt', function()
     if vim.diagnostic.config().virtual_text == true then
         vim.diagnostic.config { virtual_text = false, virtual_lines = false }
-        vim.notify '󱙎 Global diagnostic virtual lines disabled'
+        vim.notify('󱙎 Global diagnostic virtual lines disabled', vim.log.levels.INFO, { title = ' Keymap' })
     else
         vim.diagnostic.config { virtual_text = true, virtual_lines = false }
-        vim.notify '󱖭 Global diagnostic virtual lines enabled'
+        vim.notify('󱖭 Global diagnostic virtual lines enabled', vim.log.levels.INFO, { title = ' Keymap' })
     end
 end, { desc = 'Toggle [D]iagnostic [T]oggle' })
 
