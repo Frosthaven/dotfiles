@@ -39,7 +39,7 @@ Here are some examples of how to install language servers globally:
 -- attachment. This function forces a refresh once per buffer for the
 -- specified servers.
 
-local force_refresh_wait = 250 -- ms
+local force_refresh_wait = 500 -- ms
 local force_refresh_servers = {
     'twiggy_language_server',
 }
