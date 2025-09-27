@@ -124,7 +124,7 @@ packages:
         win: winget install --id Neovim.Neovim
         mac: brew install neovim
         apt: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl build-essential && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim /tmp/nvim-src && cd /tmp/nvim-src && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf /tmp/nvim-src)
-        pac: VER="v0.11.3" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo pacman -S --needed --noconfirm base-devel ninja cmake gettext unzip curl git && TMPDIR=$(mktemp -d) && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim "$TMPDIR" && cd "$TMPDIR" && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf "$TMPDIR")
+        pac: VER="master" && nvim --version 2>/dev/null | grep -q "$VER" || (sudo pacman -S --needed --noconfirm base-devel ninja cmake gettext unzip curl git && TMPDIR=$(mktemp -d) && git clone --depth 1 --branch "$VER" https://github.com/neovim/neovim "$TMPDIR" && cd "$TMPDIR" && make CMAKE_BUILD_TYPE=Release && sudo make install && rm -rf "$TMPDIR")
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
