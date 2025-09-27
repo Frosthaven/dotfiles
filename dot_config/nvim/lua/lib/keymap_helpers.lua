@@ -109,25 +109,81 @@ end
 -- the result to the clipboard.
 function M.yank_diagnostics()
     local bufnr = vim.api.nvim_get_current_buf()
-    local diagnostics = vim.diagnostic.get(bufnr)
+    local mode = vim.fn.mode()
+    local start_line, end_line
 
-    if #diagnostics == 0 then
-        return
+    if mode:match '[vV]' then
+        -- Visual mode: use selection
+        start_line = vim.fn.getpos('v')[2] - 1
+        end_line = vim.fn.getpos('.')[2] - 1
+        if start_line > end_line then
+            start_line, end_line = end_line, start_line
+        end
+    else
+        -- Normal mode: current line only
+        start_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+        end_line = start_line
     end
 
-    local start_line = diagnostics[1].lnum
-    local end_line = diagnostics[#diagnostics].lnum
-
-    local out = {}
-    for _, d in ipairs(diagnostics) do
-        table.insert(out, string.format('%d: %s', d.lnum + 1, d.message))
+    -- Collect all diagnostics in buffer
+    local all_diags = vim.diagnostic.get(bufnr)
+    local selected_diags = {}
+    for _, diag in ipairs(all_diags) do
+        local d_start = diag.lnum
+        local d_end = diag.end_lnum or diag.lnum
+        -- Include any diagnostic that overlaps selection
+        if d_end >= start_line and d_start <= end_line then
+            table.insert(selected_diags, diag)
+        end
     end
 
-    vim.fn.setreg('+', table.concat(out, '\n'))
+    -- Combine diagnostic messages with line numbers
+    local messages = {}
+    if vim.tbl_isempty(selected_diags) then
+        table.insert(messages, 'No Diagnostic Warnings Found')
+    else
+        for _, diag in ipairs(selected_diags) do
+            local line_num = diag.lnum + 1 -- convert 0-index to 1-index
+            table.insert(messages, string.format('`%d`: %s', line_num, diag.message))
+        end
+    end
+    local all_messages = table.concat(messages, '\n')
+
+    -- Get relative file path + line range
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+    local relpath = vim.fn.fnamemodify(filename, ':.') -- relative path
+    local line_info = relpath .. ':' .. (start_line + 1)
+    if end_line > start_line then
+        line_info = line_info .. '-' .. (end_line + 1)
+    end
+
+    -- Detect language from extension
+    local ext = filename:match '^.+%.(.+)$' or ''
+    local lang_map = {
+        ts = 'ts',
+        tsx = 'ts',
+        js = 'js',
+        jsx = 'js',
+        lua = 'lua',
+        php = 'php',
+        rs = 'rs',
+    }
+    local lang = lang_map[ext] or ext or ''
+
+    -- Collect code lines without soft wrap
+    local code_lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line + 1, false)
+    local code_text = table.concat(code_lines, '\n')
+
+    -- Build final string
+    local out = string.format('Diagnostic:\n\n%s\n\n`%s`:\n```%s\n%s\n```', all_messages, line_info, lang, code_text)
+
+    -- clipboard copy
+    vim.fn.setreg('+', out)
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
     M.flash_highlight(bufnr, start_line, end_line)
 
-    vim.notify(' Yanked diagnostics', vim.log.levels.INFO, { title = 'Keymap' })
+    -- Notify user
+    vim.notify(' Yanked diagnostic code block', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
 end
 
 -- Yanks the selected line(s) and formats them into a markdown code block,
@@ -169,10 +225,6 @@ function M.yank_relative_path()
 
     vim.fn.setreg('+', relpath)
 
-    local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
-    M.flash_highlight(bufnr, line, line)
-
     vim.notify(' Yanked relative path', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
@@ -183,11 +235,92 @@ function M.yank_absolute_path()
 
     vim.fn.setreg('+', filename)
 
-    local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
-    M.flash_highlight(bufnr, line, line)
-
     vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
+end
+
+-- List Movement Functions ----------------------------------------------------
+-------------------------------------------------------------------------------
+
+function M.dynamic_list_location_shift(next)
+    local wininfo_list = vim.fn.getwininfo()
+    local loc_winid = nil
+
+    -- Find first visible location list window
+    for _, win in ipairs(wininfo_list) do
+        if win.loclist == 1 and #vim.fn.getloclist(win.winid) > 0 then
+            loc_winid = win.winid
+            break
+        end
+    end
+
+    if loc_winid then
+        -- Jump to the location list window
+        vim.api.nvim_set_current_win(loc_winid)
+        if next then
+            pcall(function()
+                vim.cmd 'lnext'
+            end)
+        else
+            pcall(function()
+                vim.cmd 'lprev'
+            end)
+        end
+    elseif #vim.fn.getqflist() > 0 then
+        if next then
+            pcall(function()
+                vim.cmd 'cnext'
+            end)
+        else
+            pcall(function()
+                vim.cmd 'cprev'
+            end)
+        end
+    else
+        print 'No location list or quickfix list found'
+    end
+end
+
+function M.move_dynamic_list_prev()
+    M.dynamic_list_location_shift(false)
+end
+
+function M.move_dynamic_list_next()
+    M.dynamic_list_location_shift(true)
+end
+
+-- Diagnostic Toggle Functions ------------------------------------------------
+-------------------------------------------------------------------------------
+
+function M.toggle_diagnostic_virtual_text()
+    if vim.diagnostic.config().virtual_text == true then
+        vim.diagnostic.config { virtual_text = false, virtual_lines = false }
+        vim.notify('󱙎 Global diagnostic virtual lines disabled', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
+    else
+        vim.diagnostic.config { virtual_text = true, virtual_lines = false }
+        vim.notify('󱖭 Global diagnostic virtual lines enabled', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
+    end
+end
+
+function M.show_curr_diagnostic_float()
+    local opts = {
+        focusable = true,
+        close_events = { 'BufLeave', 'CursorMoved', 'InsertEnter' },
+        border = 'rounded',
+        source = 'always',
+        prefix = ' ',
+        scope = 'line',
+    }
+    vim.diagnostic.open_float(nil, opts)
+end
+
+function M.show_next_diagnostic_float()
+    vim.diagnostic.goto_next()
+    M.show_curr_diagnostic_float()
+end
+
+function M.show_prev_diagnostic_float()
+    vim.diagnostic.goto_prev()
+    M.show_curr_diagnostic_float()
 end
 
 return M
