@@ -18,6 +18,28 @@ vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' })
 
 -- Yank into Markdown code block ----------------------------------------------
 
+-- Flash highlight lines between start_line and end_line (inclusive)
+local ns = vim.api.nvim_create_namespace 'flash_yank'
+
+local function flash_highlight(bufnr, start_line, end_line)
+    local hl_group = 'IncSearch'
+    local duration = 200 -- ms
+
+    for l = start_line, end_line do
+        -- highlight whole line
+        vim.api.nvim_buf_set_extmark(bufnr, ns, l, 0, {
+            end_line = l + 1,
+            hl_group = hl_group,
+            hl_eol = true,
+        })
+    end
+
+    -- clear after timeout
+    vim.defer_fn(function()
+        vim.api.nvim_buf_clear_namespace(bufnr, ns, start_line, end_line + 1)
+    end, duration)
+end
+
 vim.keymap.set({ 'n', 'v' }, '<leader>yc', function()
     local bufnr = vim.api.nvim_get_current_buf()
     local mode = vim.fn.mode()
@@ -66,6 +88,9 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yc', function()
 
     -- Copy to clipboard
     vim.fn.setreg('+', out)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
+    flash_highlight(bufnr, start_line, end_line)
+
     vim.notify({ ' Yanked code block' }, vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
 end, { desc = '[Y]ank as [C]ode block' })
 
@@ -79,6 +104,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yr', function()
         filepath = filepath:sub(#cwd + 1)
     end
     vim.fn.setreg('+', filepath)
+
     vim.notify(' Yanked relative file path', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
 end, { desc = '[Y]ank [R]elative path of file' })
 
@@ -163,6 +189,8 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', function()
 
     -- clipboard copy
     vim.fn.setreg('+', out)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
+    flash_highlight(bufnr, start_line, end_line)
 
     -- Notify user
     vim.notify(' Yanked diagnostic code block', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
@@ -254,6 +282,9 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yg', function()
 
     -- Copy to clipboard
     vim.fn.setreg('+', url)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'nx', false)
+    flash_highlight(bufnr, start_line - 1, end_line - 1)
+
     vim.notify(' Yanked GitHub URL', vim.log.levels.INFO, { title = 'Keymap', render = 'compact' })
 end, { desc = '[Y]ank [G]itHub URL for current line(s)' })
 
