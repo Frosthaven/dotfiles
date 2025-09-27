@@ -39,7 +39,7 @@ Here are some examples of how to install language servers globally:
 -- attachment. This function forces a refresh once per buffer for the
 -- specified servers.
 
-local force_refresh_wait = 300 -- ms
+local force_refresh_wait = 500 -- ms
 local force_refresh_servers = {
     'twiggy_language_server',
 }
@@ -80,9 +80,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
         -- Enable documentColor if supported
         -- @TODO: remove the version guard when neovim 0.12 is more common
         local version = vim.version()
-        if version and version.minor > 11 and client:supports_method 'textDocument/documentColor' then
-            -- attach document color to buffer
-            require('vim.lsp._internal').document_color_attach(ev.buf, client.id)
+        if version and version.minor > 11 and vim.lsp.document_color then
+            vim.lsp.document_color.enable(true, ev.buf, {
+                style = 'virtual',
+            })
         end
 
         -- Enable document highlight if supported by the server. Document
