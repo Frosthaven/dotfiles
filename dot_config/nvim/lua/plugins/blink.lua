@@ -1,8 +1,8 @@
--- Color Hack For Autocompletion Icons ----------------------------------------
+-- KIND ICON PROVIDERS --------------------------------------------------------
 -------------------------------------------------------------------------------
--- this will force colored icons if an entry's documentation contains a hex
--- code
-local function color_swatch_icon_component()
+
+-- Uses a simple hex matcher in completion docs to create a colored kind icon.
+local function kind_icon_color_swatch_hex_only_hack()
     return {
         text = function(ctx)
             local doc = ctx.item.documentation
@@ -19,11 +19,7 @@ local function color_swatch_icon_component()
                 ctx.tailwind_hl = hl_name
             end
 
-            if hex_color then
-                return ''
-            else
-                return ctx.kind_icon .. ctx.icon_gap
-            end
+            return '' .. ctx.icon_gap
         end,
 
         highlight = function(ctx)
@@ -40,7 +36,9 @@ return {
     'saghen/blink.cmp',
     enabled = true,
     build = 'cargo +nightly build --release',
-    dependencies = 'rafamadriz/friendly-snippets',
+    dependencies = {
+        'rafamadriz/friendly-snippets',
+    },
     version = '1.*',
     opts = {
         keymap = {
@@ -54,9 +52,8 @@ return {
             documentation = { auto_show = true },
             menu = {
                 draw = {
-                    gap = 2,
                     components = {
-                        kind_icon = color_swatch_icon_component(),
+                        kind_icon = kind_icon_color_swatch_hex_only_hack(),
                     },
                 },
             },

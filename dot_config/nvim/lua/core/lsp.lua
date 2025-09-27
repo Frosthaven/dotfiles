@@ -65,6 +65,7 @@ end
 -- create the autocommand
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(ev)
+        -- Validate event data, bailing if not valid
         if not ev.data or not ev.data.client_id then
             return
         end
@@ -75,5 +76,40 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
         -- Force refresh for servers in the list
         force_refresh(ev.buf, client, force_refresh_servers)
+
+        -- Enable documentColor if supported by the server.
+        -- TODO: this is not yet enabled. Wait for nvim 0.12
+        -- @see https://github.com/neovim/neovim/pull/33440
+        -- if client:supports_method 'textDocument/documentColor' then
+        --     vim.lsp.document_color.enable(true, ev.buf, { style = 'virtual' })
+        -- end
+
+        -- Enable document highlight if supported by the server. Document
+        -- highlight will highlight other uses of the symbol under the cursor.
+        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+            local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+                buffer = ev.buf,
+                group = highlight_augroup,
+                callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+                buffer = ev.buf,
+                group = highlight_augroup,
+                callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+                group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+                callback = function(event2)
+                    vim.lsp.buf.clear_references()
+                    vim.api.nvim_clear_autocmds {
+                        group = 'lsp-highlight',
+                        buffer = event2.buf,
+                    }
+                end,
+            })
+        end
     end,
 })
