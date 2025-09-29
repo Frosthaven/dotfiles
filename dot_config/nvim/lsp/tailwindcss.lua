@@ -1,21 +1,21 @@
 return {
-    cmd = { "tailwindcss-language-server", "--stdio" },
+    cmd = { 'tailwindcss-language-server', '--stdio' },
     filetypes = {
-        "html",
-        "css",
-        "scss",
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact",
-        "svelte",
-        "astro",
-        "vue",
-        "twig",
-        "php",
-        "heex",
+        'html',
+        'css',
+        'scss',
+        'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+        'svelte',
+        'astro',
+        'vue',
+        'twig',
+        'php',
+        'heex',
     },
-    root_markers = { ".git" },
+    root_markers = { '.git' },
     settings = {
         tailwindCSS = {
             colorDecorators = true,
@@ -32,17 +32,17 @@ return {
                 twig = 'html',
             },
             lint = {
-                cssConflict = "warning", -- or "error", "ignore"
-                invalidApply = "error",
-                invalidConfigPath = "error",
-                invalidScreen = "error",
-                invalidTailwindDirective = "error",
-                unknownAtRules = "ignore", -- or "error", "warning"
-                unknownClasses = "error",
+                cssConflict = 'warning', -- or "error", "ignore"
+                invalidApply = 'error',
+                invalidConfigPath = 'error',
+                invalidScreen = 'error',
+                invalidTailwindDirective = 'error',
+                unknownAtRules = 'ignore', -- or "error", "warning"
+                unknownClasses = 'error',
             },
             experimental = {
                 configFile = {
-                    -- new project layout
+                    -- iww-project-skeleton
                     ['assets/site.tailwind.css'] = {
                         'assets/react/site/**',
                         'src/Controller/Site/**',
@@ -54,12 +54,29 @@ return {
                         'templates/admin/**',
                         'templates/bundles/EasyAdminBundle/**',
                     },
+                    -- skeleton-website-framework
+                    ['tailwind.2.admin.css'] = {
+                        'assets/local-assets/react/admin/**',
+                        'templates/admin/**',
+                        'templates/bundles/EasyAdminBundle/**',
+                        'src/Controller/Admin/**',
+                    },
+                    ['tailwind.1.app.css'] = {
+                        '**/*',
+                    },
                 },
                 classRegex = {
-                    -- 1) Twig `{% set name = '...' %}`:
+                    -- 1) Twig variable sets:
+                    -- {% set name = '...' %}
                     { [[{%\s*set\s+\w+\s*=\s*([^%]*)%}]], [[(?:'|")([^'"]*)(?:'|")]] },
+                    -- 2) Twig key/value pairs:
+                    -- key: '...'
+                    { [[\w+:\s*(['"`][^'"`]+['"`])]], [[([^'"`]+)]] },
+                    -- 3) All string literals
+                    -- '...', "...", `...`
+                    { [[(['"`][^'"`]+['"`])]], [[([^'"`]+)]] },
                 },
             },
         },
-    }
+    },
 }
