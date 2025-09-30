@@ -13,6 +13,7 @@ $env.config.show_banner = false
 source ./sources/_env_path.nu
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
+source ./sources/nvim-bob.nu
 source ./sources/uv.nu
 source ./sources/wezterm.nu
 source ./sources/homebrew.nu

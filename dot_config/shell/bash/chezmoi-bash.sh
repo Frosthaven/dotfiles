@@ -1,6 +1,9 @@
 # add $HOME/.local/bin binaries to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+# nvim-bob
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+
 # Starship prompt
 eval "$(starship init bash)"
 

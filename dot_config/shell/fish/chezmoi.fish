@@ -1,6 +1,9 @@
 # Add $HOME/.local/bin to PATH
 set -gx PATH $HOME/.local/bin $PATH
 
+# Add nvim-bob to PATH
+set -gx PATH $HOME/.local/share/bob/nvim-bin $PATH
+
 # Starship prompt
 starship init fish | source
 

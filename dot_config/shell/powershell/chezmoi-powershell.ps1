@@ -38,6 +38,9 @@ function Invoke-Starship-PreCommand {
     $host.ui.Write($prompt)
 }
 
+# nvim-bob binaries
+$env:Path += ";$env:USERPROFILE\.local\share\bob\nvim-bin"
+
 # UV binaries
 $env:Path += ";$env:USERPROFILE\.local\bin"
 
