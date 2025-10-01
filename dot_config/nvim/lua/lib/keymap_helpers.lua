@@ -350,7 +350,7 @@ local function __compress_file(items, base_dir, filetype)
         os.remove(existing[i])
     end
 
-    vim.notify(string.format(' %s\n  Yanked path', zip_name:match '([^/]+)$'), vim.log.levels.INFO, { title = 'Keymap' })
+    return zip_path
 end
 
 -- Extract a zip archive into target_dir, return file_count or error
@@ -375,6 +375,48 @@ local function __extract_zip(zip_path, target_dir)
     end
 
     return file_count
+end
+
+-- Copy a file refrence to clipboard (platform-specific)
+local function __copy_file_to_clipboard(file_path)
+    if vim.fn.has 'mac' == 1 then
+        -- macOS: real file object
+        local osa_cmd = string.format('osascript -e \'set the clipboard to POSIX file "%s"\'', file_path)
+        local result = vim.fn.system(osa_cmd)
+        if vim.v.shell_error ~= 0 then
+            vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+            return false
+        end
+    elseif vim.fn.has 'win32' == 1 then
+        -- Windows: PowerShell
+        local ps_cmd = string.format('powershell -Command "Set-Clipboard -Path \'%s\'"', file_path)
+        local result = vim.fn.system(ps_cmd)
+        if vim.v.shell_error ~= 0 then
+            vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+            return false
+        end
+    elseif os.getenv 'WAYLAND_DISPLAY' then
+        -- Wayland (GNOME/Sway/most DEs)
+        local cmd = string.format("printf 'copy\\n%s\\n' '%s' | wl-copy --type x-special/gnome-copied-files", file_path, file_path)
+        local result = vim.fn.system(cmd)
+        if vim.v.shell_error ~= 0 then
+            vim.notify('Failed to copy file to clipboard on Wayland: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+            return false
+        end
+    elseif os.getenv 'DISPLAY' then
+        -- X11 (GNOME/Xfce/etc)
+        local cmd = string.format("printf 'copy\\n%s\\n' '%s' | xclip -selection clipboard -t x-special/gnome-copied-files", file_path, file_path)
+        local result = vim.fn.system(cmd)
+        if vim.v.shell_error ~= 0 then
+            vim.notify('Failed to copy file to clipboard on X11: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+            return false
+        end
+    else
+        vim.notify('Copying files to clipboard not supported on this Linux environment', vim.log.levels.WARN, { title = 'Keymap' })
+        return false
+    end
+
+    return true
 end
 
 -- Refresh explorers and buffers after extraction
@@ -402,7 +444,47 @@ function M.yank_compressed_file()
     if not base_dir or #items == 0 then
         return
     end
-    __compress_file(items, base_dir, filetype)
+
+    local zip_path = __compress_file(items, base_dir, filetype)
+    if not zip_path then
+        vim.notify(' Failed to create zip file', vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    local zip_name = vim.fn.fnamemodify(zip_path, ':t') -- tail of the path
+    vim.notify(string.format(' %s\n  Yanked path', zip_name), vim.log.levels.INFO, { title = 'Keymap' })
+end
+
+-- puts the entire binary content of the compressed file into the clipboard
+-- for pasting into other applications that accept binary data
+function M.yank_file_binary()
+    local items, base_dir, filetype = __get_buffer_context 'compress'
+    if not base_dir or #items == 0 then
+        return
+    end
+
+    local target_path
+
+    if #items == 1 then
+        -- Single file: copy it directly
+        target_path = items[1]
+        if vim.fn.filereadable(target_path) == 0 then
+            vim.notify(' File does not exist: ' .. target_path, vim.log.levels.ERROR, { title = 'Keymap' })
+            return
+        end
+    else
+        -- Multiple files/folders: compress first
+        target_path = __compress_file(items, base_dir, filetype)
+        if not target_path or vim.fn.filereadable(target_path) == 0 then
+            return
+        end
+    end
+
+    -- Copy the file (or zip) as a "real file" to clipboard
+    if __copy_file_to_clipboard(target_path) then
+        local name = vim.fn.fnamemodify(target_path, ':t')
+        vim.notify(string.format(' %s\n  Copied file to clipboard', name), vim.log.levels.INFO, { title = 'Keymap' })
+    end
 end
 
 function M.paste_compressed_file()
@@ -442,7 +524,7 @@ function M.yank_relative_path()
 
     vim.fn.setreg('+', relpath)
 
-    vim.notify(' Yanked relative path', vim.log.levels.INFO, { title = 'Keymap' })
+    vim.notify(' Yanked relative path', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
 -- Yanks the absolute path of the current file to the clipboard
@@ -452,7 +534,7 @@ function M.yank_absolute_path()
 
     vim.fn.setreg('+', filename)
 
-    vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
+    vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
 -- List Movement Functions ----------------------------------------------------
