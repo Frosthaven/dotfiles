@@ -110,6 +110,11 @@ packages:
         mac: brew install git
         apt: sudo apt install git -y
         pac: yes | sudo pacman -S --needed git
+    cli-7zip:
+        win: winget install -e --id 7zip.7zip
+        mac: brew install sevenzip
+        apt: sudo apt install 7zip -y
+        pac: yes | sudo pacman -S --needed 7zip
     cli-composer:
         win: if (-not (Get-Command composer -ErrorAction SilentlyContinue)) { $p="$env:TEMP\Composer-Setup.exe"; Invoke-WebRequest https://getcomposer.org/Composer-Setup.exe -OutFile $p -UseBasicParsing; if (Test-Path $p) { Start-Process -Wait -FilePath $p } else { Write-Error "Download failed or file missing." } }
         mac: brew install composer
