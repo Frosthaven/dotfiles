@@ -239,8 +239,8 @@ function M.yank_absolute_path()
 end
 
 -- Compresses the selected file(s) or folder(s) into a zip archive and copies
--- the archive to the clipboard. File(s) & folder(s) to copy are as follows:
--- 1. If we're in a mini.files buffer, use the selected items
+-- the archive path to clipboard. File(s) & folder(s) to copy are as follows:
+-- 1. If we're in a mini.files buffer, use the highlighted item
 -- 2. If we're in a netrw buffer, zip all visible files and folders
 -- 3. If we're in a normal buffer, zip the active file
 function M.yank_compressed_file()
@@ -256,26 +256,14 @@ function M.yank_compressed_file()
             return
         end
 
-        -- Use marked files if any
-        if state.marked and next(state.marked) then
-            for path, _ in pairs(state.marked) do
-                local abs = vim.fn.fnamemodify(path, ':p')
-                if vim.loop.fs_stat(abs) then
-                    table.insert(items, abs)
-                end
-            end
-        end
-
-        -- Fallback to current file under cursor
-        if #items == 0 then
-            local curr_entry = require('mini.files').get_fs_entry()
-            if curr_entry and curr_entry.path and vim.loop.fs_stat(curr_entry.path) then
-                table.insert(items, vim.fn.fnamemodify(curr_entry.path, ':p'))
-            end
+        -- Use only the current file under cursor
+        local curr_entry = require('mini.files').get_fs_entry()
+        if curr_entry and curr_entry.path and vim.loop.fs_stat(curr_entry.path) then
+            table.insert(items, vim.fn.fnamemodify(curr_entry.path, ':p'))
         end
 
         if #items == 0 then
-            vim.notify(' No files/folders selected in mini.files', vim.log.levels.WARN, { title = 'Keymap' })
+            vim.notify(' No file/folder under cursor in mini.files', vim.log.levels.WARN, { title = 'Keymap' })
             return
         end
 
@@ -313,35 +301,53 @@ function M.yank_compressed_file()
 
     -- determine zip name
     local first_item = items[1]
+    local timestamp = os.date '%Y%m%d_%H%M%S'
+
+    -- determine project name
     local project_root = vim.fn.finddir('.git/..', first_item .. ';')
     if type(project_root) == 'table' then
         project_root = project_root[1] or ''
     end
-
-    local zip_name
+    local project_name
     if project_root ~= '' then
-        zip_name = vim.fn.fnamemodify(project_root, ':t')
+        project_name = vim.fn.fnamemodify(project_root, ':t')
     else
-        zip_name = vim.fn.fnamemodify(first_item, ':t')
+        project_name = vim.fn.fnamemodify(first_item:gsub('/$', ''), ':h:t')
     end
-    if zip_name == '' then
-        zip_name = 'archive'
+    if project_name == '' then
+        project_name = 'project'
     end
 
-    -- Downloads folder + timestamp
-    local downloads = vim.fn.expand '~/Downloads/_nvim_compressed'
+    -- determine zip name depending on buffer type
+    local zip_name
+    if filetype == 'netrw' then
+        local netrw_dir = vim.b.netrw_curdir or vim.fn.getcwd()
+        local curr_folder_name = vim.fn.fnamemodify(netrw_dir:gsub('/$', ''), ':t')
+        if curr_folder_name == '' then
+            curr_folder_name = 'folder'
+        end
+        zip_name = string.format('%s__%s__%s.nvim.zip', project_name, curr_folder_name, timestamp)
+    else
+        local item_name = vim.fn.fnamemodify(first_item:gsub('/$', ''), ':t')
+        if item_name == '' then
+            item_name = 'item'
+        end
+        zip_name = string.format('%s__%s__%s.nvim.zip', project_name, item_name, timestamp)
+    end
+
+    -- Downloads folder
+    local downloads = vim.fn.expand '~/Downloads'
     if vim.fn.isdirectory(downloads) == 0 then
         vim.fn.mkdir(downloads, 'p')
     end
-    local timestamp = os.date '%Y%m%d_%H%M%S'
-    local zip_path = string.format('%s/%s_%s.zip', downloads, zip_name, timestamp)
+    local zip_path = downloads .. '/' .. zip_name
 
     -- build relative paths for 7z
     local rel_items = {}
     for _, item in ipairs(items) do
         local rel = vim.fn.fnamemodify(item, ':.' .. base_dir)
         if rel == '' or rel == '.' then
-            rel = vim.fn.fnamemodify(item, ':t')
+            rel = vim.fn.fnamemodify(item:gsub('/$', ''), ':t')
         end
         table.insert(rel_items, rel)
     end
@@ -356,7 +362,91 @@ function M.yank_compressed_file()
 
     -- copy zip path to clipboard
     vim.fn.setreg('+', zip_path)
-    vim.notify(' Created and yanked: ' .. zip_path, vim.log.levels.INFO, { title = 'Keymap' })
+
+    -- clean up old zip files, keep only latest 3
+    local existing = vim.fn.globpath(downloads, '*.nvim.zip', true, true)
+    table.sort(existing, function(a, b)
+        return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec
+    end)
+    for i = 4, #existing do
+        os.remove(existing[i])
+    end
+
+    -- notify user
+    vim.notify(string.format(' Yanked %s', zip_name), vim.log.levels.INFO, { title = 'Keymap' })
+end
+
+-- Pastes (extracts) a .nvim.zip file from clipboard into the current project
+-- root (determined by .git folder) or current working directory if no git repo
+-- is found.
+function M.paste_compressed_file()
+    local zip_path = vim.fn.getreg '+'
+    if zip_path == '' then
+        vim.notify(' Clipboard is empty', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    if not zip_path:match '%.nvim%.zip$' then
+        vim.notify(' Clipboard does not contain a .nvim.zip file', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    local current_file = vim.fn.expand '%:p'
+    local filetype = vim.bo.filetype
+
+    if filetype == 'minifiles' then
+        local entry = require('mini.files').get_fs_entry()
+        if entry and entry.path then
+            current_file = entry.path
+        end
+    elseif filetype == 'netrw' then
+        current_file = vim.b.netrw_curdir or vim.fn.getcwd()
+    end
+
+    -- Strip any minifiles:// prefix
+    current_file = current_file:gsub('^minifiles://%d+//', '')
+
+    -- Determine project root
+    local project_root = vim.fn.finddir('.git/..', current_file .. ';')
+    if type(project_root) == 'table' then
+        project_root = project_root[1] or vim.fn.fnamemodify(current_file, ':h')
+    elseif project_root == '' then
+        project_root = vim.fn.fnamemodify(current_file, ':h')
+    end
+
+    -- Build the 7z command with overwrite
+    local cmd = string.format('7z x "%s" -o"%s" -aoa', zip_path, project_root)
+
+    -- Execute the command
+    local result = vim.fn.system(cmd)
+    if vim.v.shell_error ~= 0 then
+        vim.notify('Failed to extract zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    -- Refresh mini.files if open
+    if filetype == 'minifiles' then
+        local mini_files = require 'mini.files'
+        mini_files.refresh()
+
+        -- Get real filesystem directory of current entry
+        local entry = mini_files.get_fs_entry()
+        local curr_dir
+        if entry and entry.path then
+            curr_dir = vim.fn.fnamemodify(entry.path, ':h')
+        else
+            curr_dir = vim.fn.getcwd()
+        end
+
+        mini_files.open(curr_dir, true)
+    end
+
+    -- Refresh netrw if open
+    if filetype == 'netrw' then
+        vim.cmd 'Explore'
+    end
+
+    vim.notify(' Extracted and overwritten ' .. zip_path .. ' into ' .. project_root, vim.log.levels.INFO, { title = 'Keymap' })
 end
 
 -- List Movement Functions ----------------------------------------------------
