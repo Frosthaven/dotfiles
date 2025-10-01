@@ -562,6 +562,79 @@ function M.yank_absolute_path()
     vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
+-- Explorer Functions ---------------------------------------------------------
+-------------------------------------------------------------------------------
+
+-- Opens the file manager at the current buffer's file or directory
+function M.open_buffer_in_file_manager()
+    local items, base_dir, filetype = __get_buffer_context 'compress'
+
+    local target
+    if #items == 1 then
+        -- Single file
+        target = items[1]
+    elseif #items > 1 then
+        -- Multiple files: just open base_dir
+        target = base_dir
+    else
+        -- No explicit items, fallback to base_dir
+        target = base_dir
+    end
+
+    if not target or vim.fn.empty(target) == 1 then
+        vim.notify(' No file or directory found', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    local abs_path = vim.fn.fnamemodify(target, ':p')
+    local cmd
+
+    if vim.fn.has 'mac' == 1 then
+        -- reveal file or open folder in Finder
+        if vim.fn.isdirectory(abs_path) == 1 then
+            cmd = string.format(
+                [[
+                osascript -e 'tell application "Finder" to open POSIX file "%s"
+                   tell application "System Events" to keystroke "." using {command down, shift down}'
+            ]],
+                abs_path
+            )
+        else
+            cmd = string.format(
+                [[
+                osascript -e 'tell application "Finder" to reveal POSIX file "%s"
+                               tell application "Finder" to activate
+                               tell application "System Events" to keystroke "." using {command down, shift down}'
+            ]],
+                abs_path
+            )
+        end
+    elseif vim.fn.has 'win32' == 1 then
+        if vim.fn.isdirectory(abs_path) == 1 then
+            cmd = string.format('explorer "%s"', abs_path)
+        else
+            cmd = string.format('explorer /select,"%s"', abs_path)
+        end
+    elseif vim.fn.has 'linux' == 1 then
+        -- Linux: open folder; highlighting single files depends on DE
+        if vim.fn.isdirectory(abs_path) == 1 then
+            cmd = string.format('xdg-open "%s"', abs_path)
+        else
+            cmd = string.format('xdg-open "%s"', vim.fn.fnamemodify(abs_path, ':h'))
+        end
+    else
+        vim.notify('Opening files not supported on this OS', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    vim.fn.system(cmd)
+    if vim.v.shell_error == 0 then
+        vim.notify(' Opened file manager', vim.log.levels.INFO, { title = 'Keymap' })
+    else
+        vim.notify('Failed to open file manager', vim.log.levels.ERROR, { title = 'Keymap' })
+    end
+end
+
 -- List Movement Functions ----------------------------------------------------
 -------------------------------------------------------------------------------
 
