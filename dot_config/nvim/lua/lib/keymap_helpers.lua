@@ -571,14 +571,11 @@ function M.open_buffer_in_file_manager()
 
     local target
     if #items == 1 then
-        -- Single file
-        target = items[1]
+        target = items[1] -- Single file
     elseif #items > 1 then
-        -- Multiple files: just open base_dir
-        target = base_dir
+        target = base_dir -- Multiple files: just open base_dir
     else
-        -- No explicit items, fallback to base_dir
-        target = base_dir
+        target = base_dir -- Fallback
     end
 
     if not target or vim.fn.empty(target) == 1 then
@@ -590,25 +587,35 @@ function M.open_buffer_in_file_manager()
     local cmd
 
     if vim.fn.has 'mac' == 1 then
-        -- reveal file or open folder in Finder
-        if vim.fn.isdirectory(abs_path) == 1 then
+        local forklift_path = '/Applications/ForkLift.app'
+        if vim.fn.isdirectory(forklift_path) == 1 then
+            -- ForkLift
             cmd = string.format(
                 [[
-                osascript -e 'tell application "Finder" to open POSIX file "%s"
-                   tell application "Finder" to activate
-                   tell application "System Events" to keystroke "." using {command down, shift down}'
-            ]],
+                    osascript -e 'tell application "ForkLift" to open POSIX file "%s"
+                        tell application "ForkLift" to activate'
+                ]],
                 abs_path
             )
         else
-            cmd = string.format(
-                [[
-                osascript -e 'tell application "Finder" to reveal POSIX file "%s"
-                   tell application "Finder" to activate
-                   tell application "System Events" to keystroke "." using {command down, shift down}'
-            ]],
-                abs_path
-            )
+            -- Finder
+            if vim.fn.isdirectory(abs_path) == 1 then
+                cmd = string.format(
+                    [[
+                    osascript -e 'tell application "Finder" to open POSIX file "%s"
+                        tell application "Finder" to activate'
+                ]],
+                    abs_path
+                )
+            else
+                cmd = string.format(
+                    [[
+                    osascript -e 'tell application "Finder" to reveal POSIX file "%s"
+                        tell application "Finder" to activate'
+                ]],
+                    abs_path
+                )
+            end
         end
     elseif vim.fn.has 'win32' == 1 then
         if vim.fn.isdirectory(abs_path) == 1 then
@@ -617,7 +624,6 @@ function M.open_buffer_in_file_manager()
             cmd = string.format('explorer /select,"%s"', abs_path)
         end
     elseif vim.fn.has 'linux' == 1 then
-        -- Linux: open folder; highlighting single files depends on DE
         if vim.fn.isdirectory(abs_path) == 1 then
             cmd = string.format('xdg-open "%s"', abs_path)
         else
