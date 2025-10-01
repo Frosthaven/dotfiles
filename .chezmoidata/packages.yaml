@@ -260,8 +260,8 @@ packages:
         mac: brew install cursorcerer
     toy-paragon-ntfs: # ntfs driver
         mac: brew install paragon-ntfs
-    toy-bartender: # menu bar manager
-        mac: brew install bartender
+    toy-ice: # menu bar manager
+        mac: brew install --cask jordanbaird-ice@beta
     toy-cleanshot: # screen capture
         mac: brew install cleanshot
     toy-amphetamine: # keep mac awake
