@@ -377,42 +377,67 @@ local function __extract_zip(zip_path, target_dir)
     return file_count
 end
 
--- Copy a file refrence to clipboard (platform-specific)
-local function __copy_file_to_clipboard(file_path)
+-- Copy file(s) reference to clipboard in a platform-specific way
+-- Store the persistent clipboard job ID
+local clipboard_job_id = nil
+
+local function __copy_file_to_clipboard(file)
+    if type(file) ~= 'string' or file == '' then
+        vim.notify('No file provided to copy', vim.log.levels.WARN, { title = 'Keymap' })
+        return false
+    end
+
+    -- macOS
     if vim.fn.has 'mac' == 1 then
-        -- macOS: real file object
-        local osa_cmd = string.format('osascript -e \'set the clipboard to POSIX file "%s"\'', file_path)
+        local osa_cmd = string.format('osascript -e \'set the clipboard to POSIX file "%s"\'', file)
         local result = vim.fn.system(osa_cmd)
         if vim.v.shell_error ~= 0 then
             vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
             return false
         end
+
+    -- Windows
     elseif vim.fn.has 'win32' == 1 then
-        -- Windows: PowerShell
-        local ps_cmd = string.format('powershell -Command "Set-Clipboard -Path \'%s\'"', file_path)
+        local ps_cmd = string.format(
+            'powershell -Command "[System.Windows.Forms.Clipboard]::SetFileDropList((New-Object System.Collections.Specialized.StringCollection; $_.Add(\'%s\')))"',
+            file
+        )
         local result = vim.fn.system(ps_cmd)
         if vim.v.shell_error ~= 0 then
             vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
             return false
         end
-    elseif os.getenv 'WAYLAND_DISPLAY' then
-        -- Wayland (GNOME/Sway/most DEs)
-        local cmd = string.format("printf 'copy\\n%s\\n' '%s' | wl-copy --type x-special/gnome-copied-files", file_path, file_path)
-        local result = vim.fn.system(cmd)
-        if vim.v.shell_error ~= 0 then
-            vim.notify('Failed to copy file to clipboard on Wayland: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
-            return false
-        end
-    elseif os.getenv 'DISPLAY' then
-        -- X11 (GNOME/Xfce/etc)
-        local cmd = string.format("printf 'copy\\n%s\\n' '%s' | xclip -selection clipboard -t x-special/gnome-copied-files", file_path, file_path)
-        local result = vim.fn.system(cmd)
-        if vim.v.shell_error ~= 0 then
-            vim.notify('Failed to copy file to clipboard on X11: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+
+    -- Linux
+    elseif vim.fn.has 'linux' == 1 then
+        local abs_path = vim.fn.fnamemodify(file, ':p')
+        local uri = 'file://' .. abs_path
+
+        if os.getenv 'WAYLAND_DISPLAY' then
+            -- Copy the file URI
+            local cmd = string.format([[bash -c 'wl-copy -t text/uri-list "%s"']], uri)
+            vim.fn.system(cmd)
+
+            -- Notify on errors
+            local result = vim.fn.system(cmd)
+            if vim.v.shell_error ~= 0 then
+                vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+                return false
+            end
+        elseif os.getenv 'DISPLAY' then
+            -- X11 fallback
+            local cmd = string.format('xclip -selection clipboard -t x-special/gnome-copied-files <<< "copy\nfile://%s\n"', file)
+            local result = vim.fn.system(cmd)
+            if vim.v.shell_error ~= 0 then
+                vim.notify('Failed to copy file to clipboard: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+                return false
+            end
+        else
+            vim.notify('Copying files to clipboard not supported on this Linux environment', vim.log.levels.WARN, { title = 'Keymap' })
             return false
         end
     else
-        vim.notify('Copying files to clipboard not supported on this Linux environment', vim.log.levels.WARN, { title = 'Keymap' })
+        vim.notify('Copying files to clipboard not supported on this OS', vim.log.levels.WARN, { title = 'Keymap' })
         return false
     end
 
