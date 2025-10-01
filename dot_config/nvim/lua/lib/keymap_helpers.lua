@@ -238,6 +238,127 @@ function M.yank_absolute_path()
     vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
+-- Compresses the selected file(s) or folder(s) into a zip archive and copies
+-- the archive to the clipboard. File(s) & folder(s) to copy are as follows:
+-- 1. If we're in a mini.files buffer, use the selected items
+-- 2. If we're in a netrw buffer, zip all visible files and folders
+-- 3. If we're in a normal buffer, zip the active file
+function M.yank_compressed_file()
+    local items = {}
+    local base_dir
+    local filetype = vim.bo.filetype
+
+    -- mini.files
+    if filetype == 'minifiles' then
+        local state = require('mini.files').get_explorer_state()
+        if not state then
+            vim.notify(' Mini.files not active', vim.log.levels.WARN, { title = 'Keymap' })
+            return
+        end
+
+        -- Use marked files if any
+        if state.marked and next(state.marked) then
+            for path, _ in pairs(state.marked) do
+                local abs = vim.fn.fnamemodify(path, ':p')
+                if vim.loop.fs_stat(abs) then
+                    table.insert(items, abs)
+                end
+            end
+        end
+
+        -- Fallback to current file under cursor
+        if #items == 0 then
+            local curr_entry = require('mini.files').get_fs_entry()
+            if curr_entry and curr_entry.path and vim.loop.fs_stat(curr_entry.path) then
+                table.insert(items, vim.fn.fnamemodify(curr_entry.path, ':p'))
+            end
+        end
+
+        if #items == 0 then
+            vim.notify(' No files/folders selected in mini.files', vim.log.levels.WARN, { title = 'Keymap' })
+            return
+        end
+
+        base_dir = vim.fn.fnamemodify(items[1], ':h')
+
+    -- netrw: archive everything in current directory
+    elseif filetype == 'netrw' then
+        local netrw_dir = vim.b.netrw_curdir or vim.fn.getcwd()
+        base_dir = netrw_dir
+
+        local scan = vim.fn.globpath(netrw_dir, '*', true, true)
+        for _, f in ipairs(scan) do
+            if vim.loop.fs_stat(f) then
+                table.insert(items, f)
+            end
+        end
+
+        if #items == 0 then
+            vim.notify(' No files/folders found in Netrw directory', vim.log.levels.WARN, { title = 'Keymap' })
+            return
+        end
+    end
+
+    -- normal buffer: current file
+    if vim.tbl_isempty(items) then
+        local curr = vim.fn.expand '%:p'
+        if curr ~= '' then
+            table.insert(items, curr)
+            base_dir = vim.fn.fnamemodify(curr, ':h')
+        else
+            vim.notify(' No files/folders to compress', vim.log.levels.WARN, { title = 'Keymap' })
+            return
+        end
+    end
+
+    -- determine zip name
+    local first_item = items[1]
+    local project_root = vim.fn.finddir('.git/..', first_item .. ';')
+    if type(project_root) == 'table' then
+        project_root = project_root[1] or ''
+    end
+
+    local zip_name
+    if project_root ~= '' then
+        zip_name = vim.fn.fnamemodify(project_root, ':t')
+    else
+        zip_name = vim.fn.fnamemodify(first_item, ':t')
+    end
+    if zip_name == '' then
+        zip_name = 'archive'
+    end
+
+    -- Downloads folder + timestamp
+    local downloads = vim.fn.expand '~/Downloads/_nvim_compressed'
+    if vim.fn.isdirectory(downloads) == 0 then
+        vim.fn.mkdir(downloads, 'p')
+    end
+    local timestamp = os.date '%Y%m%d_%H%M%S'
+    local zip_path = string.format('%s/%s_%s.zip', downloads, zip_name, timestamp)
+
+    -- build relative paths for 7z
+    local rel_items = {}
+    for _, item in ipairs(items) do
+        local rel = vim.fn.fnamemodify(item, ':.' .. base_dir)
+        if rel == '' or rel == '.' then
+            rel = vim.fn.fnamemodify(item, ':t')
+        end
+        table.insert(rel_items, rel)
+    end
+
+    -- 7z a -tzip archive.zip file1 file2 ...
+    local cmd = '7z a -tzip "' .. zip_path .. '" ' .. table.concat(rel_items, ' ')
+    local result = vim.fn.system(cmd, base_dir)
+    if vim.v.shell_error ~= 0 then
+        vim.notify('Failed to create zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    -- copy zip path to clipboard
+    vim.fn.setreg('+', zip_path)
+    vim.notify(' Created and yanked: ' .. zip_path, vim.log.levels.INFO, { title = 'Keymap' })
+end
+
 -- List Movement Functions ----------------------------------------------------
 -------------------------------------------------------------------------------
 
