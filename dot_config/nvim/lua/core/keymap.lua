@@ -26,9 +26,13 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', keymap_helpers.yank_diagnostics, { de
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yg', keymap_helpers.yank_github_url, { desc = '[Y]ank [G]itHub URL for current line(s)' })
 
--- Yank As Zip File -----------------------------------------------------------
+-- Yank As NVIM Zip File ------------------------------------------------------
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yz', keymap_helpers.yank_compressed_file, { desc = '[Y]ank as [Z]ip file' })
+
+-- Paste NVIM Zip File --------------------------------------------------------
+
+vim.keymap.set('n', '<leader>pz', keymap_helpers.paste_compressed_file, { desc = '[Z]ip file [P]aste' })
 
 -- Center Screen When Jumping -------------------------------------------------
 
