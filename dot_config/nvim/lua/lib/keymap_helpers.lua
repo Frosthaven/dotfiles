@@ -216,6 +216,223 @@ function M.yank_codeblock()
     vim.notify(' Yanked code block', vim.log.levels.INFO, { title = 'Keymap' })
 end
 
+-- Yank compressed file functions ---------------------------------------------
+
+function __get_7zip_binary()
+    local possible_binaries = { '7z', '7zz' }
+    for _, b in ipairs(possible_binaries) do
+        if vim.fn.executable(b) == 1 then
+            return b
+        end
+    end
+
+    vim.notify(' No 7z binary found in PATH (tried: ' .. table.concat(possible_binaries, ', ') .. ')', vim.log.levels.ERROR, { title = 'Keymap' })
+    return nil
+end
+
+-- mode = "compress" | "extract"
+-- returns items, base_dir, filetype
+local function __get_buffer_context(mode)
+    local items = {}
+    local base_dir
+    local filetype = vim.bo.filetype
+
+    if filetype == 'minifiles' then
+        local curr_path = vim.fn.expand '%:p'
+        if curr_path ~= '' then
+            curr_path = curr_path:gsub('^minifiles://%d+//', '/')
+            local stat = vim.loop.fs_stat(curr_path)
+            if stat then
+                if stat.type == 'directory' then
+                    base_dir = curr_path
+                else
+                    base_dir = vim.fn.fnamemodify(curr_path, ':h')
+                    if mode == 'compress' then
+                        table.insert(items, curr_path)
+                    end
+                end
+            end
+        end
+        if not base_dir then
+            base_dir = vim.fn.getcwd()
+        end
+    elseif filetype == 'netrw' then
+        base_dir = vim.b.netrw_curdir or vim.fn.getcwd()
+    else
+        local curr_file = vim.fn.expand '%:p'
+        if curr_file ~= '' then
+            base_dir = vim.fn.fnamemodify(curr_file, ':h')
+            if mode == 'compress' then
+                table.insert(items, curr_file)
+            end
+        else
+            base_dir = vim.fn.getcwd()
+        end
+    end
+
+    -- If compressing and no explicit items, scan base_dir
+    if mode == 'compress' and vim.tbl_isempty(items) and base_dir then
+        local scan = vim.fn.globpath(base_dir, '*', true, true)
+        for _, f in ipairs(scan) do
+            if vim.loop.fs_stat(f) then
+                table.insert(items, f)
+            end
+        end
+    end
+
+    return items, base_dir, filetype
+end
+
+local function __compress_file(items, base_dir, filetype)
+    if not items or #items == 0 then
+        vim.notify(' No files/folders to compress', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    -- Determine project root for prefix
+    local project_root = vim.fn.finddir('.git/..', base_dir .. ';')
+    local project_prefix = ''
+
+    -- Only compute prefix if we found a project root
+    if project_root ~= '' and type(project_root) == 'string' then
+        project_prefix = vim.fn.fnamemodify(project_root, ':t') .. '__'
+    end
+
+    -- Determine base name
+    local first_item = items[1]
+    local base_name
+    if filetype == 'minifiles' or filetype == 'netrw' then
+        base_name = vim.fn.fnamemodify(base_dir:gsub('/$', ''), ':t')
+    else
+        base_name = vim.fn.fnamemodify(first_item:gsub('/$', ''), ':t')
+    end
+    if base_name == '' then
+        base_name = 'project'
+    end
+
+    -- Add timestamp
+    local timestamp = os.date '%Y%m%d_%H%M%S'
+    local zip_name = string.format('%s%s__%s.nvim.zip', project_prefix, base_name, timestamp)
+
+    -- Downloads dir
+    local downloads = vim.fn.expand '~/Downloads'
+    if vim.fn.isdirectory(downloads) == 0 then
+        vim.fn.mkdir(downloads, 'p')
+    end
+    local zip_path = downloads .. '/' .. zip_name
+
+    -- Build 7z args
+    local rel_items = {}
+    for _, f in ipairs(items) do
+        local st = vim.loop.fs_stat(f)
+        if st then
+            table.insert(rel_items, string.format('"%s"', f))
+        end
+    end
+
+    local binary = __get_7zip_binary()
+    local cmd = string.format('%s a -tzip "%s" %s -r', binary, zip_path, table.concat(rel_items, ' '))
+    local result = vim.fn.system(cmd)
+    if vim.v.shell_error ~= 0 then
+        vim.notify('Failed to create zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    -- Yank zip path
+    vim.fn.setreg('+', zip_path)
+
+    -- Keep latest 3 only
+    local existing = vim.fn.globpath(downloads, '*.nvim.zip', true, true)
+    table.sort(existing, function(a, b)
+        return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec
+    end)
+    for i = 4, #existing do
+        os.remove(existing[i])
+    end
+
+    vim.notify(string.format(' %s\n  Yanked path', zip_name:match '([^/]+)$'), vim.log.levels.INFO, { title = 'Keymap' })
+end
+
+-- Extract a zip archive into target_dir, return file_count or error
+local function __extract_zip(zip_path, target_dir)
+    local binary = __get_7zip_binary()
+
+    -- Count files
+    local list_cmd = string.format('%s l -ba "%s"', binary, zip_path)
+    local zip_list = vim.fn.split(vim.fn.system(list_cmd), '\n')
+    local file_count = 0
+    for _, f in ipairs(zip_list) do
+        if f ~= '' then
+            file_count = file_count + 1
+        end
+    end
+
+    -- Extract with overwrite
+    local extract_cmd = string.format('%s x "%s" -o"%s" -aoa', binary, zip_path, target_dir)
+    local result = vim.fn.system(extract_cmd)
+    if vim.v.shell_error ~= 0 then
+        return nil, 'Failed to extract zip: ' .. result
+    end
+
+    return file_count
+end
+
+-- Refresh explorers and buffers after extraction
+local function __refresh_after_extract(filetype)
+    if filetype == 'minifiles' then
+        require('mini.files').open()
+    elseif filetype == 'netrw' then
+        vim.cmd 'Explore'
+    end
+
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local buf_name = vim.api.nvim_buf_get_name(buf)
+        if buf_name ~= '' and vim.fn.filereadable(buf_name) == 1 then
+            if vim.api.nvim_buf_is_loaded(buf) and not vim.bo[buf].modified then
+                vim.api.nvim_buf_call(buf, function()
+                    vim.cmd 'checktime'
+                end)
+            end
+        end
+    end
+end
+
+function M.yank_compressed_file()
+    local items, base_dir, filetype = __get_buffer_context 'compress'
+    if not base_dir or #items == 0 then
+        return
+    end
+    __compress_file(items, base_dir, filetype)
+end
+
+function M.paste_compressed_file()
+    local zip_path = vim.fn.getreg '+'
+    if zip_path == '' then
+        vim.notify(' Clipboard is empty', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+    if not zip_path:match '%.nvim%.zip$' then
+        vim.notify(' Clipboard does not contain a .nvim.zip file', vim.log.levels.WARN, { title = 'Keymap' })
+        return
+    end
+
+    local _, target_dir, filetype = __get_buffer_context 'extract'
+    if not target_dir or vim.fn.isdirectory(target_dir) == 0 then
+        vim.notify(' Target directory not found', vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    local file_count, err = __extract_zip(zip_path, target_dir)
+    if not file_count then
+        vim.notify(err, vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    __refresh_after_extract(filetype)
+
+    vim.notify(string.format(' %s\n  Extracted %d file(s)', zip_path:match '([^/]+)$', file_count), vim.log.levels.INFO, { title = 'Keymap' })
+end
+
 -- Yanks the relative path of the current file to the clipboard
 function M.yank_relative_path()
     local bufnr = vim.api.nvim_get_current_buf()
@@ -236,237 +453,6 @@ function M.yank_absolute_path()
     vim.fn.setreg('+', filename)
 
     vim.notify(' Yanked absolute path', vim.log.levels.INFO, { title = 'Keymap' })
-end
-
-function M.yank_compressed_file()
-    local items = {}
-    local base_dir
-    local filetype = vim.bo.filetype
-
-    -- Determine base directory and items
-    if filetype == 'minifiles' then
-        local curr_path = vim.fn.expand '%:p'
-        if curr_path == '' then
-            vim.notify(' No file or directory in buffer', vim.log.levels.WARN, { title = 'Keymap' })
-            return
-        end
-
-        -- Strip minifiles:// prefix and keep leading slash
-        curr_path = curr_path:gsub('^minifiles://%d+//', '/')
-
-        local stat = vim.loop.fs_stat(curr_path)
-        if not stat then
-            vim.notify(' Path does not exist: ' .. curr_path, vim.log.levels.WARN, { title = 'Keymap' })
-            return
-        end
-
-        if stat.type == 'directory' then
-            base_dir = curr_path
-        else
-            base_dir = vim.fn.fnamemodify(curr_path, ':h')
-            table.insert(items, curr_path)
-        end
-    elseif filetype == 'netrw' then
-        base_dir = vim.b.netrw_curdir or vim.fn.getcwd()
-    else
-        local curr_file = vim.fn.expand '%:p'
-        if curr_file == '' then
-            vim.notify(' No file to compress', vim.log.levels.WARN, { title = 'Keymap' })
-            return
-        end
-        base_dir = vim.fn.fnamemodify(curr_file, ':h')
-        table.insert(items, curr_file)
-    end
-
-    -- Scan directory if no items yet
-    if vim.tbl_isempty(items) then
-        local scan = vim.fn.globpath(base_dir, '*', true, true)
-        for _, f in ipairs(scan) do
-            if vim.loop.fs_stat(f) then
-                table.insert(items, f)
-            end
-        end
-    end
-
-    if #items == 0 then
-        vim.notify(' No files/folders to compress', vim.log.levels.WARN, { title = 'Keymap' })
-        return
-    end
-
-    -- Determine project root for prefix
-    local project_root = vim.fn.finddir('.git/..', base_dir .. ';')
-    if type(project_root) == 'table' then
-        project_root = project_root[1] or ''
-    end
-    if project_root == '' then
-        project_root = nil
-    end
-    local project_prefix = project_root and (vim.fn.fnamemodify(project_root, ':t') .. '__') or ''
-
-    -- Determine base name for zip
-    local first_item = items[1]
-    local base_name
-    if filetype == 'minifiles' or filetype == 'netrw' then
-        -- Use the current directory name
-        base_name = vim.fn.fnamemodify(base_dir:gsub('/$', ''), ':t')
-    else
-        -- Use the file name
-        base_name = vim.fn.fnamemodify(first_item:gsub('/$', ''), ':t')
-    end
-    if base_name == '' then
-        base_name = 'project'
-    end
-
-    -- Add timestamp to filename
-    local timestamp = os.date '%Y%m%d_%H%M%S'
-    local zip_name = string.format('%s%s__%s.nvim.zip', project_prefix, base_name, timestamp)
-
-    -- Ensure Downloads folder exists
-    local downloads = vim.fn.expand '~/Downloads'
-    if vim.fn.isdirectory(downloads) == 0 then
-        vim.fn.mkdir(downloads, 'p')
-    end
-    local zip_path = downloads .. '/' .. zip_name
-
-    -- Build 7z items: flatten files, keep directories intact
-    local rel_items = {}
-    for _, f in ipairs(items) do
-        local st = vim.loop.fs_stat(f)
-        if st then
-            if st.type == 'directory' then
-                table.insert(rel_items, string.format('"%s"', f))
-            else
-                table.insert(rel_items, string.format('"%s"', f))
-            end
-        end
-    end
-
-    -- Get possible 7z binary (7zip, p7zip, etc)
-    local binaries = { '7z', '7zz' }
-    local binary = nil
-    for _, b in ipairs(binaries) do
-        if vim.fn.executable(b) == 1 then
-            binary = b
-            break
-        end
-    end
-    if not binary then
-        vim.notify(' 7z binary not found in PATH', vim.log.levels.ERROR, { title = 'Keymap' })
-        return
-    end
-
-    local cmd = string.format(binary .. ' a -tzip "%s" %s -r', zip_path, table.concat(rel_items, ' '))
-    local result = vim.fn.system(cmd)
-    if vim.v.shell_error ~= 0 then
-        vim.notify('Failed to create zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
-        return
-    end
-
-    -- Copy zip path to clipboard
-    vim.fn.setreg('+', zip_path)
-
-    -- Keep only latest 3 archives
-    local existing = vim.fn.globpath(downloads, '*.nvim.zip', true, true)
-    table.sort(existing, function(a, b)
-        return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec
-    end)
-    for i = 4, #existing do
-        os.remove(existing[i])
-    end
-
-    vim.notify(string.format(' %s\n  Yanked path', zip_name:match '([^/]+)$'), vim.log.levels.INFO, { title = 'Keymap' })
-end
-
-function M.paste_compressed_file()
-    local zip_path = vim.fn.getreg '+'
-    if zip_path == '' then
-        vim.notify(' Clipboard is empty', vim.log.levels.WARN, { title = 'Keymap' })
-        return
-    end
-
-    if not zip_path:match '%.nvim%.zip$' then
-        vim.notify(' Clipboard does not contain a .nvim.zip file', vim.log.levels.WARN, { title = 'Keymap' })
-        return
-    end
-
-    local filetype = vim.bo.filetype
-    local target_dir
-
-    -- Determine active buffer directory
-    if filetype == 'minifiles' then
-        local curr_path = vim.fn.expand '%:p'
-        if curr_path == '' then
-            target_dir = vim.fn.getcwd()
-        else
-            curr_path = curr_path:gsub('^minifiles://%d+//', '/')
-            local stat = vim.loop.fs_stat(curr_path)
-            target_dir = stat and stat.type == 'directory' and curr_path or vim.fn.fnamemodify(curr_path, ':h')
-        end
-    elseif filetype == 'netrw' then
-        target_dir = vim.b.netrw_curdir or vim.fn.getcwd()
-    else
-        local curr_file = vim.fn.expand '%:p'
-        target_dir = (curr_file ~= '' and vim.fn.fnamemodify(curr_file, ':h')) or vim.fn.getcwd()
-    end
-
-    if vim.fn.isdirectory(target_dir) == 0 then
-        vim.notify(' Target directory does not exist: ' .. target_dir, vim.log.levels.ERROR, { title = 'Keymap' })
-        return
-    end
-
-    -- Get possible 7z binary (7zip, p7zip, etc)
-    local binaries = { '7z', '7zz' }
-    local binary = nil
-    for _, b in ipairs(binaries) do
-        if vim.fn.executable(b) == 1 then
-            binary = b
-            break
-        end
-    end
-    if not binary then
-        vim.notify(' 7z binary not found in PATH', vim.log.levels.ERROR, { title = 'Keymap' })
-        return
-    end
-
-    -- List files in the zip to count them
-    local list_cmd = string.format(binary .. ' l -ba "%s"', zip_path)
-    local zip_list = vim.fn.split(vim.fn.system(list_cmd), '\n')
-    local file_count = 0
-    for _, f in ipairs(zip_list) do
-        if f ~= '' then
-            file_count = file_count + 1
-        end
-    end
-
-    -- Extract with overwrite
-    local extract_cmd = string.format(binary .. ' x "%s" -o"%s" -aoa', zip_path, target_dir)
-    local result = vim.fn.system(extract_cmd)
-    if vim.v.shell_error ~= 0 then
-        vim.notify('Failed to extract zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
-        return
-    end
-
-    -- Refresh explorers / buffers
-    if filetype == 'minifiles' then
-        local mini_files = require 'mini.files'
-        mini_files.open() -- just reopen current buffer
-    elseif filetype == 'netrw' then
-        vim.cmd 'Explore'
-    end
-
-    -- Reload any regular file buffers that were overwritten, even if not active
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local buf_name = vim.api.nvim_buf_get_name(buf)
-        if buf_name ~= '' and vim.fn.filereadable(buf_name) == 1 then
-            if vim.api.nvim_buf_is_loaded(buf) and not vim.api.nvim_buf_get_option(buf, 'modified') then
-                vim.api.nvim_buf_call(buf, function()
-                    vim.cmd 'checktime'
-                end)
-            end
-        end
-    end
-
-    vim.notify(string.format(' %s\n  Extracted %d file(s)', zip_path:match '([^/]+)$', file_count), vim.log.levels.INFO, { title = 'Keymap' })
 end
 
 -- List Movement Functions ----------------------------------------------------
