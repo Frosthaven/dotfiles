@@ -595,6 +595,7 @@ function M.open_buffer_in_file_manager()
             cmd = string.format(
                 [[
                 osascript -e 'tell application "Finder" to open POSIX file "%s"
+                   tell application "Finder" to activate
                    tell application "System Events" to keystroke "." using {command down, shift down}'
             ]],
                 abs_path
@@ -603,8 +604,8 @@ function M.open_buffer_in_file_manager()
             cmd = string.format(
                 [[
                 osascript -e 'tell application "Finder" to reveal POSIX file "%s"
-                               tell application "Finder" to activate
-                               tell application "System Events" to keystroke "." using {command down, shift down}'
+                   tell application "Finder" to activate
+                   tell application "System Events" to keystroke "." using {command down, shift down}'
             ]],
                 abs_path
             )
