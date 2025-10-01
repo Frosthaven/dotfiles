@@ -34,6 +34,10 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yz', keymap_helpers.yank_compressed_file, 
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yb', keymap_helpers.yank_file_binary, { desc = '[Y]ank as Zip [B]inary file' })
 
+-- Open Buffer in External File Browser ---------------------------------------
+
+vim.keymap.set('n', '<leader>o', keymap_helpers.open_buffer_in_file_manager, { desc = '[O]pen in external file browser' })
+
 -- Paste NVIM Zip File --------------------------------------------------------
 
 vim.keymap.set('n', '<leader>pz', keymap_helpers.paste_compressed_file, { desc = '[Z]ip file [P]aste' })
