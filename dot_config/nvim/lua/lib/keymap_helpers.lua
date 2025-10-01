@@ -341,8 +341,21 @@ function M.yank_compressed_file()
         end
     end
 
-    -- Run 7z recursively
-    local cmd = string.format('7z a -tzip "%s" %s -r', zip_path, table.concat(rel_items, ' '))
+    -- Get possible 7z binary (7zip, p7zip, etc)
+    local binaries = { '7z', '7zz' }
+    local binary = nil
+    for _, b in ipairs(binaries) do
+        if vim.fn.executable(b) == 1 then
+            binary = b
+            break
+        end
+    end
+    if not binary then
+        vim.notify(' 7z binary not found in PATH', vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
+    local cmd = string.format(binary .. ' a -tzip "%s" %s -r', zip_path, table.concat(rel_items, ' '))
     local result = vim.fn.system(cmd)
     if vim.v.shell_error ~= 0 then
         vim.notify('Failed to create zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
@@ -401,8 +414,22 @@ function M.paste_compressed_file()
         return
     end
 
+    -- Get possible 7z binary (7zip, p7zip, etc)
+    local binaries = { '7z', '7zz' }
+    local binary = nil
+    for _, b in ipairs(binaries) do
+        if vim.fn.executable(b) == 1 then
+            binary = b
+            break
+        end
+    end
+    if not binary then
+        vim.notify(' 7z binary not found in PATH', vim.log.levels.ERROR, { title = 'Keymap' })
+        return
+    end
+
     -- List files in the zip to count them
-    local list_cmd = string.format('7z l -ba "%s"', zip_path)
+    local list_cmd = string.format(binary .. ' l -ba "%s"', zip_path)
     local zip_list = vim.fn.split(vim.fn.system(list_cmd), '\n')
     local file_count = 0
     for _, f in ipairs(zip_list) do
@@ -412,7 +439,7 @@ function M.paste_compressed_file()
     end
 
     -- Extract with overwrite
-    local extract_cmd = string.format('7z x "%s" -o"%s" -aoa', zip_path, target_dir)
+    local extract_cmd = string.format(binary .. ' x "%s" -o"%s" -aoa', zip_path, target_dir)
     local result = vim.fn.system(extract_cmd)
     if vim.v.shell_error ~= 0 then
         vim.notify('Failed to extract zip: ' .. result, vim.log.levels.ERROR, { title = 'Keymap' })
