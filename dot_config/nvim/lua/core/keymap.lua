@@ -26,9 +26,13 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', keymap_helpers.yank_diagnostics, { de
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yg', keymap_helpers.yank_github_url, { desc = '[Y]ank [G]itHub URL for current line(s)' })
 
--- Yank As NVIM Zip File ------------------------------------------------------
+-- Yank as NVIM Zip File Path -------------------------------------------------
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yz', keymap_helpers.yank_compressed_file, { desc = '[Y]ank as [Z]ip file' })
+
+-- Yank as NVIM Zip File Binary -----------------------------------------------
+
+vim.keymap.set({ 'n', 'v' }, '<leader>yb', keymap_helpers.yank_file_binary, { desc = '[Y]ank as Zip [B]inary file' })
 
 -- Paste NVIM Zip File --------------------------------------------------------
 
