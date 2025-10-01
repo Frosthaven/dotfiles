@@ -26,6 +26,10 @@ vim.keymap.set({ 'n', 'v' }, '<leader>yd', keymap_helpers.yank_diagnostics, { de
 
 vim.keymap.set({ 'n', 'v' }, '<leader>yg', keymap_helpers.yank_github_url, { desc = '[Y]ank [G]itHub URL for current line(s)' })
 
+-- Yank As Zip File -----------------------------------------------------------
+
+vim.keymap.set({ 'n', 'v' }, '<leader>yz', keymap_helpers.yank_compressed_file, { desc = '[Y]ank as [Z]ip file' })
+
 -- Center Screen When Jumping -------------------------------------------------
 
 vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
