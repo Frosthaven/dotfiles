@@ -419,12 +419,24 @@ function M.paste_compressed_file()
         return
     end
 
-    -- Refresh explorers
+    -- Refresh explorers / buffers
     if filetype == 'minifiles' then
         local mini_files = require 'mini.files'
-        mini_files.open()
+        mini_files.open() -- just reopen current buffer
     elseif filetype == 'netrw' then
         vim.cmd 'Explore'
+    end
+
+    -- Reload any regular file buffers that were overwritten, even if not active
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local buf_name = vim.api.nvim_buf_get_name(buf)
+        if buf_name ~= '' and vim.fn.filereadable(buf_name) == 1 then
+            if vim.api.nvim_buf_is_loaded(buf) and not vim.api.nvim_buf_get_option(buf, 'modified') then
+                vim.api.nvim_buf_call(buf, function()
+                    vim.cmd 'checktime'
+                end)
+            end
+        end
     end
 
     vim.notify(string.format(' %s\n  Extracted %d file(s)', zip_path:match '([^/]+)$', file_count), vim.log.levels.INFO, { title = 'Keymap' })
