@@ -446,7 +446,7 @@ function M.paste_compressed_file()
         vim.cmd 'Explore'
     end
 
-    vim.notify(' Extracted and overwritten ' .. zip_path .. ' into ' .. project_root, vim.log.levels.INFO, { title = 'Keymap' })
+    vim.notify(' Extracted ' .. zip_path .. ' into ' .. project_root, vim.log.levels.INFO, { title = 'Keymap' })
 end
 
 -- List Movement Functions ----------------------------------------------------
