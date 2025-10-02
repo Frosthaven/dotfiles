@@ -9,39 +9,6 @@ vim.g.maplocalleader = ' '
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' })
 
--- Yank into Markdown Code Block ----------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yc', keymap_helpers.yank_codeblock, { desc = '[Y]ank as [C]ode block' })
-
--- Yank File Path -------------------------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yr', keymap_helpers.yank_relative_path, { desc = '[Y]ank [R]elative path of file' })
-vim.keymap.set({ 'n', 'v' }, '<leader>ya', keymap_helpers.yank_absolute_path, { desc = '[Y]ank [A]bsolute path of file' })
-
--- Yank Diagnostic Messaging --------------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yd', keymap_helpers.yank_diagnostics, { desc = '[Y]ank [D]iagnostic code block' })
-
--- Yank Github URL For Line(s) ------------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yg', keymap_helpers.yank_github_url, { desc = '[Y]ank [G]itHub URL for current line(s)' })
-
--- Yank as NVIM Zip File Path -------------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yz', keymap_helpers.yank_compressed_file, { desc = '[Y]ank as [Z]ip file' })
-
--- Yank as NVIM Zip File Binary -----------------------------------------------
-
-vim.keymap.set({ 'n', 'v' }, '<leader>yb', keymap_helpers.yank_file_binary, { desc = '[Y]ank as Zip [B]inary file' })
-
--- Open Buffer in External File Browser ---------------------------------------
-
-vim.keymap.set('n', '<leader>o', keymap_helpers.open_buffer_in_file_manager, { desc = '[O]pen in external file browser' })
-
--- Paste NVIM Zip File --------------------------------------------------------
-
-vim.keymap.set('n', '<leader>pz', keymap_helpers.paste_compressed_file, { desc = '[Z]ip file [P]aste' })
-
 -- Center Screen When Jumping -------------------------------------------------
 
 vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
