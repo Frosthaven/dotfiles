@@ -714,17 +714,32 @@ function M.show_curr_diagnostic_float()
         prefix = ' ',
         scope = 'line',
     }
+
     vim.diagnostic.open_float(nil, opts)
 end
 
 function M.show_next_diagnostic_float()
-    vim.diagnostic.goto_next()
-    M.show_curr_diagnostic_float()
+    vim.diagnostic.jump {
+        count = 1,
+        on_jump = function()
+            -- small delay to ensure cursor has moved
+            vim.defer_fn(function()
+                M.show_curr_diagnostic_float()
+            end, 50)
+        end,
+    }
 end
 
 function M.show_prev_diagnostic_float()
-    vim.diagnostic.goto_prev()
-    M.show_curr_diagnostic_float()
+    vim.diagnostic.jump {
+        count = -1,
+        on_jump = function()
+            -- small delay to ensure cursor has moved
+            vim.defer_fn(function()
+                M.show_curr_diagnostic_float()
+            end, 50)
+        end,
+    }
 end
 
 return M
