@@ -203,6 +203,18 @@ def sysup [] {
         chezmoi update
     }
 
+    if (which bob | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Neovim --------------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating nvim via bob..."
+        bob update
+        print ""
+    }
+
     if (which nvim | is-empty) {
         # nothing
     } else {
