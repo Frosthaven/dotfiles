@@ -2,9 +2,11 @@ return {
     {
         'folke/snacks.nvim',
         enabled = true,
+        lazy = false,
+        priority = 1000,
         -- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md
         opts = {
-            image = {},
+            image = { enabled = true },
             picker = {
                 matcher = {
                     fuzzy = true,
@@ -24,9 +26,9 @@ return {
                 '<leader>sa',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[A]ll Pickers',
             },
@@ -34,9 +36,9 @@ return {
                 '<leader>sf',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.smart({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker.smart {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[F]iles',
             },
@@ -44,9 +46,9 @@ return {
                 '<leader>sg',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.grep({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker.grep {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[G]rep',
             },
@@ -54,9 +56,9 @@ return {
                 '<leader>sb',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.buffers({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker.buffers {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[B]uffers',
             },
@@ -64,9 +66,9 @@ return {
                 '<leader>sh',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.help({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker.help {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[H]elp Tags',
             },
@@ -74,14 +76,23 @@ return {
                 '<leader>sr',
                 function()
                     Snacks = require 'snacks'
-                    Snacks.picker.recent({
-                        filter = { cwd = true }
-                    })
+                    Snacks.picker.recent {
+                        filter = { cwd = true },
+                    }
                 end,
                 desc = '[R]ecent',
             },
         },
         config = function()
+            -- setup notifier
+            require('snacks').setup {
+                notifier = {
+                    enabled = true,
+                    style = 'compact',
+                    timeout = 2500,
+                    top_down = true,
+                },
+            }
             -- extra searches on lsp attach
             vim.api.nvim_create_autocmd('LspAttach', {
                 group = vim.api.nvim_create_augroup('SnacksLspAttach', { clear = false }),
