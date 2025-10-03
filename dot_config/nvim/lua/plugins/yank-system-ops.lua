@@ -16,7 +16,7 @@ return {
     keys = {
         -- yf : yank file(s) --------------------------------------------------
         {
-            '<leader>yfc', function()
+            '<leader>yfz', function()
                 require('yank_system_ops').yank_compressed_file()
             end, desc = 'Yank file(s) as compressed file path'
         },
@@ -26,9 +26,9 @@ return {
             end, desc = 'Yank file(s) to system clipboard for sharing'
         },
         {
-            '<leader>yfp', function()
-                require('yank_system_ops').paste_compressed_file()
-            end, desc = 'Paste compressed file(s) here'
+            '<leader>yfe', function()
+                require('yank_system_ops').extract_compressed_file()
+            end, desc = 'Extract compressed file(s) here'
         },
         -- yp : yank path info ------------------------------------------------
         {
