@@ -14,46 +14,55 @@ return {
         debug = false,
     },
     keys = {
-        -- yf : yank file(s) --------------------------------------------------
+        -- 🧷 yank & put file(s) ----------------------------------------------
         {
-            '<leader>yfz', function()
-                require('yank_system_ops').yank_compressed_file()
-            end, desc = 'Yank file(s) as compressed file path',
+            '<leader>yy', function()
+                require('yank_system_ops').yank_files_to_clipboard()
+            end, desc = 'Yank file(s) to system clipboard',
             mode = { 'n', 'v' }
         },
         {
-            '<leader>yfs', function()
-                require('yank_system_ops').yank_file_sharing()
-            end, desc = 'Yank file(s) to system clipboard for sharing',
+            '<leader>yp', function()
+                require('yank_system_ops').put_files_from_clipboard()
+            end, desc = 'Put clipboard file(s) here',
+            mode = { 'n', 'v' }
+        },
+        -- 📥 Put / Extract files -------------------------------------------------
+        {
+            '<leader>yz', function()
+                require('yank_system_ops').zip_files_to_clipboard()
+            end, desc = 'Zip file(s) to clipboard',
             mode = { 'n', 'v' }
         },
         {
-            '<leader>yfe', function()
-                require('yank_system_ops').extract_compressed_file()
-            end, desc = 'Extract compressed file(s) here',
+            '<leader>ye', function()
+                require('yank_system_ops').extract_files_from_clipboard()
+            end, desc = 'Extract clipboard file here',
             mode = { 'n', 'v' }
         },
-        -- yp : yank path info ------------------------------------------------
+        -- 📂 Path info -----------------------------------------------------------
         {
-            '<leader>ypr', function()
+            '<leader>yr', function()
                 require('yank_system_ops').yank_relative_path()
             end, desc = 'Yank relative path to file(s)',
             mode = { 'n', 'v' }
         },
         {
-            '<leader>ypa', function()
+            '<leader>ya', function()
                 require('yank_system_ops').yank_absolute_path()
             end, desc = 'Yank absolute path to file(s)',
             mode = { 'n', 'v' }
         },
-        -- yo : open buffer in external file browser --------------------------
+
+        -- 🌐 Open in file browser ------------------------------------------------
         {
             '<leader>yo', function()
                 require('yank_system_ops').open_buffer_in_file_manager()
-            end, desc = 'Open current buffer in file browser',
+            end, desc = 'Open current buffer in system file browser',
             mode = { 'n', 'v' }
         },
-        -- ym : yank markdown code block --------------------------------------
+
+        -- 🪄 Markdown codeblocks -------------------------------------------------
         {
             '<leader>ymc', function()
                 require('yank_system_ops').yank_codeblock()
@@ -63,14 +72,15 @@ return {
         {
             '<leader>ymd', function()
                 require('yank_system_ops').yank_diagnostics()
-            end, desc = 'Yank line(s) as markdown code block with diagnostics',
+            end, desc = 'Yank line(s) as markdown code block w/ diagnostics',
             mode = { 'n', 'v' }
         },
-        -- yg : yank github url -----------------------------------------------
+
+        -- 🧭 GitHub URL ----------------------------------------------------------
         {
             '<leader>ygl', function()
                 require('yank_system_ops').yank_github_url()
-            end, desc = 'Yank line(s) as github url',
+            end, desc = 'Yank current line(s) as GitHub URL',
             mode = { 'n', 'v' }
         },
     }
