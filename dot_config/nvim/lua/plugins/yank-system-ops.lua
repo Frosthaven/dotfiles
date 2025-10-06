@@ -8,6 +8,7 @@ return {
     dir = dev_paths[vim.loop.os_uname().sysname],
     -- 'frosthaven/yank-system-ops.nvim',
     enabled = true,
+    lazy = false,
     opts = {
         storage_path = vim.fn.expand '~/Downloads', -- path to store files
         files_to_keep = 3, -- yank_system_ops will delete older files beyond this
