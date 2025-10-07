@@ -17,6 +17,7 @@ return {
                 'markdown_inline',
                 'php',
                 'query',
+                'swift',
                 'vim',
                 'vimdoc',
             },
