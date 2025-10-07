@@ -3,7 +3,9 @@ return {
         'echasnovski/mini.nvim',
         enabled = true,
         config = function()
-            local Snacks = require('snacks')
+
+            require('mini.icons').setup()
+
             -- Better Around/Inside textobjects
             --
             -- Examples:
