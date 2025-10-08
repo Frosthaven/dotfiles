@@ -1,8 +1,8 @@
 # add $HOME/.local/bin binaries to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-# add nvim-bob to PATH
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+# Add nvim-bob (stable and nightly) to PATH
+export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/share/bob/nightly/bin:$PATH"
 
 # starship
 eval "$(starship init zsh)"
