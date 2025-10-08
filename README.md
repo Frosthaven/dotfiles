@@ -39,6 +39,9 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_D
 # Run chezmoi init as non-admin
 Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
 
+# Install Visual Studio Community With C++ Workload
+winget install --id Microsoft.VisualStudio.2022.BuildTools -e --accept-package-agreements --accept-source-agreements --override "--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional"
+
 # Install Rust Toolchain with GCC
 if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process rustup-init.exe -ArgumentList "-y" -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --silent; $msys2="$Env:ProgramFiles\MSYS2\msys2.exe"; Start-Process $msys2 -ArgumentList "-mingw64","pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel" -Wait }
 
