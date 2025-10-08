@@ -34,6 +34,8 @@ packages:
     # programming languages ***************************************************
     # *************************************************************************
 
+    2-visual-studio-build-tools:
+        win: winget install --id Microsoft.VisualStudio.2022.BuildTools
     2-language-zig: # needed to auto-compile telescope in neovim cross-platform
         win: winget install --id zig.zig
         mac: brew install zig
