@@ -4,6 +4,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # nvim-bob
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 
+# Add PNPM to PATH
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+
 # Starship prompt
 eval "$(starship init bash)"
 

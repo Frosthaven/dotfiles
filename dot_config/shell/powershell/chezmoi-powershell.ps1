@@ -91,3 +91,7 @@ $env:Path += ";$env:USERPROFILE\.local\bin"
 
 # Add cargo to path
 $env:Path += ";$env:USERPROFILE\.cargo\bin"
+
+# Add PNPM to path
+$env:PNPM_HOME = "$env:USERPROFILE\.local\share\pnpm"
+$env:Path += ";$env:USERPROFILE\.local\share\pnpm"

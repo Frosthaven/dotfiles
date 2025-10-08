@@ -4,6 +4,10 @@ set -gx PATH $HOME/.local/bin $PATH
 # Add nvim-bob to PATH
 set -gx PATH $HOME/.local/share/bob/nvim-bin $PATH
 
+# Add PNPM to PATH
+set -gx PNPM_HOME $HOME/.local/share/pnpm
+set -gx PATH $PNPM_HOME $PATH
+
 # Starship prompt
 starship init fish | source
 
