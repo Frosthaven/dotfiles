@@ -1,47 +1,44 @@
 {{ if eq .chezmoi.os "windows" -}}
 
-# Path to the packages file
-$PackagesFile = "$HOME\.local\share\chezmoi\.chezmoidata\packages.yaml"
-$HashFile = "$PackagesFile.hash"
+# ----------------------------------------
+# FILEHASH CHECK
+# ----------------------------------------
+$packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
+$currentHash = CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() } | Out-String
+$hashFilePath = "$HOME/.local/share/chezmoi/.chezmoidata/packages.hash"
 
-# Compute SHA256 hash of current packages.yaml
-$CurrentHash = (CertUtil -hashfile $PackagesFile SHA256 | Select-String -Pattern "^[0-9A-F]{64}$").ToString()
-
-# Read stored hash if exists
-$StoredHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { "" }
-
-if ($CurrentHash -eq $StoredHash) {
-    Write-Host "Packages unchanged. Skipping installation."
-    return
-}
-
-# Save the new hash for next run
-$CurrentHash | Out-File -Encoding ascii $HashFile
-
-# Ensure PATH includes Machine + User for each package execution
-function Refresh-Path {
-    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine) + ';' +
-                [System.Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
-}
-
-# Prompt for admin if not running as administrator
-function Ensure-Admin {
-    if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        $answer = Read-Host "Install Packages? (y/n)"
-        if ($answer -eq 'n') {
-            Write-Host "Skipping package installation.";
-            exit
-        } else {
-            Start-Process -FilePath powershell -ArgumentList "-File `"$PSCommandPath`"" -Verb RunAs -Wait
-            exit
-        }
+$hashChanged = $true
+if (Test-Path $hashFilePath) {
+    $previousHash = Get-Content $hashFilePath -Raw
+    if ($previousHash -eq $currentHash) {
+        $hashChanged = $false
     }
 }
 
-# Run admin check once
-Ensure-Admin
+if (-not $hashChanged) {
+    Write-Host "No changes in packages.yml; skipping package installation." -ForegroundColor Green
+    exit
+}
 
-# Build ordered package list from packages.yml (preserves numeric labels)
+# ----------------------------------------
+# ADMIN CHECK
+# ----------------------------------------
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+if (-not $isAdmin) {
+    $input = Read-Host -Prompt "Install Packages? (y/n)"
+    if ($input -eq 'n') {
+        Write-Host "Skipping package installation." -ForegroundColor Yellow
+        exit
+    } else {
+        # Relaunch as admin
+        Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
+        exit
+    }
+}
+
+# ----------------------------------------
+# BUILD PACKAGE LIST
+# ----------------------------------------
 $packages = @()
 {{- $withWin := dict -}}
 {{- range $key, $value := .packages -}}
@@ -52,31 +49,39 @@ $packages = @()
 {{- $keys := keys $withWin -}}
 {{- range $i, $key := $keys }}
 $packages += @{
-    Name = "{{$key}}"
+    Name   = "{{$key}}"
     Script = @'
 {{ index (index $withWin $key) "win" | replace "'" "''" }}
 '@
 }
-{{- end -}}
+{{- end }}
 
 $totalPackages = $packages.Count
 $currentPackage = 0
 
-Write-Host "`nProcessing $totalPackages Packages...`n"
+Write-Host ""
+Write-Host "Processing $totalPackages Packages..." -ForegroundColor Cyan
+Write-Host ""
 
+# ----------------------------------------
+# EXECUTE PACKAGES
+# ----------------------------------------
 foreach ($pkg in $packages) {
-    Refresh-Path
+    # Refresh PATH from system + user in case previous installs modified it
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ';' +
+                [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
+
     $currentPackage++
     Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
-
-    try {
-        Invoke-Expression $pkg.Script
-    } catch {
-        Write-Warning "Package $($pkg.Name) failed: $_"
-    }
+    Invoke-Expression $pkg.Script
 }
 
-Write-Host "`nAll packages processed."
-Read-Host -Prompt "Press Enter to exit"
+# ----------------------------------------
+# SAVE HASH AFTER INSTALL
+# ----------------------------------------
+$currentHash | Out-File -Encoding ASCII $hashFilePath
+
+Write-Host ""
+Read-Host -Prompt "Done! Press Enter to exit the package installer."
 
 {{ end -}}
