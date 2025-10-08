@@ -1,33 +1,48 @@
 {{ if eq .chezmoi.os "windows" -}}
 
-# ENSURE ADMINISTRATOR PRIVILEGES *********************************************
-# *****************************************************************************
+# Path to the packages file
+$PackagesFile = "$HOME\.local\share\chezmoi\.chezmoidata\packages.yaml"
+$HashFile = "$PackagesFile.hash"
 
+# Compute SHA256 hash of current packages.yaml
+$CurrentHash = (CertUtil -hashfile $PackagesFile SHA256 | Select-String -Pattern "^[0-9A-F]{64}$").ToString()
 
-# FILEHASH ********************************************************************
-# *****************************************************************************
+# Read stored hash if exists
+$StoredHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { "" }
 
-$fileHash = CertUtil -hashfile "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml" SHA256
+if ($CurrentHash -eq $StoredHash) {
+    Write-Host "Packages unchanged. Skipping installation."
+    return
+}
 
-# SCRIPT **********************************************************************
-# *****************************************************************************
+# Save the new hash for next run
+$CurrentHash | Out-File -Encoding ascii $HashFile
 
-$installPackages = $false
-$env:Path = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ';' + [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
-Read-Host -Prompt "Install Packages? (y/n)" | ForEach-Object {
-    if ($_ -eq 'n') {
-        echo "Skipping package installation."
-        exit
-    } else {
-        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-            Start-Process -FilePath powershell -ArgumentList "-File", "$PSCommandPath" -Verb RunAs -Wait
+# Ensure PATH includes Machine + User for each package execution
+function Refresh-Path {
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine) + ';' +
+                [System.Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
+}
+
+# Prompt for admin if not running as administrator
+function Ensure-Admin {
+    if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        $answer = Read-Host "Install Packages? (y/n)"
+        if ($answer -eq 'n') {
+            Write-Host "Skipping package installation.";
+            exit
+        } else {
+            Start-Process -FilePath powershell -ArgumentList "-File `"$PSCommandPath`"" -Verb RunAs -Wait
             exit
         }
     }
 }
 
-# Build list of packages with 'win' key
-$packages = @(
+# Run admin check once
+Ensure-Admin
+
+# Build ordered package list from packages.yml (preserves numeric labels)
+$packages = @()
 {{- $withWin := dict -}}
 {{- range $key, $value := .packages -}}
     {{- if (index $value "win") -}}
@@ -35,29 +50,33 @@ $packages = @(
     {{- end -}}
 {{- end -}}
 {{- $keys := keys $withWin -}}
-{{- $lastIndex := sub (len $keys) 1 -}}
 {{- range $i, $key := $keys }}
-    @{ Name = "{{$key}}"; Script = @'
+$packages += @{
+    Name = "{{$key}}"
+    Script = @'
 {{ index (index $withWin $key) "win" | replace "'" "''" }}
-'@ }{{ if ne $i $lastIndex }},{{ end }}
-{{ end -}}
-)
+'@
+}
+{{- end -}}
 
 $totalPackages = $packages.Count
 $currentPackage = 0
 
-echo ""
-echo "Processing $totalPackages Packages..."
-echo ""
+Write-Host "`nProcessing $totalPackages Packages...`n"
 
 foreach ($pkg in $packages) {
-    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ';' + [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
+    Refresh-Path
     $currentPackage++
     Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
-    Invoke-Expression $pkg.Script
+
+    try {
+        Invoke-Expression $pkg.Script
+    } catch {
+        Write-Warning "Package $($pkg.Name) failed: $_"
+    }
 }
 
-echo ""
-Read-Host -Prompt "Done! Press Enter to exit the package installer."
+Write-Host "`nAll packages processed."
+Read-Host -Prompt "Press Enter to exit"
 
 {{ end -}}
