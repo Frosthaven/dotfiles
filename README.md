@@ -40,7 +40,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_D
 Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
 
 # Install Rust Toolchain with GCC
-winget install --id=MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-toolchain"; winget install --id=Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\bin'; if (Test-Path (Join-Path $mingwBin 'gcc.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; [Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::Machine); rustup target add x86_64-pc-windows-gnu; rustc --version } else { Write-Error "gcc.exe not found at $mingwBin" }
+winget install --id=MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-toolchain"; winget install --id=Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\bin'; if (Test-Path (Join-Path $mingwBin 'dlltool.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; rustup target add x86_64-pc-windows-gnu; rustc --version; cargo --version } else { Write-Error "dlltool.exe not found at $mingwBin" }
 
 chezmoi update
 ```
