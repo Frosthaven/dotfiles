@@ -370,9 +370,6 @@ packages:
     desktop-video-player:
         win: winget install screenbox -s winget
         mac: brew install iina
-    desktop-winapps-dependencies:
-        lin: sudo apt install -y curl dialog freerdp3-x11 freerdp git iproute2 libnotify-bin netcat-openbsd
-        pac: sudo pacman -Syu --needed -y curl dialog freerdp git iproute2 libnotify openbsd-netcat
     desktop-gimp:
         pac: sudo pacman -Syu --needed -y gimp
     desktop-krita:
