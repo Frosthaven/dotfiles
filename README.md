@@ -40,7 +40,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_D
 Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
 
 # Install Rust Toolchain with GCC
-winget install --id=MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; C:\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-toolchain"; winget install --id=Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\bin'; if (Test-Path (Join-Path $mingwBin 'dlltool.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; rustup target add x86_64-pc-windows-gnu; rustc --version; cargo --version } else { Write-Error "dlltool.exe not found at $mingwBin" }
+if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process rustup-init.exe -ArgumentList "-y" -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --silent; $msys2="$Env:ProgramFiles\MSYS2\msys2.exe"; Start-Process $msys2 -ArgumentList "-mingw64","pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel" -Wait }
 
 chezmoi update
 ```
