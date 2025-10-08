@@ -3,30 +3,13 @@ local helpers = require("lua/module/helpers")
 
 local M = {}
 
--- VM detection helper
+-- Helper: detect common VMs
 local function running_in_vm()
-    local os_tag = helpers.osTag()
-    if os_tag == "windows" then
-        local ok, result = pcall(
-            wezterm.os_exec,
-            'powershell -Command "Get-WmiObject Win32_ComputerSystem | Select-Object -ExpandProperty Manufacturer"'
-        )
-        if ok and result then
-            if result:match("VMware") or result:match("VirtualBox") or result:match("QEMU") then
-                return true
-            end
-        end
-    elseif os_tag == "linux" then
-        local paths = { "/sys/class/dmi/id/product_name", "/sys/class/dmi/id/sys_vendor" }
-        for _, p in ipairs(paths) do
-            local f = io.open(p, "r")
-            if f then
-                local content = f:read("*a")
-                f:close()
-                if content:match("VirtualBox") or content:match("VMware") or content:match("QEMU") then
-                    return true
-                end
-            end
+    local uname = io.popen("systeminfo"):read("*a") or ""
+    local vm_strings = { "VirtualBox", "VMware", "KVM", "QEMU", "Hyper-V" }
+    for _, s in ipairs(vm_strings) do
+        if uname:match(s) then
+            return true
         end
     end
     return false
@@ -35,7 +18,9 @@ end
 M.setup = function()
     -- load priority: platform specific > common
     local opts = {
-        linux = { font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }) },
+        linux = {
+            font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
+        },
         windows = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             win32_system_backdrop = "Acrylic",
@@ -57,42 +42,64 @@ M.setup = function()
             freetype_load_target = "Normal",
             freetype_render_target = "HorizontalLcd",
             cell_width = 1.1,
-            window_padding = { left = "5cell", right = "2cell", top = "0.5cell", bottom = "0.5cell" },
+            window_padding = {
+                left = "5cell",
+                right = "2cell",
+                top = "0.5cell",
+                bottom = "0.5cell",
+            },
             set_environment_variables = {},
         },
     }
 
-    -- platform-specific default prog and PATH
-    if helpers.osTag() == "windows" then
-        opts.windows.default_prog = { "nu.exe" }
-    elseif helpers.osTag() == "macos" then
-        opts.macos.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        opts.set_environment_variables =
-            { PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" }
-    elseif helpers.osTag() == "linux" then
-        opts.linux.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        opts.set_environment_variables =
-            { PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" }
-    end
-
-    -- combine common and platform options
+    -- platform defaults
     local osTag = helpers.osTag()
-    local platform_config = opts[osTag] or opts.common or {}
+    local platform_config = opts[osTag] or {}
     local common = opts.common or {}
     local config = helpers.mergeTables(common, platform_config)
 
-    -- attach ideal frontend (OpenGL/EGL detection)
-    config = helpers.attachIdealFrontend(config)
-
-    -- if VM detected, force EGL frontend
-    if running_in_vm() then
-        wezterm.log_info("VM detected; switching frontend to EGL")
-        config.front_end = "EGL"
+    -- default shell per platform
+    if osTag == "windows" then
+        config.default_prog = { "nu.exe" }
+    elseif osTag == "macos" then
+        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        config.set_environment_variables = {
+            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        }
+    elseif osTag == "linux" then
+        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        config.set_environment_variables = {
+            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        }
     end
 
-    -- copy on select mouse bindings
+    -- attach ideal frontend if helper exists
+    if helpers.attachIdealFrontend then
+        config = helpers.attachIdealFrontend(config)
+    end
+
+    -- Force EGL on VMs or fallback if OpenGL fails
+    if running_in_vm() then
+        wezterm.log_warn("VM detected; forcing EGL frontend")
+        config.front_end = "EGL"
+    else
+        -- attempt OpenGL, fallback to EGL if fails
+        local success, _ = pcall(function()
+            config.front_end = "OpenGL"
+        end)
+        if not success then
+            wezterm.log_warn("OpenGL failed; switching to EGL")
+            config.front_end = "EGL"
+        end
+    end
+
+    -- copy on select bindings
     local function make_mouse_binding(dir, streak, button, mods, action)
-        return { event = { [dir] = { streak = streak, button = button } }, mods = mods, action = action }
+        return {
+            event = { [dir] = { streak = streak, button = button } },
+            mods = mods,
+            action = action,
+        }
     end
     config.mouse_bindings = {
         make_mouse_binding(
