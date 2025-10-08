@@ -43,7 +43,7 @@ Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthav
 winget install --id Microsoft.VisualStudio.2022.BuildTools -e --accept-package-agreements --accept-source-agreements --override "--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional"
 
 # Install Rust Toolchain with GCC
-if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process rustup-init.exe -ArgumentList "-y" -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --silent; $msys2="$Env:ProgramFiles\MSYS2\msys2.exe"; Start-Process $msys2 -ArgumentList "-mingw64","pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel" -Wait }
+if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process -FilePath rustup-init.exe -ArgumentList "-y" -Wait; Remove-Item rustup-init.exe }; winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; $msysBash="C:\msys64\usr\bin\bash.exe"; if (Test-Path $msysBash) { & $msysBash -lc "pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel"; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\bin'; if (Test-Path (Join-Path $mingwBin 'gcc.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; rustup target add x86_64-pc-windows-gnu; rustc --version; cargo install rust-analyzer } else { Write-Error 'gcc.exe not found in MSYS2 mingw64' } } else { Write-Error 'MSYS2 bash.exe not found' }
 
 chezmoi update
 ```
