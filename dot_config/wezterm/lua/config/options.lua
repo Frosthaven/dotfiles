@@ -3,20 +3,8 @@ local helpers = require("lua/module/helpers")
 
 local M = {}
 
--- Helper: detect common VMs
-local function running_in_vm()
-    local uname = io.popen("systeminfo"):read("*a") or ""
-    local vm_strings = { "VirtualBox", "VMware", "KVM", "QEMU", "Hyper-V" }
-    for _, s in ipairs(vm_strings) do
-        if uname:match(s) then
-            return true
-        end
-    end
-    return false
-end
-
 M.setup = function()
-    -- load priority: platform specific > common
+    -- Load priority: platform specific > common
     local opts = {
         linux = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
@@ -37,7 +25,6 @@ M.setup = function()
             window_background_opacity = 0.94,
             window_decorations = "INTEGRATED_BUTTONS | RESIZE",
             window_close_confirmation = "NeverPrompt",
-            webgpu_preferred_adapter = helpers.getIdealGPU(),
             bold_brightens_ansi_colors = true,
             freetype_load_target = "Normal",
             freetype_render_target = "HorizontalLcd",
@@ -52,48 +39,29 @@ M.setup = function()
         },
     }
 
-    -- platform defaults
     local osTag = helpers.osTag()
-    local platform_config = opts[osTag] or {}
-    local common = opts.common or {}
-    local config = helpers.mergeTables(common, platform_config)
-
-    -- default shell per platform
     if osTag == "windows" then
-        config.default_prog = { "nu.exe" }
+        opts.windows.default_prog = { "nu.exe" }
     elseif osTag == "macos" then
-        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        config.set_environment_variables = {
+        opts.macos.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        opts.set_environment_variables = {
             PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
     elseif osTag == "linux" then
-        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        config.set_environment_variables = {
+        opts.linux.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        opts.set_environment_variables = {
             PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
     end
 
-    -- attach ideal frontend if helper exists
-    if helpers.attachIdealFrontend then
-        config = helpers.attachIdealFrontend(config)
-    end
+    -- Combine common and platform-specific options
+    local platform_config = opts[osTag] or {}
+    local config = helpers.mergeTables(opts.common, platform_config)
 
-    -- Force EGL on VMs or fallback if OpenGL fails
-    if running_in_vm() then
-        wezterm.log_warn("VM detected; forcing EGL frontend")
-        config.front_end = "EGL"
-    else
-        -- attempt OpenGL, fallback to EGL if fails
-        local success, _ = pcall(function()
-            config.front_end = "OpenGL"
-        end)
-        if not success then
-            wezterm.log_warn("OpenGL failed; switching to EGL")
-            config.front_end = "EGL"
-        end
-    end
+    -- Attach ideal frontend if needed
+    config = helpers.attachIdealFrontend(config)
 
-    -- copy on select bindings
+    -- Mouse selection copy behavior
     local function make_mouse_binding(dir, streak, button, mods, action)
         return {
             event = { [dir] = { streak = streak, button = button } },
@@ -101,6 +69,7 @@ M.setup = function()
             action = action,
         }
     end
+
     config.mouse_bindings = {
         make_mouse_binding(
             "Up",
@@ -127,6 +96,24 @@ M.setup = function()
         make_mouse_binding("Up", 2, "Left", "NONE", wezterm.action.CompleteSelection("ClipboardAndPrimarySelection")),
         make_mouse_binding("Up", 3, "Left", "NONE", wezterm.action.CompleteSelection("ClipboardAndPrimarySelection")),
     }
+
+    -- ----------------------------------------
+    -- Detect VM and fallback frontend
+    -- ----------------------------------------
+    local function running_in_vm()
+        local sysinfo = wezterm.run_child_process({ "wmic", "computersystem", "get", "model" })
+        local output = table.concat(sysinfo, "")
+        output = output:lower()
+        return output:find("virtual") or output:find("qemu") or output:find("vmware") or output:find("hyper-v")
+    end
+
+    if running_in_vm() then
+        wezterm.log_warn("VM detected; forcing software frontend")
+        config.front_end = "Software"
+    else
+        -- default to OpenGL, fallback to Software if initialization fails
+        config.front_end = "OpenGL"
+    end
 
     return config
 end
