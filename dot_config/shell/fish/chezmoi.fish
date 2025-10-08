@@ -1,8 +1,8 @@
 # Add $HOME/.local/bin to PATH
 set -gx PATH $HOME/.local/bin $PATH
 
-# Add nvim-bob to PATH
-set -gx PATH $HOME/.local/share/bob/nvim-bin $PATH
+# Add nvim-bob (stable and nightly) to PATH
+set -gx PATH $HOME/.local/share/bob/nvim-bin $HOME/.local/share/bob/nightly/bin $PATH
 
 # Add PNPM to PATH
 set -gx PNPM_HOME $HOME/.local/share/pnpm

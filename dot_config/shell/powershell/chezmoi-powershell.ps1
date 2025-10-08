@@ -39,7 +39,7 @@ function Invoke-Starship-PreCommand {
 }
 
 # nvim-bob binaries
-$env:Path += ";$env:USERPROFILE\.local\share\bob\nvim-bin"
+$env:Path += ";$env:LOCALAPPDATA\bob\nightly\bin;$env:USERPROFILE\.local\share\bob\nvim-bin"
 
 # UV binaries
 $env:Path += ";$env:USERPROFILE\.local\bin"
