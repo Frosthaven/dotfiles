@@ -1,15 +1,13 @@
 {{ if eq .chezmoi.os "windows" -}}
 
 # ----------------------------------------
-# COMPUTE PACKAGES.YAML HASH
+# FILEHASH CHECK (for template change detection)
 # ----------------------------------------
 $packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
-$currentHash = (CertUtil -hashfile $packagesFile SHA256 |
-    Where-Object { $_ -match '^[0-9A-F]{2,}' } |
-    ForEach-Object { ($_ -replace '\s','') }) -join ''
 
-# Output hash as part of template so chezmoi tracks changes
-Write-Output "Packages.yaml SHA256: $currentHash"
+# Get SHA256 hash as a single string
+$packagesHash = (CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() }) -join ''
+Write-Host "Packages.yaml SHA256: $packagesHash"
 
 # ----------------------------------------
 # ADMIN CHECK
@@ -28,24 +26,19 @@ if (-not $isAdmin) {
 }
 
 # ----------------------------------------
-# BUILD PACKAGE LIST (IN ORDER)
+# BUILD PACKAGE LIST (preserve YAML order)
 # ----------------------------------------
 $packages = @()
-{{- $withWin := dict -}}
 {{- range $key, $value := .packages -}}
     {{- if (index $value "win") -}}
-        {{- $_ := set $withWin $key $value -}}
-    {{- end -}}
-{{- end -}}
-{{- $keys := keys $withWin -}}
-{{- range $i, $key := $keys }}
 $packages += @{
     Name   = "{{$key}}"
     Script = @'
-{{ index (index $withWin $key) "win" | replace "'" "''" }}
+{{ index $value "win" | replace "'" "''" }}
 '@
 }
-{{- end }}
+    {{- end -}}
+{{- end -}}
 
 $totalPackages = $packages.Count
 $currentPackage = 0
@@ -58,7 +51,7 @@ Write-Host ""
 # EXECUTE PACKAGES
 # ----------------------------------------
 foreach ($pkg in $packages) {
-    # Refresh PATH from system + user
+    # Refresh PATH from system + user in case previous installs modified it
     $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ';' +
                 [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
 
