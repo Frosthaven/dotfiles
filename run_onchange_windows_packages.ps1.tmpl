@@ -1,7 +1,7 @@
-{{ if eq .chezmoi.os "windows" -}}
+{{ if eq .chezmoi.os "windows" }}
 
 # ----------------------------------------
-# FILEHASH CHECK (for template change detection)
+# FILEHASH CHECK (for template change detection only)
 # ----------------------------------------
 $packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
 
@@ -29,16 +29,16 @@ if (-not $isAdmin) {
 # BUILD PACKAGE LIST (preserve YAML order)
 # ----------------------------------------
 $packages = @()
-{{- range $key, $value := .packages -}}
-    {{- if (index $value "win") -}}
+{{ range $key, $value := .packages }}
+    {{ if index $value "win" }}
 $packages += @{
     Name   = "{{$key}}"
     Script = @'
 {{ index $value "win" | replace "'" "''" }}
 '@
 }
-    {{- end -}}
-{{- end -}}
+    {{ end }}
+{{ end }}
 
 $totalPackages = $packages.Count
 $currentPackage = 0
@@ -63,4 +63,4 @@ foreach ($pkg in $packages) {
 Write-Host ""
 Read-Host -Prompt "Done! Press Enter to exit the package installer."
 
-{{ end -}}
+{{ end }}
