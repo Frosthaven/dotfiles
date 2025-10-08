@@ -3,7 +3,7 @@ local helpers = require("lua/module/helpers")
 
 local M = {}
 
--- Helper: detect common VMs
+-- Early VM detection
 local function running_in_vm()
     local uname = io.popen("systeminfo"):read("*a") or ""
     local vm_strings = { "VirtualBox", "VMware", "KVM", "QEMU", "Hyper-V" }
@@ -16,7 +16,12 @@ local function running_in_vm()
 end
 
 M.setup = function()
-    -- load priority: platform specific > common
+    local is_vm = running_in_vm()
+    if is_vm then
+        wezterm.log_warn("VM detected; forcing Software frontend")
+    end
+
+    -- Platform-specific defaults
     local opts = {
         linux = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
@@ -52,48 +57,35 @@ M.setup = function()
         },
     }
 
-    -- platform defaults
+    -- Merge platform with common
     local osTag = helpers.osTag()
     local platform_config = opts[osTag] or {}
-    local common = opts.common or {}
-    local config = helpers.mergeTables(common, platform_config)
+    local config = helpers.mergeTables(opts.common, platform_config)
 
-    -- default shell per platform
+    -- Default shell per platform
     if osTag == "windows" then
         config.default_prog = { "nu.exe" }
-    elseif osTag == "macos" then
-        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+    else
+        local home = os.getenv("HOME")
+        config.default_prog = { home .. "/.cargo/bin/nu" }
         config.set_environment_variables = {
-            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-        }
-    elseif osTag == "linux" then
-        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        config.set_environment_variables = {
-            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            PATH = home .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
     end
 
-    -- attach ideal frontend if helper exists
+    -- Attach ideal frontend if helper exists
     if helpers.attachIdealFrontend then
         config = helpers.attachIdealFrontend(config)
     end
 
-    -- Force Software on VMs or fallback if OpenGL fails
-    if running_in_vm() then
-        wezterm.log_warn("VM detected; forcing Software frontend")
+    -- Force software frontend in VMs; otherwise OpenGL
+    if is_vm then
         config.front_end = "Software"
     else
-        -- attempt OpenGL, fallback to EGL if fails
-        local success, _ = pcall(function()
-            config.front_end = "OpenGL"
-        end)
-        if not success then
-            wezterm.log_warn("OpenGL failed; switching to Software")
-            config.front_end = "Software"
-        end
+        config.front_end = "OpenGL"
     end
 
-    -- copy on select bindings
+    -- Mouse bindings
     local function make_mouse_binding(dir, streak, button, mods, action)
         return {
             event = { [dir] = { streak = streak, button = button } },
