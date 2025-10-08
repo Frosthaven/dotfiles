@@ -42,7 +42,7 @@ packages:
         apt: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
         pac: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
     2-language-rust:
-        win: "if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process -FilePath rustup-init.exe -ArgumentList '-y' -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; $msysBash='C:\\msys64\\usr\\bin\\bash.exe'; if (Test-Path $msysBash) { & $msysBash -lc 'pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel'; $mingwBin='C:\\msys64\\mingw64\\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\\bin'; if (Test-Path (Join-Path $mingwBin 'gcc.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; rustup target add x86_64-pc-windows-gnu; rustc --version; rustup component add rust-analyzer } else { Write-Error 'gcc.exe not found in MSYS2 mingw64' } } else { Write-Error 'MSYS2 bash.exe not found' } }"
+        win: if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process -FilePath rustup-init.exe -ArgumentList '-y' -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; $msysBash='C:\msys64\usr\bin\bash.exe'; if (Test-Path $msysBash) { & $msysBash -lc 'pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel'; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo
         mac: brew install rust; brew install rustup;
         apt: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
         pac: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
@@ -99,7 +99,7 @@ packages:
         apt: CARAPACE_VERSION=v0.22.0 && if ! command -v carapace >/dev/null 2>&1 || [[ "$(carapace --version | awk '{print $3}')" != "$CARAPACE_VERSION" ]]; then curl -LO https://github.com/rsteube/carapace-bin/releases/download/$CARAPACE_VERSION/carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && mkdir -p ~/.local/bin && tar -xzf carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz -C ~/.local/bin carapace && rm carapace-bin_$CARAPACE_VERSION-linux_amd64.tar.gz && echo "Carapace $CARAPACE_VERSION installed."; else echo "Carapace $CARAPACE_VERSION is already installed."; fi && mkdir -p ~/.local/bin
         pac: yay -S --noconfirm carapace-bin
     shell-starship: # prompt
-        win: choco install starship.portable -y
+        win: if (-not (Get-Command starship -ErrorAction SilentlyContinue)) { choco install starship.portable -y }
         mac: brew install starship
         apt: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
         pac: curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir ~/.local/bin
@@ -198,7 +198,7 @@ packages:
         apt: uv tool install --python 3.12 posting
         pac: pipx install posting
     cli-mkdocs:
-        win: uv tool install --python 3.12 mkdocs-material
+        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv tool install --python 3.12 mkdocs }; uv tool install --python 3.12 mkdocs-material
         mac: pipx install mkdocs-material --include-deps
         apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
         pac: pipx install mkdocs-material --include-deps
