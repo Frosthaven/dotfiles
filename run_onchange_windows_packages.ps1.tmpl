@@ -11,7 +11,7 @@ $currentHash = (CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-
 
 $hashChanged = $true
 if (Test-Path $hashFilePath) {
-    $previousHash = Get-Content $hashFilePath -Raw
+    $previousHash = (Get-Content $hashFilePath -Raw).Trim()
     if ($previousHash -eq $currentHash) {
         $hashChanged = $false
     }
@@ -22,8 +22,8 @@ if (-not $hashChanged) {
     exit
 }
 
-# Save the hash cleanly
-$currentHash | Set-Content -Encoding ASCII $hashFilePath
+# Save the hash cleanly (single line, no newline)
+$currentHash | Set-Content -Encoding ASCII -NoNewline $hashFilePath
 
 # ----------------------------------------
 # ADMIN CHECK
@@ -80,11 +80,6 @@ foreach ($pkg in $packages) {
     Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
     Invoke-Expression $pkg.Script
 }
-
-# ----------------------------------------
-# SAVE HASH AFTER INSTALL
-# ----------------------------------------
-$currentHash | Out-File -Encoding ASCII $hashFilePath
 
 Write-Host ""
 Read-Host -Prompt "Done! Press Enter to exit the package installer."
