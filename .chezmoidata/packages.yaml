@@ -26,7 +26,7 @@ packages:
         apt: sudo apt install nodejs npm
         pac: yes | sudo pacman -S --needed nodejs npm
     1-language-package-manager-pnpm:
-        win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression; $env:PNPM_HOME="$env:USERPROFILE\.local\share\pnpm"; $env:Path="$env:PNPM_HOME;$env:Path" }
+        win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { $old=$env:PNPM_HOME; Remove-Item Env:PNPM_HOME -ErrorAction SilentlyContinue; Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression; $env:PNPM_HOME="$env:USERPROFILE\.local\share\pnpm"; $env:Path+=";$env:PNPM_HOME"; [Environment]::SetEnvironmentVariable("PNPM_HOME",$env:PNPM_HOME,"User"); [Environment]::SetEnvironmentVariable("Path",$env:Path,"User"); if($old){$env:PNPM_HOME=$old} }
         mac: if (! (command -v pnpm >/dev/null 2>&1)) { export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh - }
         apt: if ! command -v pnpm >/dev/null 2>&1; then export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh -; fi
         pac: if ! command -v pnpm >/dev/null 2>&1; then export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh -; fi
@@ -332,7 +332,7 @@ packages:
         apt: flatpak install flathub com.slack.Slack -y
         pac: yay -S --noconfirm slack-desktop
     desktop-spotify: # music
-        win: $pkg = "Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
+        win: $pkg="Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg --scope user }; try { winget pin add $pkg } catch {}
         mac: brew install spotify
         apt: flatpak install flathub com.spotify.Client -y
         pac: flatpak install flathub com.spotify.Client -y
