@@ -98,21 +98,41 @@ M.setup = function()
     }
 
     -- ----------------------------------------
-    -- Detect VM and fallback frontend
+    -- Windows VM detection
     -- ----------------------------------------
-    local function running_in_vm()
-        local sysinfo = wezterm.run_child_process({ "wmic", "computersystem", "get", "model" })
-        local output = table.concat(sysinfo, "")
-        output = output:lower()
-        return output:find("virtual") or output:find("qemu") or output:find("vmware") or output:find("hyper-v")
-    end
+    if osTag == "windows" then
+        local function running_in_vm()
+            local ok, output = pcall(wezterm.run_child_process, {
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                [[
+                $keys = @(
+                    "HKLM:\HARDWARE\DESCRIPTION\System",
+                    "HKLM:\HARDWARE\DESCRIPTION\System\BIOS"
+                )
+                foreach ($key in $keys) {
+                    Get-ItemProperty $key | ForEach-Object {
+                        $_.SystemManufacturer, $_.SystemProductName
+                    }
+                }
+                ]],
+            })
+            if ok and output then
+                local text = table.concat(output, " "):lower()
+                if text:match("vmware") or text:match("virtualbox") or text:match("hyper%-v") or text:match("qemu") then
+                    return true
+                end
+            end
+            return false
+        end
 
-    if running_in_vm() then
-        wezterm.log_warn("VM detected; forcing software frontend")
-        config.front_end = "Software"
-    else
-        -- default to OpenGL, fallback to Software if initialization fails
-        config.front_end = "OpenGL"
+        if running_in_vm() then
+            wezterm.log_warn("VM detected; forcing Software frontend")
+            config.front_end = "Software"
+        else
+            config.front_end = "OpenGL"
+        end
     end
 
     return config
