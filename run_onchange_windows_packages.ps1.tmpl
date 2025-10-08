@@ -1,14 +1,15 @@
 {{ if eq .chezmoi.os "windows" -}}
 
 # ----------------------------------------
-# FILEHASH CHECK (in-memory only)
+# COMPUTE PACKAGES.YAML HASH
 # ----------------------------------------
 $packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
+$currentHash = (CertUtil -hashfile $packagesFile SHA256 |
+    Where-Object { $_ -match '^[0-9A-F]{2,}' } |
+    ForEach-Object { ($_ -replace '\s','') }) -join ''
 
-# Get SHA256 hash as a single string
-$currentHash = (CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() }) -join ''
-
-Write-Host "Packages.yaml SHA256: $currentHash" -ForegroundColor Cyan
+# Output hash as part of template so chezmoi tracks changes
+Write-Output "Packages.yaml SHA256: $currentHash"
 
 # ----------------------------------------
 # ADMIN CHECK
@@ -27,7 +28,7 @@ if (-not $isAdmin) {
 }
 
 # ----------------------------------------
-# BUILD PACKAGE LIST
+# BUILD PACKAGE LIST (IN ORDER)
 # ----------------------------------------
 $packages = @()
 {{- $withWin := dict -}}
@@ -57,23 +58,16 @@ Write-Host ""
 # EXECUTE PACKAGES
 # ----------------------------------------
 foreach ($pkg in $packages) {
-    # Refresh PATH from system + user in case previous installs modified it
+    # Refresh PATH from system + user
     $env:Path = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ';' +
                 [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
 
     $currentPackage++
     Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
-
-    # Optional: check for main binary before running
-    try {
-        Invoke-Expression $pkg.Script
-    } catch {
-        Write-Warning "Error installing $($pkg.Name): $_"
-    }
+    Invoke-Expression $pkg.Script
 }
 
 Write-Host ""
-Write-Host "Finished processing packages. Current packages.yaml hash: $currentHash" -ForegroundColor Green
-Read-Host -Prompt "Press Enter to exit the package installer"
+Read-Host -Prompt "Done! Press Enter to exit the package installer."
 
 {{ end -}}
