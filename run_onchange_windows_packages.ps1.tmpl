@@ -1,29 +1,14 @@
 {{ if eq .chezmoi.os "windows" -}}
 
 # ----------------------------------------
-# FILEHASH CHECK
+# FILEHASH CHECK (in-memory only)
 # ----------------------------------------
 $packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
-$hashFilePath = "$HOME/.local/share/chezmoi/.chezmoidata/packages.hash"
 
 # Get SHA256 hash as a single string
 $currentHash = (CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() }) -join ''
 
-$hashChanged = $true
-if (Test-Path $hashFilePath) {
-    $previousHash = (Get-Content $hashFilePath -Raw).Trim()
-    if ($previousHash -eq $currentHash) {
-        $hashChanged = $false
-    }
-}
-
-if (-not $hashChanged) {
-    Write-Host "No changes in packages.yml; skipping package installation." -ForegroundColor Green
-    exit
-}
-
-# Save the hash cleanly (single line, no newline)
-$currentHash | Set-Content -Encoding ASCII -NoNewline $hashFilePath
+Write-Host "Packages.yaml SHA256: $currentHash" -ForegroundColor Cyan
 
 # ----------------------------------------
 # ADMIN CHECK
@@ -78,10 +63,17 @@ foreach ($pkg in $packages) {
 
     $currentPackage++
     Write-Host "----- [$currentPackage/$totalPackages] $($pkg.Name) -----" -ForegroundColor Magenta
-    Invoke-Expression $pkg.Script
+
+    # Optional: check for main binary before running
+    try {
+        Invoke-Expression $pkg.Script
+    } catch {
+        Write-Warning "Error installing $($pkg.Name): $_"
+    }
 }
 
 Write-Host ""
-Read-Host -Prompt "Done! Press Enter to exit the package installer."
+Write-Host "Finished processing packages. Current packages.yaml hash: $currentHash" -ForegroundColor Green
+Read-Host -Prompt "Press Enter to exit the package installer"
 
 {{ end -}}
