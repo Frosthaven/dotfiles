@@ -3,10 +3,20 @@ local helpers = require("lua/module/helpers")
 
 local M = {}
 
+-- Helper: detect common VMs
+local function running_in_vm()
+    local uname = io.popen("systeminfo"):read("*a") or ""
+    local vm_strings = { "VirtualBox", "VMware", "KVM", "QEMU", "Hyper-V" }
+    for _, s in ipairs(vm_strings) do
+        if uname:match(s) then
+            return true
+        end
+    end
+    return false
+end
+
 M.setup = function()
-    -- -------------------------
-    -- Platform-specific options
-    -- -------------------------
+    -- load priority: platform specific > common
     local opts = {
         linux = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "Thin", scale = 1 }),
@@ -15,16 +25,11 @@ M.setup = function()
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiBold", scale = 1 }),
             win32_system_backdrop = "Acrylic",
             window_background_opacity = 0.88,
-            default_prog = { "nu.exe" },
         },
         macos = {
             font = wezterm.font({ family = "JetBrainsMono NF", weight = "DemiLight", scale = 1 }),
             font_size = 15,
             macos_window_background_blur = 50,
-            default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" },
-            set_environment_variables = {
-                PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-            },
         },
         common = {
             font_size = 10.5,
@@ -32,6 +37,7 @@ M.setup = function()
             window_background_opacity = 0.94,
             window_decorations = "INTEGRATED_BUTTONS | RESIZE",
             window_close_confirmation = "NeverPrompt",
+            webgpu_preferred_adapter = helpers.getIdealGPU(),
             bold_brightens_ansi_colors = true,
             freetype_load_target = "Normal",
             freetype_render_target = "HorizontalLcd",
@@ -46,23 +52,48 @@ M.setup = function()
         },
     }
 
+    -- platform defaults
     local osTag = helpers.osTag()
-    if osTag == "linux" then
-        opts.linux.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
-        opts.set_environment_variables = {
+    local platform_config = opts[osTag] or {}
+    local common = opts.common or {}
+    local config = helpers.mergeTables(common, platform_config)
+
+    -- default shell per platform
+    if osTag == "windows" then
+        config.default_prog = { "nu.exe" }
+    elseif osTag == "macos" then
+        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        config.set_environment_variables = {
+            PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        }
+    elseif osTag == "linux" then
+        config.default_prog = { os.getenv("HOME") .. "/.cargo/bin/nu" }
+        config.set_environment_variables = {
             PATH = os.getenv("HOME") .. "/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
         }
     end
 
-    -- Merge common + platform-specific
-    local config = helpers.mergeTables(opts.common, opts[osTag] or {})
+    -- attach ideal frontend if helper exists
+    if helpers.attachIdealFrontend then
+        config = helpers.attachIdealFrontend(config)
+    end
 
-    -- Attach ideal frontend (WebGPU/OpenGL/etc.)
-    config = helpers.attachIdealFrontend(config)
+    -- Force Software on VMs or fallback if OpenGL fails
+    if running_in_vm() then
+        wezterm.log_warn("VM detected; forcing Software frontend")
+        config.front_end = "Software"
+    else
+        -- attempt OpenGL, fallback to EGL if fails
+        local success, _ = pcall(function()
+            config.front_end = "OpenGL"
+        end)
+        if not success then
+            wezterm.log_warn("OpenGL failed; switching to Software")
+            config.front_end = "Software"
+        end
+    end
 
-    -- -------------------------
-    -- Mouse selection copy behavior
-    -- -------------------------
+    -- copy on select bindings
     local function make_mouse_binding(dir, streak, button, mods, action)
         return {
             event = { [dir] = { streak = streak, button = button } },
@@ -70,7 +101,6 @@ M.setup = function()
             action = action,
         }
     end
-
     config.mouse_bindings = {
         make_mouse_binding(
             "Up",
@@ -97,49 +127,6 @@ M.setup = function()
         make_mouse_binding("Up", 2, "Left", "NONE", wezterm.action.CompleteSelection("ClipboardAndPrimarySelection")),
         make_mouse_binding("Up", 3, "Left", "NONE", wezterm.action.CompleteSelection("ClipboardAndPrimarySelection")),
     }
-
-    -- -------------------------
-    -- Detect VM on Windows
-    -- -------------------------
-    local function running_in_vm()
-        if osTag ~= "windows" then
-            return false
-        end
-
-        local ok, output = pcall(wezterm.run_child_process, {
-            "powershell",
-            "-NoProfile",
-            "-Command",
-            [[
-            $keys = @(
-                "HKLM:\HARDWARE\DESCRIPTION\System",
-                "HKLM:\HARDWARE\DESCRIPTION\System\BIOS"
-            )
-            foreach ($key in $keys) {
-                Get-ItemProperty $key | ForEach-Object {
-                    $_.SystemManufacturer, $_.SystemProductName
-                }
-            }
-            ]],
-        })
-
-        if not ok or not output then
-            return false
-        end
-
-        -- make sure output is a string
-        local text = type(output) == "table" and table.concat(output, " ") or tostring(output)
-        text = text:lower()
-
-        return text:match("vmware") or text:match("virtualbox") or text:match("hyper%-v") or text:match("qemu")
-    end
-
-    if running_in_vm() then
-        wezterm.log_warn("VM detected; forcing software frontend")
-        config.front_end = "Software"
-    else
-        config.front_end = "OpenGL"
-    end
 
     return config
 end
