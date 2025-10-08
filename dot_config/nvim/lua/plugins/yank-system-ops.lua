@@ -2,18 +2,28 @@ local local_yank_system_ops = {
     Darwin = '/Volumes/T7 Black Shield/repositories-personal/yank-system-ops.nvim/',
     Linux = '/mnt/vault/github/repositories-personal/yank-system-ops.nvim/',
     Windows_NT = 'X:/github/repositories-personal/yank-system-ops.nvim/',
+    VM = '~/Github/repositories-personal/yank-system-ops.nvim/',
 }
 
 local native_clipboard = {
     Darwin = '/Volumes/T7 Black Shield/repositories-personal/native-clipboard.nvim/',
     Linux = '/mnt/vault/github/repositories-personal/native-clipboard.nvim/',
     Windows_NT = 'X:/github/repositories-personal/native-clipboard.nvim/',
+    VM = '~/Github/repositories-personal/native-clipboard.nvim/',
 }
+
+local native_clipboard_path = vim.fn.expand(native_clipboard[vim.loop.os_uname().sysname])
+local yank_system_ops_path = vim.fn.expand(local_yank_system_ops[vim.loop.os_uname().sysname])
+
+if not vim.loop.fs_stat(native_clipboard_path) then
+    native_clipboard_path = native_clipboard['VM']
+    yank_system_ops_path = local_yank_system_ops['VM']
+end
 
 
 return {
     {
-        dir = native_clipboard[vim.loop.os_uname().sysname],
+        dir = native_clipboard_path,
         -- 'frosthaven/native-clipboard.nvim',
         enabled = true,
         lazy = false,
@@ -45,7 +55,7 @@ return {
         }
     },
     {
-        dir = local_yank_system_ops[vim.loop.os_uname().sysname],
+        dir = yank_system_ops_path,
         -- 'frosthaven/yank-system-ops.nvim',
         enabled = true,
         lazy = false,
