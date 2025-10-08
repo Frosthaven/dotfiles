@@ -4,8 +4,10 @@
 # FILEHASH CHECK
 # ----------------------------------------
 $packagesFile = "$HOME/.local/share/chezmoi/.chezmoidata/packages.yaml"
-$currentHash = CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() } | Out-String
 $hashFilePath = "$HOME/.local/share/chezmoi/.chezmoidata/packages.hash"
+
+# Get SHA256 hash as a single string
+$currentHash = (CertUtil -hashfile $packagesFile SHA256 | Select-String "^[0-9A-F]{2}" | ForEach-Object { $_.ToString().Trim() }) -join ''
 
 $hashChanged = $true
 if (Test-Path $hashFilePath) {
@@ -19,6 +21,9 @@ if (-not $hashChanged) {
     Write-Host "No changes in packages.yml; skipping package installation." -ForegroundColor Green
     exit
 }
+
+# Save the hash cleanly
+$currentHash | Set-Content -Encoding ASCII $hashFilePath
 
 # ----------------------------------------
 # ADMIN CHECK
