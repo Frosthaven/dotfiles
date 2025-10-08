@@ -57,7 +57,7 @@ M.setup = function()
         },
     }
 
-    -- Merge platform with common
+    -- Merge platform-specific with common
     local osTag = helpers.osTag()
     local platform_config = opts[osTag] or {}
     local config = helpers.mergeTables(opts.common, platform_config)
@@ -78,11 +78,14 @@ M.setup = function()
         config = helpers.attachIdealFrontend(config)
     end
 
-    -- Force software frontend in VMs; otherwise OpenGL
+    -- Frontend selection
     if is_vm then
+        -- Safe fallback for VMs
         config.front_end = "Software"
     else
+        -- Physical hardware: prefer OpenGL, try EGL if available
         config.front_end = "OpenGL"
+        config.prefer_egl = true
     end
 
     -- Mouse bindings
