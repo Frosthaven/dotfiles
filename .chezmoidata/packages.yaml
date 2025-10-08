@@ -198,7 +198,7 @@ packages:
         apt: uv tool install --python 3.12 posting
         pac: pipx install posting
     cli-mkdocs:
-        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material --include-deps }
+        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv python install --default 3.12; uv tool install mkdocs mkdocs-material --include-deps }
         mac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
         apt: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
         pac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material --include-deps }
@@ -332,7 +332,7 @@ packages:
         apt: flatpak install flathub com.slack.Slack -y
         pac: yay -S --noconfirm slack-desktop
     desktop-spotify: # music
-        win: $pkg="Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { Start-Process powershell -ArgumentList "-NoProfile -Command `"winget install --id $pkg --scope machine --accept-source-agreements --accept-package-agreements`"" -Wait }; try { winget pin add $pkg } catch {}
+        win: Write-Output "Spotify installation via winget doesn't work as admin. Please install manually from https://www.spotify.com/download/windows/"
         mac: brew install spotify
         apt: flatpak install flathub com.spotify.Client -y
         pac: flatpak install flathub com.spotify.Client -y
