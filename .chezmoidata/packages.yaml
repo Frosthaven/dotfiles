@@ -26,10 +26,10 @@ packages:
         apt: sudo apt install nodejs npm
         pac: yes | sudo pacman -S --needed nodejs npm
     1-language-package-manager-pnpm:
-        win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression; $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "Machine") }
-        mac: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
-        apt: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
-        pac: command -v pnpm >/dev/null 2>&1 || curl -fsSL https://get.pnpm.io/install.sh | sh -
+        win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression; $env:PNPM_HOME="$env:USERPROFILE\.local\share\pnpm"; $env:Path="$env:PNPM_HOME;$env:Path" }
+        mac: if (! (command -v pnpm >/dev/null 2>&1)) { export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh - }
+        apt: if ! command -v pnpm >/dev/null 2>&1; then export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh -; fi
+        pac: if ! command -v pnpm >/dev/null 2>&1; then export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh -; fi
 
     # programming languages ***************************************************
     # *************************************************************************
@@ -42,7 +42,7 @@ packages:
         apt: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
         pac: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
     2-language-rust:
-        win: if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process -FilePath rustup-init.exe -ArgumentList '-y' -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; $msysBash='C:\msys64\usr\bin\bash.exe'; if (Test-Path $msysBash) { & $msysBash -lc 'pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel'; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo
+        win: if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe; Start-Process -FilePath rustup-init.exe -ArgumentList '-y' -Wait; Remove-Item rustup-init.exe; winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; $msysBash='C:\msys64\usr\bin\bash.exe'; if (Test-Path $msysBash) { & $msysBash -lc 'pacman -Syu --noconfirm mingw-w64-x86_64-toolchain base-devel'; $mingwBin='C:\msys64\mingw64\bin'; $cargoBin=Join-Path $env:USERPROFILE '.cargo\bin'; if (Test-Path (Join-Path $mingwBin 'gcc.exe')) { $env:Path += ';' + $mingwBin + ';' + $cargoBin; rustup target add x86_64-pc-windows-gnu; rustc --version; rustup component add rust-analyzer } else { Write-Error 'gcc.exe not found in MSYS2 mingw64' } } else { Write-Error 'MSYS2 bash.exe not found' } }
         mac: brew install rust; brew install rustup;
         apt: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
         pac: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
@@ -198,10 +198,10 @@ packages:
         apt: uv tool install --python 3.12 posting
         pac: pipx install posting
     cli-mkdocs:
-        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv tool install --python 3.12 mkdocs }; uv tool install --python 3.12 mkdocs-material
-        mac: pipx install mkdocs-material --include-deps
-        apt: uv tool install --python 3.12 mkdocs-material 2>/dev/null
-        pac: pipx install mkdocs-material --include-deps
+        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material }
+        mac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
+        apt: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
+        pac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material --include-deps }
     cli-prettier:
         win: if (-not (npm list -g prettier -s 2>$null)) { npm install -g prettier }
         mac: bash -c "npm list -g prettier || npm install -g prettier"
