@@ -123,12 +123,15 @@ M.setup = function()
             ]],
         })
 
-        if ok and type(output) == "table" then
-            local text = table.concat(output, " "):lower()
-            return text:match("vmware") or text:match("virtualbox") or text:match("hyper%-v") or text:match("qemu")
+        if not ok or not output then
+            return false
         end
 
-        return false
+        -- make sure output is a string
+        local text = type(output) == "table" and table.concat(output, " ") or tostring(output)
+        text = text:lower()
+
+        return text:match("vmware") or text:match("virtualbox") or text:match("hyper%-v") or text:match("qemu")
     end
 
     if running_in_vm() then
