@@ -35,14 +35,14 @@ packages:
     # *************************************************************************
 
     2-visual-studio-build-tools:
-        win: winget install --id Microsoft.VisualStudio.2022.BuildTools
+        win: winget install --id Microsoft.VisualStudio.2022.BuildTools -e --accept-package-agreements --accept-source-agreements --override "--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional"
     2-language-zig: # needed to auto-compile telescope in neovim cross-platform
         win: winget install --id zig.zig
         mac: brew install zig
         apt: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
         pac: ZIG_VERSION=0.12.0 && if ! command -v zig >/dev/null 2>&1 || [[ "$(zig version)" != "$ZIG_VERSION" ]]; then mkdir -p ~/.local/bin && curl -LO https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz && tar -xf zig-linux-x86_64-$ZIG_VERSION.tar.xz && mv zig-linux-x86_64-$ZIG_VERSION/zig ~/.local/bin/zig && rm -rf zig-linux-x86_64-$ZIG_VERSION* && echo "Zig $ZIG_VERSION installed."; else echo "Zig $ZIG_VERSION is already installed."; fi
     2-language-rust:
-        win: winget install --id Rustlang.Rust.GNU --accept-package-agreements --accept-source-agreements; choco install mingw -y; $mingwBin = "C:\ProgramData\mingw64\mingw64\bin"; $cargoBin = "$env:USERPROFILE\.cargo\bin"; if (Test-Path "$mingwBin\dlltool.exe") { $env:Path += ";$mingwBin;$cargoBin"; dlltool --version } else { Write-Error "dlltool.exe not found at $mingwBin" }; winget install --id=Rustlang.Rustup;
+        win: winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; & "C:\msys64\usr\bin\bash.exe" -lc "pacman -Syu --noconfirm && pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain"; $mingwBin = 'C:\msys64\mingw64\bin'; $cargoBin = \"$env:USERPROFILE\.cargo\bin\"; if (Test-Path \"$mingwBin\dlltool.exe\") { $env:Path += \";$mingwBin;$cargoBin\"; dlltool --version } else { Write-Error \"dlltool.exe not found at $mingwBin\" }; winget install --id=Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements; $env:Path += \";$cargoBin\"; rustup toolchain install stable-x86_64-pc-windows-gnu; rustup default stable-x86_64-pc-windows-gnu; rustup target add x86_64-pc-windows-gnu; rustc --version
         mac: brew install rust; brew install rustup;
         apt: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
         pac: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; . "$HOME/.cargo/env"
