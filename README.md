@@ -2,7 +2,7 @@
 
 This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
 
-## Installation
+## Automatic Deployment
 
 <details>
 
@@ -39,11 +39,15 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_D
 # Run chezmoi init as non-admin
 Start-Process powershell -ArgumentList 'chezmoi init https://github.com/Frosthaven/dotfiles' -WorkingDirectory $env:USERPROFILE
 
+# Install Rust Toolchain with GCC
+winget install --id MSYS2.MSYS2 -e --accept-package-agreements --accept-source-agreements; & "C:\msys64\usr\bin\bash.exe" -lc "pacman -Syu --noconfirm && pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain"; $mingwBin = 'C:\msys64\mingw64\bin'; $cargoBin = \"$env:USERPROFILE\.cargo\bin\"; if (Test-Path \"$mingwBin\dlltool.exe\") { $env:Path += \";$mingwBin;$cargoBin\"; dlltool --version } else { Write-Error \"dlltool.exe not found at $mingwBin\" }; winget install --id=Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements; $env:Path += \";$cargoBin\"; rustup toolchain install stable-x86_64-pc-windows-gnu; rustup default stable-x86_64-pc-windows-gnu; rustup target add x86_64-pc-windows-gnu; rustc --version
+
+chezmoi update
 ```
 
 </details>
 
-## Deployment
+## Manual Deployment
 
 1. Clone this repository into `~/.local/share/chezmoi`.
 2. Run `chezmoi -v apply`.
