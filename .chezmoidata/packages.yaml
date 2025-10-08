@@ -332,7 +332,7 @@ packages:
         apt: flatpak install flathub com.slack.Slack -y
         pac: yay -S --noconfirm slack-desktop
     desktop-spotify: # music
-        win: $pkg="Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg --scope user }; try { winget pin add $pkg } catch {}
+        win: $pkg="Spotify.Spotify"; if (-not (winget list --id $pkg | Select-String $pkg)) { Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -Command `"winget install --id $pkg --scope user`"" -Wait }; try { winget pin add $pkg } catch {}
         mac: brew install spotify
         apt: flatpak install flathub com.spotify.Client -y
         pac: flatpak install flathub com.spotify.Client -y
