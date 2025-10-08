@@ -198,7 +198,7 @@ packages:
         apt: uv tool install --python 3.12 posting
         pac: pipx install posting
     cli-mkdocs:
-        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material }
+        win: if (-not (Get-Command mkdocs -ErrorAction SilentlyContinue)) { uv python install --default 3.12 --yes; $env:Path = "$env:USERPROFILE\.uv\python\3.12\Scripts;" + $env:Path; uv run pip install mkdocs mkdocs-material }
         mac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
         apt: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material 2>/dev/null }
         pac: if (! (command -v mkdocs)) { uv python install --default 3.12; uv run pip install mkdocs mkdocs-material --include-deps }
