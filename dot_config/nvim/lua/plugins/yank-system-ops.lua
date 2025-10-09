@@ -57,24 +57,24 @@ return {
                             { title = 'Debug' }
                     )
 
-                    if clipboard:has_tag('html') then
+                    if clipboard:has('html') then
                         vim.notify(
-                            clipboard:tag('html'),
+                            clipboard:get('html'),
                             vim.log.levels.INFO,
                             { title = 'HTML' }
                         )
                     end
 
-                    if clipboard:has_tag('rtf') then
+                    if clipboard:has('rtf') then
                         vim.notify(
-                            clipboard:tag('rtf'),
+                            clipboard:get('rtf'),
                             vim.log.levels.INFO,
                             { title = 'RICH TEXT' }
                         )
                     end
 
-                    if clipboard:has_tag('image') then
-                        local image_data = clipboard:tag('image')
+                    if clipboard:has('image') then
+                        local image_data = clipboard:get('image')
                         vim.notify(
                             string.format(
                                 'Clipboard contains image\n - %d bytes',
@@ -85,16 +85,16 @@ return {
                         )
                     end
 
-                    if clipboard:has_tag('text') then
+                    if clipboard:has('text') then
                         vim.notify(
-                            clipboard:tag('text'),
+                            clipboard:get('text'),
                             vim.log.levels.INFO,
                             { title = 'TEXT' }
                         )
                     end
 
-                    if clipboard:has_tag('files') then
-                        local files = clipboard:tag('files')
+                    if clipboard:has('files') then
+                        local files = clipboard:get('files')
                         local file_list = table.concat(files, "\n")
                         vim.notify(
                             file_list,
