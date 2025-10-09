@@ -33,7 +33,8 @@ return {
         keys = {
             {
                 '<leader>yc', function()
-                    local map = require('native_clipboard').list_tag_type_map()
+                    local clipboard = require('native_clipboard')
+                    local map = clipboard.list_tag_type_map()
                     local lines = {}
 
                     for tag, list in pairs(map) do
@@ -49,7 +50,59 @@ return {
                         table.insert(lines, "<clipboard is empty>")
                     end
 
-                    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = 'Clipboard Content' })
+                    vim.notify(
+                        table.concat(
+                            lines, "\n"),
+                            vim.log.levels.DEBUG,
+                            { title = 'Debug' }
+                    )
+
+                    if clipboard:has_tag('html') then
+                        vim.notify(
+                            clipboard:tag('html'),
+                            vim.log.levels.INFO,
+                            { title = 'HTML' }
+                        )
+                    end
+
+                    if clipboard:has_tag('rtf') then
+                        vim.notify(
+                            clipboard:tag('rtf'),
+                            vim.log.levels.INFO,
+                            { title = 'RICH TEXT' }
+                        )
+                    end
+
+                    if clipboard:has_tag('image') then
+                        local image_data = clipboard:tag('image')
+                        vim.notify(
+                            string.format(
+                                'Clipboard contains image\n - %d bytes',
+                                #image_data
+                            ),
+                            vim.log.levels.INFO,
+                            { title = 'IMAGE' }
+                        )
+                    end
+
+                    if clipboard:has_tag('text') then
+                        vim.notify(
+                            clipboard:tag('text'),
+                            vim.log.levels.INFO,
+                            { title = 'TEXT' }
+                        )
+                    end
+
+                    if clipboard:has_tag('files') then
+                        local files = clipboard:tag('files')
+                        local file_list = table.concat(files, "\n")
+                        vim.notify(
+                            file_list,
+                            vim.log.levels.INFO,
+                            { title = 'FILES' }
+                        )
+                    end
+
                 end, desc = 'Show clipboard content',
             },
         }
