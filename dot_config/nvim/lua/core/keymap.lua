@@ -9,10 +9,6 @@ vim.g.maplocalleader = ' '
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' })
 
--- Don't lose clipboard content when pasting in visual mode -------------------
-
-vim.keymap.set('v', '<leader>p', '"0p', { desc = 'Paste from clipboard register' })
-
 -- Center Screen When Jumping -------------------------------------------------
 
 vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
