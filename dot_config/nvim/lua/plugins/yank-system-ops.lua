@@ -79,7 +79,7 @@ return {
                     if image then
                         vim.notify(
                             vim.inspect({
-                                data = '(binary)',
+                                data = '(blob)',
                                 bytes = image.bytes,
                                 extension = image.extension,
                                 type = image.type,
