@@ -57,7 +57,8 @@ return {
                             { title = 'Debug' }
                     )
 
-                    if clipboard:has('html') then
+                    local html = clipboard:get('html')
+                    if html then
                         vim.notify(
                             clipboard:get('html'),
                             vim.log.levels.INFO,
@@ -65,7 +66,8 @@ return {
                         )
                     end
 
-                    if clipboard:has('rtf') then
+                    local rtf = clipboard:get('rtf')
+                    if rtf then
                         vim.notify(
                             clipboard:get('rtf'),
                             vim.log.levels.INFO,
@@ -73,19 +75,40 @@ return {
                         )
                     end
 
-                    if clipboard:has('image') then
-                        local image_data = clipboard:get('image')
+                    local image = clipboard:get('image')
+                    if image then
                         vim.notify(
-                            string.format(
-                                'Clipboard contains image\n - %d bytes',
-                                #image_data
-                            ),
+                            vim.inspect({
+                                data = '(binary)',
+                                bytes = image.bytes,
+                                extension = image.extension,
+                                type = image.type,
+                            }),
                             vim.log.levels.INFO,
                             { title = 'IMAGE' }
                         )
+
+                        -- save the image to clipboard_image.png in downloads
+                        local f = io.open(vim.fn.expand '~/Downloads/' .. 'clipboard_image.' .. image.extension, 'wb')
+                        if f then
+                            f:write(image.data)
+                            f:close()
+                            vim.notify(
+                                'Image saved to clipboard_image.' .. image.extension,
+                                vim.log.levels.INFO,
+                                { title = 'IMAGE' }
+                            )
+                        else
+                            vim.notify(
+                                'Failed to save image to clipboard_image.' .. image.extension,
+                                vim.log.levels.ERROR,
+                                { title = 'IMAGE' }
+                            )
+                        end
                     end
 
-                    if clipboard:has('text') then
+                    local text = clipboard:get('text')
+                    if text then
                         vim.notify(
                             clipboard:get('text'),
                             vim.log.levels.INFO,
@@ -93,9 +116,9 @@ return {
                         )
                     end
 
-                    if clipboard:has('files') then
-                        local files = clipboard:get('files')
-                        local file_list = table.concat(files, "\n")
+                    local files = clipboard:get('files')
+                    if files then
+                        local file_list = " - " .. table.concat(files, "\n - ")
                         vim.notify(
                             file_list,
                             vim.log.levels.INFO,
