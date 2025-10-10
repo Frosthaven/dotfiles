@@ -89,22 +89,22 @@ return {
                         )
 
                         -- save the image to clipboard_image.png in downloads
-                        local f = io.open(vim.fn.expand '~/Downloads/' .. 'clipboard_image.' .. image.extension, 'wb')
-                        if f then
-                            f:write(image.data)
-                            f:close()
-                            vim.notify(
-                                'Image saved to clipboard_image.' .. image.extension,
-                                vim.log.levels.INFO,
-                                { title = 'IMAGE' }
-                            )
-                        else
-                            vim.notify(
-                                'Failed to save image to clipboard_image.' .. image.extension,
-                                vim.log.levels.ERROR,
-                                { title = 'IMAGE' }
-                            )
-                        end
+                        -- local f = io.open(vim.fn.expand '~/Downloads/' .. 'clipboard_image.' .. image.extension, 'wb')
+                        -- if f then
+                        --     f:write(image.data)
+                        --     f:close()
+                        --     vim.notify(
+                        --         'Image saved to clipboard_image.' .. image.extension,
+                        --         vim.log.levels.INFO,
+                        --         { title = 'IMAGE' }
+                        --     )
+                        -- else
+                        --     vim.notify(
+                        --         'Failed to save image to clipboard_image.' .. image.extension,
+                        --         vim.log.levels.ERROR,
+                        --         { title = 'IMAGE' }
+                        --     )
+                        -- end
                     end
 
                     local text = clipboard:get('text')
