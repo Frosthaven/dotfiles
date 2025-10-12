@@ -20,7 +20,6 @@ if not vim.loop.fs_stat(native_clipboard_path) then
     yank_system_ops_path = local_yank_system_ops['VM']
 end
 
-
 return {
     {
         dir = native_clipboard_path,
@@ -31,7 +30,86 @@ return {
             debug = false,
         },
         keys = {
-            {
+            { -- test setting text
+                '<leader>yst', function()
+                    local clipboard = require('native_clipboard')
+                    clipboard:set('text', 'hello world')
+                    vim.notify('Set clipboard text to "hello world"', vim.log.levels.INFO, { title = 'Info' })
+                end, desc = 'Set clipboard to text',
+
+            },
+            { -- test setting html
+                '<leader>ysh', function()
+                    local clipboard = require('native_clipboard')
+                    local html_content = [[
+                        <h1 style="color: blue;">Hello World</h1>
+                        <p>This is a <strong>test</strong> of <em>HTML</em> content in the clipboard.</p>
+                        <ul>
+                            <li>Item 1</li>
+                            <li>Item 2</li>
+                            <li>Item 3</li>
+                        </ul>
+                    ]]
+                    clipboard:set('html', html_content)
+                    vim.notify('Set clipboard HTML content', vim.log.levels.INFO, { title = 'Info' })
+                end, desc = 'Set clipboard to HTML',
+            },
+            { -- test setting rtf
+                '<leader>ysr', function()
+                    local clipboard = require('native_clipboard')
+                    local rtf_content = [[
+                        {\rtf1\ansi\deff0
+                        {\fonttbl{\f0\fswiss Helvetica;}}
+                        {\colortbl;\red0\green0\blue0;\red255\green0\blue0;}
+                        \f0\fs24
+                        This is some \b bold\b0  text.\par
+                        This is some \i italic\i0  text.\par
+                        This is some \cf2 colored\cf0  text.\par
+                        }
+                    ]]
+                    clipboard:set('rtf', rtf_content)
+                    vim.notify('Set clipboard RTF content', vim.log.levels.INFO, { title = 'Info' })
+                end, desc = 'Set clipboard to RTF',
+            },
+            { -- test setting image
+                '<leader>ysi', function()
+                    local clipboard = require('native_clipboard')
+                    local image_path = vim.fn.expand '~/Downloads/test.png'
+                    local f = io.open(image_path, 'rb')
+                    if not f then
+                        vim.notify(
+                            'Failed to open ' .. image_path,
+                            vim.log.levels.ERROR,
+                            { title = 'IMAGE' }
+                        )
+                        return
+                    end
+                    local data = f:read '*a'
+                    f:close()
+
+                    clipboard:set('image', {
+                        data = data,
+                        extension = 'png',
+                    })
+                    vim.notify('Set clipboard image from ' .. image_path, vim.log.levels.INFO, { title = 'Info' })
+                end, desc = 'Set clipboard to image',
+            },
+            { -- test setting files
+                '<leader>ysf', function()
+                    local clipboard = require('native_clipboard')
+                    local files = {
+                        vim.fn.expand '~/Downloads/test.png',
+                        vim.fn.expand '~/Downloads/test',
+                    }
+                    clipboard:set('files', files)
+                    vim.notify(
+                        'Set clipboard files to:\n - ' .. table.concat(files, '\n - '),
+                        vim.log.levels.INFO,
+                        { title = 'Info' }
+                    )
+                end, desc = 'Set clipboard to files',
+            },
+            { -- test clibboard get
                 '<leader>yc', function()
                     local clipboard = require('native_clipboard')
                     local map = clipboard.list_tag_type_map()
@@ -87,24 +165,6 @@ return {
                             vim.log.levels.INFO,
                             { title = 'IMAGE' }
                         )
-
-                        -- save the image to clipboard_image.png in downloads
-                        -- local f = io.open(vim.fn.expand '~/Downloads/' .. 'clipboard_image.' .. image.extension, 'wb')
-                        -- if f then
-                        --     f:write(image.data)
-                        --     f:close()
-                        --     vim.notify(
-                        --         'Image saved to clipboard_image.' .. image.extension,
-                        --         vim.log.levels.INFO,
-                        --         { title = 'IMAGE' }
-                        --     )
-                        -- else
-                        --     vim.notify(
-                        --         'Failed to save image to clipboard_image.' .. image.extension,
-                        --         vim.log.levels.ERROR,
-                        --         { title = 'IMAGE' }
-                        --     )
-                        -- end
                     end
 
                     local text = clipboard:get('text')
