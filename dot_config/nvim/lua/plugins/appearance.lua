@@ -29,8 +29,30 @@ return {
         priority = 1000,
         config = function()
             vim.cmd.colorscheme 'catppuccin-mocha'
-            vim.cmd([[highlight ColorColumn guibg=#101521]])
-            vim.cmd([[highlight Whitespace guifg=#363748]])
-        end,
+
+            local colors = require("catppuccin.palettes").get_palette()
+            local function update_cursor_color()
+                local mode = vim.fn.mode()
+                local color
+                if mode == 'n' then
+                    color = colors.blue
+                elseif mode == 'v' or mode == 'V' or mode == '\22' then
+                    color = colors.mauve
+                elseif mode == 'c' then
+                    color = colors.peach
+                elseif mode == 'i' then
+                    color = colors.green
+                else
+                    color = colors.overlay2
+                end
+                vim.cmd("highlight Cursor guifg=NONE guibg=" .. color)
+            end
+
+            update_cursor_color()
+            vim.api.nvim_create_autocmd("ModeChanged", {
+                callback = update_cursor_color
+            })
+
+        end
     },
 }
