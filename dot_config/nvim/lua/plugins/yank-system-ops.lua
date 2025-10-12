@@ -54,23 +54,6 @@ return {
                     vim.notify('Set clipboard HTML content', vim.log.levels.INFO, { title = 'Info' })
                 end, desc = 'Set clipboard to HTML',
             },
-            { -- test setting rtf
-                '<leader>ysr', function()
-                    local clipboard = require('native_clipboard')
-                    local rtf_content = [[
-                        {\rtf1\ansi\deff0
-                        {\fonttbl{\f0\fswiss Helvetica;}}
-                        {\colortbl;\red0\green0\blue0;\red255\green0\blue0;}
-                        \f0\fs24
-                        This is some \b bold\b0  text.\par
-                        This is some \i italic\i0  text.\par
-                        This is some \cf2 colored\cf0  text.\par
-                        }
-                    ]]
-                    clipboard:set('rtf', rtf_content)
-                    vim.notify('Set clipboard RTF content', vim.log.levels.INFO, { title = 'Info' })
-                end, desc = 'Set clipboard to RTF',
-            },
             { -- test setting image
                 '<leader>ysi', function()
                     local clipboard = require('native_clipboard')
@@ -138,18 +121,9 @@ return {
                     local html = clipboard:get('html')
                     if html then
                         vim.notify(
-                            clipboard:get('html'),
+                            html,
                             vim.log.levels.INFO,
                             { title = 'HTML' }
-                        )
-                    end
-
-                    local rtf = clipboard:get('rtf')
-                    if rtf then
-                        vim.notify(
-                            clipboard:get('rtf'),
-                            vim.log.levels.INFO,
-                            { title = 'RICH TEXT' }
                         )
                     end
 
@@ -170,7 +144,7 @@ return {
                     local text = clipboard:get('text')
                     if text then
                         vim.notify(
-                            clipboard:get('text'),
+                            text,
                             vim.log.levels.INFO,
                             { title = 'TEXT' }
                         )
