@@ -33,7 +33,7 @@ return {
             { -- test setting text
                 '<leader>yst', function()
                     local clipboard = require('native_clipboard')
-                    clipboard:set('text', 'hello world')
+                    clipboard:set('text', 'hello world 😀')
                     vim.notify('Set clipboard text to "hello world"', vim.log.levels.INFO, { title = 'Info' })
                 end, desc = 'Set clipboard to text',
 
