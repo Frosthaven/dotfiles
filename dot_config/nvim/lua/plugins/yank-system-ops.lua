@@ -34,8 +34,8 @@ return {
                 '<leader>yst', function()
                     local clipboard = require('native_clipboard')
                     clipboard:set('text', 'hello world 😀')
-                    vim.notify('Set clipboard text to "hello world"', vim.log.levels.INFO, { title = 'Info' })
-                end, desc = 'Set clipboard to text',
+                    vim.notify('Set clipboard text', vim.log.levels.INFO, { title = 'config' })
+                end, desc = 'Set clipboard text',
 
             },
             { -- test setting html
@@ -51,8 +51,8 @@ return {
                         </ul>
                     ]]
                     clipboard:set('html', html_content)
-                    vim.notify('Set clipboard HTML content', vim.log.levels.INFO, { title = 'Info' })
-                end, desc = 'Set clipboard to HTML',
+                    vim.notify('Set clipboard html', vim.log.levels.INFO, { title = 'config' })
+                end, desc = 'Set clipboard html',
             },
             { -- test setting image
                 '<leader>ysi', function()
@@ -74,8 +74,8 @@ return {
                         data = data,
                         extension = 'png',
                     })
-                    vim.notify('Set clipboard image from ' .. image_path, vim.log.levels.INFO, { title = 'Info' })
-                end, desc = 'Set clipboard to image',
+                    vim.notify('Set clipboard image', vim.log.levels.INFO, { title = 'config' })
+                end, desc = 'Set clipboard image',
             },
             { -- test setting files
                 '<leader>ysf', function()
@@ -86,11 +86,91 @@ return {
                     }
                     clipboard:set('files', files)
                     vim.notify(
-                        'Set clipboard files to:\n - ' .. table.concat(files, '\n - '),
-                        vim.log.levels.INFO,
-                        { title = 'Info' }
+                        'Set clipboard files', vim.log.levels.INFO, { title = 'config' }
                     )
-                end, desc = 'Set clipboard to files',
+                end, desc = 'Set clipboard files',
+            },
+            { -- test getting text
+                '<leader>ygt', function()
+                    local clipboard = require('native_clipboard')
+                    local text = clipboard:get('text')
+                    if text then
+                        vim.notify(
+                            text,
+                            vim.log.levels.INFO,
+                            { title = 'TEXT' }
+                        )
+                    else
+                        vim.notify(
+                            '<no text in clipboard>',
+                            vim.log.levels.WARN,
+                            { title = 'TEXT' }
+                        )
+                    end
+                end, desc = 'Get clipboard text',
+            },
+            { -- test getting html
+                '<leader>ygh', function()
+                    local clipboard = require('native_clipboard')
+                    local html = clipboard:get('html')
+                    if html then
+                        vim.notify(
+                            html,
+                            vim.log.levels.INFO,
+                            { title = 'HTML' }
+                        )
+                    else
+                        vim.notify(
+                            '<no HTML in clipboard>',
+                            vim.log.levels.WARN,
+                            { title = 'HTML' }
+                        )
+                    end
+                end, desc = 'Get clipboard HTML',
+            },
+            { -- test getting image
+                '<leader>ygi', function()
+                    local clipboard = require('native_clipboard')
+                    local image = clipboard:get('image')
+                    if image then
+                        vim.notify(
+                            vim.inspect({
+                                data = '(blob)',
+                                bytes = image.bytes,
+                                extension = image.extension,
+                                type = image.type,
+                            }),
+                            vim.log.levels.INFO,
+                            { title = 'IMAGE' }
+                        )
+                    else
+                        vim.notify(
+                            '<no IMAGE in clipboard>',
+                            vim.log.levels.WARN,
+                            { title = 'IMAGE' }
+                        )
+                    end
+                end, desc = 'Get clipboard image',
+            },
+            { -- test getting files
+                '<leader>ygf', function()
+                    local clipboard = require('native_clipboard')
+                    local files = clipboard:get('files')
+                    if files then
+                        local file_list = " - " .. table.concat(files, "\n - ")
+                        vim.notify(
+                            file_list,
+                            vim.log.levels.INFO,
+                            { title = 'FILES' }
+                        )
+                    else
+                        vim.notify(
+                            '<no FILES in clipboard>',
+                            vim.log.levels.WARN,
+                            { title = 'FILES' }
+                        )
+                    end
+                end, desc = 'Get clipboard files',
             },
             { -- test clibboard get
                 '<leader>yc', function()
