@@ -6,8 +6,8 @@ local isPadded = false
 local FocusedNeovimProcesses = {}
 
 local defaultTitle = "WezTerm - " .. wezterm.hostname()
-local maxTitleLength = 20 -- maximum length of the tab title
-local maxProjectLength = 5 -- maximum length of the project name
+local maxTitleLength = 30 -- maximum length of the tab title
+local maxProjectLength = 7 -- maximum length of the project name
 local maxFinalLength = maxTitleLength + 14 -- the extra 14 is for the padding and icon length usage
 
 local extensionToIcon = {
