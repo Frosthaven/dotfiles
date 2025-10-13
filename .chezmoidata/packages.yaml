@@ -325,7 +325,7 @@ packages:
         win: $pkg = "Discord.Discord"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
         mac: brew install discord
         apt: flatpak install flathub com.discordapp.Discord -y
-        pac: flatpak install flathub com.discordapp.Discord -y
+        pac: yes | sudo pacman -Syu --needed discord
     desktop-slack: # chat
         win: winget install --id SlackTechnologies.Slack
         mac: brew install slack
