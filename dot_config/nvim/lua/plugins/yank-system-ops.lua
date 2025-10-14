@@ -247,6 +247,10 @@ return {
     {
         dir = yank_system_ops_path,
         -- 'frosthaven/yank-system-ops.nvim',
+        dependencies = {
+            dir = native_clipboard_path,
+            -- 'frosthaven/native-clipboard.nvim'
+        },
         enabled = true,
         lazy = false,
         opts = {
