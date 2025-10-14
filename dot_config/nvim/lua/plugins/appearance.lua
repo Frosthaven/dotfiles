@@ -45,9 +45,11 @@ return {
                 else
                     color = colors.overlay2
                 end
+                vim.cmd("highlight CursorLineNr guifg=" .. color)
                 vim.cmd("highlight Cursor guifg=NONE guibg=" .. color)
+                vim.cmd("highlight ColorColumn guibg=#101521")
+                vim.cmd("highlight Whitespace guifg=#313243")
             end
-
             update_cursor_color()
             vim.api.nvim_create_autocmd("ModeChanged", {
                 callback = update_cursor_color
