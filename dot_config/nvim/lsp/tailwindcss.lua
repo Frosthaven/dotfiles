@@ -55,15 +55,15 @@ return {
                         'templates/bundles/EasyAdminBundle/**',
                     },
                     -- skeleton-website-framework
-                    -- ['tailwind.2.admin.css'] = {
-                    --     'assets/local-assets/react/admin/**',
-                    --     'templates/admin/**',
-                    --     'templates/bundles/EasyAdminBundle/**',
-                    --     'src/Controller/Admin/**',
-                    -- },
-                    -- ['tailwind.1.app.css'] = {
-                    --     '**/*',
-                    -- },
+                    ['tailwind.2.admin.css'] = {
+                        'assets/local-assets/react/admin/**',
+                        'templates/admin/**',
+                        'templates/bundles/EasyAdminBundle/**',
+                        'src/Controller/Admin/**',
+                    },
+                    ['tailwind.1.app.css'] = {
+                        '**/*',
+                    },
                 },
                 classRegex = {
                     -- 1) Twig variable sets:
