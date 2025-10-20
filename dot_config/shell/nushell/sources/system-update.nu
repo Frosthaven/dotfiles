@@ -122,10 +122,10 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         print "Updating Flatpak..."
-        flatpak update --appstream -y
+        sudo flatpak update --appstream -y
         print ""
         print "Updating all Flatpak remotes..."
-        flatpak update -y
+        sudo flatpak update -y
     }
 
     if ($nu.os-info.family == "windows") {
