@@ -26,7 +26,6 @@ def sysup [] {
     if (which pacman | is-empty) {
         # nothing
     } else {
-        # check if we have yay installed
         if (which yay | is-empty) {
             print ""
             print "🔄 Updating Arch packages -------------------------------------"
@@ -53,7 +52,11 @@ def sysup [] {
         rustup update
         print ""
         print "Updating all global Cargo packages..."
-        cargo install --list | lines | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' } | each {|l| $l | split row ' ' | get 0 } | par-each {|c| cargo install $c }
+        cargo install --list
+            | lines
+            | where {|l| $l =~ '^[a-z0-9_-]+ v[0-9.]+:$' }
+            | each {|l| $l | split row ' ' | get 0 }
+            | par-each {|c| cargo install $c }
     }
 
     if (which uv | is-empty) {
@@ -67,7 +70,6 @@ def sysup [] {
         uv tool upgrade --all
     }
 
-    # Determine which package manager to use: prefer pnpm > npm > yarn
     let pkg_manager = if (which pnpm | default null) != null {
         "pnpm"
     } else if (which npm | default null) != null {
@@ -77,7 +79,7 @@ def sysup [] {
     } else {
         ""
     }
-    # If none found, do nothing
+
     if ($pkg_manager == "") {
         print "⚠️  No package manager (pnpm, npm, or yarn) found in PATH."
     } else {
@@ -129,6 +131,7 @@ def sysup [] {
     }
 
     if ($nu.os-info.family == "windows") {
+
         if (which scoop | is-empty) {
             # nothing
         } else {
@@ -136,7 +139,6 @@ def sysup [] {
             print "🔄 Updating Scoop packages ------------------------------------"
             print "---------------------------------------------------------------"
             print ""
-            print "Updating all Scoop packages..."
             scoop update
         }
 
@@ -147,7 +149,6 @@ def sysup [] {
             print "🔄 Updating Chocolatey packages -------------------------------"
             print "---------------------------------------------------------------"
             print ""
-            print "Updating all Chocolatey packages..."
             powershell -Command "$p = Start-Process -FilePath choco -ArgumentList 'upgrade all -y' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
 
@@ -158,11 +159,13 @@ def sysup [] {
             print "🔄 Updating Winget packages -----------------------------------"
             print "---------------------------------------------------------------"
             print ""
-            print "Updating all Winget packages..."
             powershell -Command "$p = Start-Process winget -ArgumentList 'upgrade','--all','--include-unknown' -Verb RunAs -PassThru; $p.WaitForExit()"
         }
     }
 
+    #
+    # ✔️ NEW: SAFE MAS UPDATE (Option B)
+    #
     if (which mas | is-empty) {
         # nothing
     } else {
@@ -172,7 +175,29 @@ def sysup [] {
         print "---------------------------------------------------------------"
         print ""
         print "Updating Mac App Store apps..."
-        mas upgrade
+
+        # First attempt
+        let first = (mas upgrade | complete)
+
+        if ($first.exit_code != 0) {
+
+            print ""
+            print "⚠️ MAS failed — restarting App Store services..."
+            print ""
+
+            sudo killall installd storeaccountd storeassetd storedownloadd ^/dev/null
+
+            sleep 1sec
+
+            print "Retrying MAS update..."
+            let second = (mas upgrade | complete)
+
+            if ($second.exit_code != 0) {
+                print ""
+                print "❌ MAS upgrade failed after retry. Likely App Store login issue."
+                print "   Please open the App Store app and re-sign-in."
+            }
+        }
     }
 
     if (which brew | is-empty) {
@@ -199,7 +224,6 @@ def sysup [] {
         print "🔄 Updating Chezmoi configuration -----------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating Chezmoi..."
         chezmoi update
     }
 
@@ -210,8 +234,7 @@ def sysup [] {
         print "🔄 Updating Neovim --------------------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating nvim via bob..."
-        bob update
+        bob update nightly
         print ""
     }
 
@@ -222,7 +245,6 @@ def sysup [] {
         print "🔄 Updating Neovim plugins ------------------------------------"
         print "---------------------------------------------------------------"
         print ""
-        print "Updating all plugins..."
         nvim --headless "+Lazy! update" "+MasonUpdate" +qa
         print ""
     }
