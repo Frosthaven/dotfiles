@@ -8,6 +8,16 @@ export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/share/bob/nightly/bin:
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
+# SSH Agent configuration for Arch-based distros with COSMIC desktop
+if command -v pacman &>/dev/null && [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
+    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
+    
+    # Auto-start service if not running
+    if ! systemctl --user is-active --quiet ssh-agent.service; then
+        systemctl --user start ssh-agent.service
+    fi
+fi
+
 # Starship prompt
 eval "$(starship init bash)"
 
