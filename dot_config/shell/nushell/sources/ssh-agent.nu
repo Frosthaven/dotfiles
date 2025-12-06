@@ -1,5 +1,5 @@
 # SSH Agent configuration for Arch-based distros with COSMIC desktop
-if (which pacman | is-not-empty) and ($env.XDG_CURRENT_DESKTOP? == "COSMIC") {
+if (which pacman | is-not-empty) and (($env.XDG_CURRENT_DESKTOP? | default "" | str downcase) == "cosmic") {
     # Set SSH_AUTH_SOCK to systemd user service socket
     $env.SSH_AUTH_SOCK = $"($env.XDG_RUNTIME_DIR)/ssh-agent.socket"
     
