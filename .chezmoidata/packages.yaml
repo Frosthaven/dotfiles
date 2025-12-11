@@ -128,10 +128,10 @@ packages:
         apt: sudo snap install yazi --classic
         pac: sudo pacman -S --needed yazi ffmpeg p7zip jq poppler fd ripgrep fzf zoxide imagemagick
     cli-bob-neovim: # neovim, provided by bob version manager
-        win: cargo install --git https://github.com/MordechaiHadad/bob.git --no-default-features --features native-tls; bob use nightly;
-        mac: cargo install --git https://github.com/MordechaiHadad/bob.git --no-default-features --features native-tls; bob use nightly;
-        apt: cargo install --git https://github.com/MordechaiHadad/bob.git --no-default-features --features native-tls; bob use nightly;
-        pac: cargo install --git https://github.com/MordechaiHadad/bob.git --no-default-features --features native-tls; bob use nightly;
+        win: cargo install bob-nvim;
+        mac: cargo install bob-nvim;
+        apt: cargo install bob-nvim;
+        pac: cargo install bob-nvim;
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
