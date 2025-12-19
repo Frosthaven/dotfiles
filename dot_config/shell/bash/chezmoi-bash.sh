@@ -1,3 +1,6 @@
+# add /usr/local/bin (system-wide binaries like rclone)
+export PATH="/usr/local/bin:$PATH"
+
 # add $HOME/.local/bin binaries to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
