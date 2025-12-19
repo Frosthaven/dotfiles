@@ -1,3 +1,6 @@
+# Add /usr/local/bin (system-wide binaries like rclone)
+set -gx PATH /usr/local/bin $PATH
+
 # Add $HOME/.local/bin to PATH
 set -gx PATH $HOME/.local/bin $PATH
 
