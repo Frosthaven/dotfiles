@@ -4,6 +4,15 @@ return {
     dependencies = {
         { 'mason-org/mason.nvim', opts = {} },
         'neovim/nvim-lspconfig',
+        {
+            'WhoIsSethDaniel/mason-tool-installer.nvim',
+            opts = {
+                ensure_installed = {
+                    'stylua',
+                    'prettierd',
+                },
+            },
+        },
     },
     opts = {
         -- custom lsp configuration overrides are located in:
@@ -15,9 +24,7 @@ return {
             'tailwindcss',
             'intelephense',
             'twiggy_language_server',
-            'stylua',
             'biome',
-            'prettierd',
         },
         -- we automatically enable all lsp servers installed through mason. If
         -- there are servers that you'd rather manage at the system level or
