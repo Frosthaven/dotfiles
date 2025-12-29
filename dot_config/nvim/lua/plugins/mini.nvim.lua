@@ -107,6 +107,23 @@ return {
                 return '%2l:%-2v'
             end
 
+            -- Toggle comments with gc (e.g., gcc to comment line)
+            require('mini.comment').setup()
+
+            -- Git diff signs in the gutter
+            require('mini.diff').setup {
+                view = {
+                    style = 'sign',
+                    signs = { add = '│', change = '│', delete = '_' },
+                },
+            }
+
+            -- Animated scope-based indent guides
+            require('mini.indentscope').setup {
+                symbol = '│',
+                options = { try_as_border = true },
+            }
+
             -- ... and there is more!
             --  Check out: https://github.com/echasnovski/mini.nvim
         end,

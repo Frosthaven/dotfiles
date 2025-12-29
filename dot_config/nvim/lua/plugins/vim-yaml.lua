@@ -1,5 +1,5 @@
 return {
     "stephpy/vim-yaml",
     enabled = true,
-    lazy = true,
+    ft = { "yaml", "yml" },
 }

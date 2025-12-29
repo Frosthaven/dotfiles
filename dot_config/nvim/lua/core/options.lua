@@ -50,7 +50,6 @@ vim.opt.pumblend = 10                             -- popup menu transparency
 vim.opt.winblend = 0                              -- floating window transparency
 vim.opt.conceallevel = 0                          -- don't hide markup
 vim.opt.concealcursor = ""                        -- don't hide cursor line markup
-vim.opt.lazyredraw = true                         -- don't redraw during macros
 vim.opt.synmaxcol = 300                           -- syntax highlighting limit
 
 -- File handling --------------------------------------------------------------
@@ -76,7 +75,7 @@ vim.opt.backspace = "indent,eol,start"  -- better backspace behavior
 vim.opt.autochdir = false               -- don't auto change directory
 vim.opt.iskeyword:append("-")           -- treat dash as part of word
 vim.opt.path:append("**")               -- include subdirectories in search
-vim.opt.selection = "exclusive"         -- selection behavior
+vim.opt.selection = "inclusive"         -- selection behavior
 vim.opt.mouse = "a"                     -- enable mouse
 vim.opt.clipboard:append("unnamedplus") -- use system clipboard
 vim.opt.modifiable = true               -- allow buffer modifications
@@ -93,30 +92,29 @@ vim.api.nvim_create_autocmd(            -- highlight on yank
     }
 )
 
--- Diagnosti settings ---------------------------------------------------------
+-- Diagnostic settings ---------------------------------------------------------
 
 -- diagnostics messages
-vim.diagnostic.config({
-    virtual_text = true,      -- show inline error messages
-    underline = true,         -- underline problematic code
+vim.diagnostic.config {
+    virtual_text = true, -- show inline error messages
+    underline = true, -- underline problematic code
     update_in_insert = false, -- update diagnostics while in insert mode
-    severity_sort = true,     -- sort diagnostics by severity
+    severity_sort = true, -- sort diagnostics by severity
     float = {
-        border = "rounded",   -- border style for floating windows
-        source = "if_many",   -- show the diagnostic source (LSP name)
-        header = "",          -- optional header
-        prefix = "",          -- optional prefix
+        border = 'rounded', -- border style for floating windows
+        source = 'if_many', -- show the diagnostic source (LSP name)
+        header = '', -- optional header
+        prefix = '', -- optional prefix
     },
     signs = {
-        active = true, -- show signs in the sign column
-        values = {
-            { name = "DiagnosticSignError", text = "✖" },
-            { name = "DiagnosticSignWarn", text = "⚠" },
-            { name = "DiagnosticSignHint", text = "➤" },
-            { name = "DiagnosticSignInfo", text = "ℹ" },
+        text = {
+            [vim.diagnostic.severity.ERROR] = '✖',
+            [vim.diagnostic.severity.WARN] = '⚠',
+            [vim.diagnostic.severity.HINT] = '➤',
+            [vim.diagnostic.severity.INFO] = 'ℹ',
         },
     },
-})
+}
 
 -- Cursor settings ------------------------------------------------------------
 

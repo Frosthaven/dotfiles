@@ -24,7 +24,7 @@ return {
         -- through another plugin, you can exclude them here.
         automatic_enable = {
             exclude = {
-                -- 'rust_analyzer',
+                'rust_analyzer',
             },
         },
     },

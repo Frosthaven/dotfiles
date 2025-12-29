@@ -7,6 +7,12 @@ return {
         -- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md
         opts = {
             image = { enabled = true },
+            notifier = {
+                enabled = true,
+                style = 'compact',
+                timeout = 3000,
+                top_down = true,
+            },
             picker = {
                 matcher = {
                     fuzzy = true,
@@ -25,74 +31,55 @@ return {
             {
                 '<leader>sa',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker { filter = { cwd = true } }
                 end,
                 desc = '[A]ll Pickers',
             },
             {
                 '<leader>sf',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker.smart {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker.smart { filter = { cwd = true } }
                 end,
                 desc = '[F]iles',
             },
             {
                 '<leader>sg',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker.grep {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker.grep { filter = { cwd = true } }
                 end,
                 desc = '[G]rep',
             },
             {
                 '<leader>sb',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker.buffers {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker.buffers { filter = { cwd = true } }
                 end,
                 desc = '[B]uffers',
             },
             {
                 '<leader>sh',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker.help {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker.help { filter = { cwd = true } }
                 end,
                 desc = '[H]elp Tags',
             },
             {
                 '<leader>sr',
                 function()
-                    Snacks = require 'snacks'
-                    Snacks.picker.recent {
-                        filter = { cwd = true },
-                    }
+                    require('snacks').picker.recent { filter = { cwd = true } }
                 end,
                 desc = '[R]ecent',
             },
+            {
+                '<leader>sn',
+                function()
+                    require('snacks').notifier.show_history()
+                end,
+                desc = '[N]otification History',
+            },
         },
-        config = function()
-            -- setup notifier
-            require('snacks').setup {
-                notifier = {
-                    enabled = true,
-                    style = 'compact',
-                    timeout = 3000,
-                    top_down = true,
-                },
-            }
+        config = function(_, opts)
+            require('snacks').setup(opts)
             -- extra searches on lsp attach
             vim.api.nvim_create_autocmd('LspAttach', {
                 group = vim.api.nvim_create_augroup('SnacksLspAttach', { clear = false }),
@@ -101,13 +88,13 @@ return {
                         mode = mode or 'n'
                         vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
                     end
-                    Snacks = require 'snacks'
-                    map('<leader>lt', Snacks.picker.lsp_type_definitions, '[T]ypes')
-                    map('<leader>ld', Snacks.picker.lsp_definitions, '[D]efinitions')
-                    map('<leader>lD', Snacks.picker.lsp_declarations, '[D]eclarations')
-                    map('<leader>li', Snacks.picker.lsp_implementations, '[I]mplementations')
-                    map('<leader>lr', Snacks.picker.lsp_references, '[R]eferences')
-                    map('<leader>ls', Snacks.picker.lsp_symbols, '[S]ymbols')
+                    local picker = require('snacks').picker
+                    map('<leader>lt', picker.lsp_type_definitions, '[T]ypes')
+                    map('<leader>ld', picker.lsp_definitions, '[D]efinitions')
+                    map('<leader>lD', picker.lsp_declarations, '[D]eclarations')
+                    map('<leader>li', picker.lsp_implementations, '[I]mplementations')
+                    map('<leader>lr', picker.lsp_references, '[R]eferences')
+                    map('<leader>ls', picker.lsp_symbols, '[S]ymbols')
                 end,
             })
         end,

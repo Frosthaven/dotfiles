@@ -71,12 +71,6 @@ vim.keymap.set('n', '<leader>dp', keymap_helpers.show_prev_diagnostic_float, { d
 -- Toggle Terminal ------------------------------------------------------------
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-vim.keymap.set('n', '<leader>tt', function()
-    vim.cmd.vnew()
-    vim.cmd.term()
-    vim.cmd.wincmd 'J'
-    vim.api.nvim_win_set_height(0, 10)
-end, { desc = '[T]iny [T]erminal' })
 
 -- Toggle :Explore Buffer -----------------------------------------------------
 -- these :explore keymaps are loaded initially, but get replaced by navigation
