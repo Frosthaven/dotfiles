@@ -8,7 +8,6 @@ return {
             'WhoIsSethDaniel/mason-tool-installer.nvim',
             opts = {
                 ensure_installed = {
-                    'stylua',
                     'prettierd',
                 },
             },
@@ -25,6 +24,7 @@ return {
             'intelephense',
             'twiggy_language_server',
             'biome',
+            'stylua',
         },
         -- we automatically enable all lsp servers installed through mason. If
         -- there are servers that you'd rather manage at the system level or
