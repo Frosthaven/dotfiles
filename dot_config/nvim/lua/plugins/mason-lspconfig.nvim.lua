@@ -16,6 +16,8 @@ return {
             'intelephense',
             'twiggy_language_server',
             'stylua',
+            'biome',
+            'prettierd',
         },
         -- we automatically enable all lsp servers installed through mason. If
         -- there are servers that you'd rather manage at the system level or
