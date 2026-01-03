@@ -1,10 +1,12 @@
+{{- $isRepoOwner := promptBool "Are you the GitHub repository owner for this chezmoi configuration (y/n)" }}
+
 [data]
-  isRepoOwner = {{ promptBool "Are you the GitHub repository owner for this chezmoi configuration (y/n)" }}
+  isRepoOwner = {{ $isRepoOwner }}
 
 [edit]
   command = "nvim"
 
-{{- if .isRepoOwner }}
+{{- if $isRepoOwner }}
 
 encryption = "age"
 [age]
