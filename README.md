@@ -17,12 +17,12 @@ Are you the GitHub repository owner for this chezmoi configuration (y/n)?
 
 Identity files (SSH config, git config, rclone config) are encrypted with age. Before running `chezmoi apply`, you need to:
 
-1. **Install age** (encryption tool):
-   | Platform | Command |
-   |----------|---------|
-   | Arch | `sudo pacman -S age` |
-   | macOS | `brew install age` |
-   | Windows | `winget install FiloSottile.age` |
+1. **Install age and Proton Pass CLI**:
+   | Platform | Commands |
+   |----------|----------|
+   | Arch | `sudo pacman -S age` and `yay -S proton-pass-cli-bin` |
+   | macOS | `brew install age protonpass/tap/pass-cli` |
+   | Windows | `winget install FiloSottile.age Proton.ProtonPass` |
 
 2. **Login to Proton Pass**:
    ```bash

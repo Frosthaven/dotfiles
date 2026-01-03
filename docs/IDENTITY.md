@@ -17,33 +17,26 @@ This document explains how SSH keys, git config, and rclone are managed in this 
 
 Identity files are encrypted with age. Before running `chezmoi apply`:
 
-1. **Install age** (encryption tool):
-   | Platform | Command |
-   |----------|---------|
-   | Arch | `sudo pacman -S age` |
-   | macOS | `brew install age` |
-   | Windows | `winget install FiloSottile.age` |
+1. **Install age and Proton Pass CLI**:
+   | Platform | Commands |
+   |----------|----------|
+   | Arch | `sudo pacman -S age` and `yay -S proton-pass-cli-bin` |
+   | macOS | `brew install age protonpass/tap/pass-cli` |
+   | Windows | `winget install FiloSottile.age Proton.ProtonPass` |
 
-2. **Install Proton Pass CLI** (installed automatically via chezmoi packages, or manually):
-   | Platform | Command |
-   |----------|---------|
-   | Arch | `yay -S proton-pass-cli-bin` |
-   | macOS | `brew install protonpass/tap/pass-cli` |
-   | Windows | `winget install Proton.ProtonPass` |
-
-3. **Login to Proton Pass**:
+2. **Login to Proton Pass**:
    ```bash
    pass-cli login
    ```
 
-4. **Fetch the age decryption key**:
+3. **Fetch the age decryption key**:
    ```bash
    mkdir -p ~/.config/chezmoi
    pass-cli item view --vault-name "Personal" --item-title "chezmoi/age-key" --field private_key > ~/.config/chezmoi/key.txt
    chmod 600 ~/.config/chezmoi/key.txt
    ```
 
-5. **Run chezmoi**:
+4. **Run chezmoi**:
    ```bash
    chezmoi init <repo-url>   # Answer 'y' when prompted if you're the repo owner
    chezmoi apply
