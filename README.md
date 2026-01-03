@@ -13,6 +13,35 @@ Are you the GitHub repository owner for this chezmoi configuration (y/n)?
 - **Answer `y`** if you're Frosthaven - you'll get the full config including SSH, git, and rclone identity files
 - **Answer `n`** if you're someone else - identity files are skipped so you can set up your own
 
+### Repo Owner Setup (Frosthaven only)
+
+Identity files (SSH config, git config, rclone config) are encrypted with age. Before running `chezmoi apply`, you need to:
+
+1. **Install age** (encryption tool):
+   | Platform | Command |
+   |----------|---------|
+   | Arch | `sudo pacman -S age` |
+   | macOS | `brew install age` |
+   | Windows | `winget install FiloSottile.age` |
+
+2. **Login to Proton Pass**:
+   ```bash
+   pass-cli login
+   ```
+
+3. **Fetch the age decryption key**:
+   ```bash
+   mkdir -p ~/.config/chezmoi
+   pass-cli item view --vault-name "Personal" --item-title "chezmoi/age-key" --field private_key > ~/.config/chezmoi/key.txt
+   chmod 600 ~/.config/chezmoi/key.txt
+   ```
+
+4. **Run chezmoi**:
+   ```bash
+   chezmoi init <repo-url>
+   chezmoi apply
+   ```
+
 See [docs/IDENTITY.md](docs/IDENTITY.md) for details on managing SSH keys, git config, and rclone.
 
 ## Automatic Deployment

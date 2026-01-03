@@ -187,6 +187,11 @@ packages:
         mac: sudo -v ; curl https://rclone.org/install.sh | sudo bash
         apt: sudo -v ; curl https://rclone.org/install.sh | sudo bash
         pac: yes | sudo pacman -S --needed rclone
+    cli-age: # encryption tool for chezmoi
+        win: winget install --id FiloSottile.age
+        mac: brew install age
+        apt: sudo apt install age -y
+        pac: yes | sudo pacman -S --needed age
     cli-proton-pass: # password manager cli for secrets management
         win: $installScript = "$env:TEMP\pass-cli-install.ps1"; Invoke-WebRequest -Uri https://proton.me/download/pass-cli/install.ps1 -OutFile $installScript; & $installScript; Remove-Item $installScript -ErrorAction SilentlyContinue
         mac: brew install protonpass/tap/pass-cli

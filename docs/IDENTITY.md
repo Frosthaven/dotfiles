@@ -5,29 +5,62 @@ This document explains how SSH keys, git config, and rclone are managed in this 
 ## Overview
 
 - **SSH keys**: Stored in Proton Pass, loaded into SSH agent on shell start
-- **SSH config**: Managed by Chezmoi (`~/.ssh/config`)
-- **Git config**: Managed by Chezmoi with conditional includes for multiple identities
+- **SSH config**: Managed by Chezmoi (`~/.ssh/config`) - encrypted with age
+- **Git config**: Managed by Chezmoi with conditional includes for multiple identities - encrypted with age
 - **Rclone config**: Encrypted by rclone, synced by Chezmoi, password stored in Proton Pass
+
+**Note:** SSH config, git config, and rclone config are only applied for the repository owner (determined by the prompt during `chezmoi init`). These files are encrypted with age to protect identity information.
 
 ## First-Time Setup
 
-### 1. Install Proton Pass CLI
+### For Repository Owner
 
-Installed automatically via Chezmoi packages. Manual install if needed:
+Identity files are encrypted with age. Before running `chezmoi apply`:
 
-| Platform | Command |
-|----------|---------|
-| Arch | `yay -S proton-pass-cli-bin` |
-| macOS | `brew install protonpass/tap/pass-cli` |
-| Windows | Download from proton.me |
+1. **Install age** (encryption tool):
+   | Platform | Command |
+   |----------|---------|
+   | Arch | `sudo pacman -S age` |
+   | macOS | `brew install age` |
+   | Windows | `winget install FiloSottile.age` |
 
-### 2. Login to Proton Pass
+2. **Install Proton Pass CLI** (installed automatically via Chezmoi packages, or manually):
+   | Platform | Command |
+   |----------|---------|
+   | Arch | `yay -S proton-pass-cli-bin` |
+   | macOS | `brew install protonpass/tap/pass-cli` |
+   | Windows | Download from proton.me |
+
+3. **Login to Proton Pass**:
+   ```bash
+   pass-cli login
+   ```
+
+4. **Fetch the age decryption key**:
+   ```bash
+   mkdir -p ~/.config/chezmoi
+   pass-cli item view --vault-name "Personal" --item-title "chezmoi/age-key" --field private_key > ~/.config/chezmoi/key.txt
+   chmod 600 ~/.config/chezmoi/key.txt
+   ```
+
+5. **Run chezmoi**:
+   ```bash
+   chezmoi init <repo-url>   # Answer 'y' when prompted if you're the repo owner
+   chezmoi apply
+   ```
+
+### For Others
+
+If you're not the repository owner, identity files are skipped. Just run:
 
 ```bash
-pass-cli login
+chezmoi init <repo-url>   # Answer 'n' when prompted
+chezmoi apply
 ```
 
-### 3. Verify
+You'll need to set up your own git config, SSH config, and rclone config.
+
+### Verify Setup
 
 ```bash
 ssh-add -l          # Should list your SSH keys
@@ -53,6 +86,22 @@ SSH keys are stored in Proton Pass and loaded into the SSH agent automatically o
 - Shell startup checks if keys are already in agent (fast ~2ms check)
 - If agent is empty and you're logged into Proton Pass, keys are loaded automatically
 - No private key files are stored on disk - they live only in Proton Pass
+- SSH config file is encrypted with age in the chezmoi repository
+
+### Edit SSH config
+
+Since SSH config is encrypted, use `chezmoi edit`:
+
+```bash
+chezmoi edit ~/.ssh/config
+```
+
+Or edit the live file and re-add:
+
+```bash
+vim ~/.ssh/config
+chezmoi re-add ~/.ssh/config   # Re-encrypts and updates chezmoi source
+```
 
 ## Git Config
 
@@ -69,14 +118,19 @@ Git uses conditional includes for multiple identities based on repository path.
 
 ### Edit config
 
-```bash
-# Edit directly (changes take effect immediately)
-vim ~/.gitconfig
-chezmoi re-add ~/.gitconfig   # Persist to chezmoi
+Since git config files are encrypted, use `chezmoi edit` which handles decryption/encryption automatically:
 
-# Or edit via chezmoi
-chezmoi edit ~/.gitconfig
-chezmoi apply
+```bash
+chezmoi edit ~/.gitconfig                      # Main config
+chezmoi edit ~/.gitconfigs/personal.gitconfig  # Personal identity
+chezmoi edit ~/.gitconfigs/iww.gitconfig       # Work identity
+```
+
+Changes take effect after running `chezmoi apply`, or edit the live file directly and re-add:
+
+```bash
+vim ~/.gitconfig
+chezmoi re-add ~/.gitconfig   # Re-encrypts and updates chezmoi source
 ```
 
 ### Add a new identity
@@ -188,6 +242,6 @@ Verify the repo path matches a conditional include pattern in `~/.gitconfig`.
 | Reload SSH keys | `pass-cli ssh-agent load` |
 | List rclone remotes | `rclone listremotes` |
 | Edit rclone config | `rclone-config` |
-| Edit SSH config | `chezmoi edit ~/.ssh/config && chezmoi apply` |
-| Edit git config | `vim ~/.gitconfig && chezmoi re-add ~/.gitconfig` |
+| Edit SSH config | `chezmoi edit ~/.ssh/config` |
+| Edit git config | `chezmoi edit ~/.gitconfig` |
 | Check Proton Pass status | `pass-cli info` |

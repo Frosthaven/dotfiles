@@ -31,8 +31,8 @@ README.md
 # Personal identity files - only for repo owner
 {{ if not .isRepoOwner }}
 private_dot_ssh/
-dot_gitconfig
+encrypted_dot_gitconfig.age
 dot_gitconfigs/
-dot_gitignore_global
+encrypted_dot_gitignore_global.age
 dot_config/rclone/
 {{ end }}
