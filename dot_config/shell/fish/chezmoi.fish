@@ -21,6 +21,28 @@ if command -v pacman &>/dev/null; and test "$XDG_CURRENT_DESKTOP" = "COSMIC"
     end
 end
 
+# Load SSH keys from Proton Pass (all vaults)
+if command -v pass-cli &>/dev/null
+    if pass-cli info &>/dev/null 2>&1
+        pass-cli ssh-agent load &>/dev/null
+        # Set rclone config password
+        set -l rclone_pass (pass-cli view "pass://Personal/rclone/password" 2>/dev/null)
+        if test -n "$rclone_pass"
+            set -gx RCLONE_CONFIG_PASS $rclone_pass
+        end
+    else
+        echo "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys."
+    end
+end
+
+# Helper: rclone-config - runs rclone config and syncs to chezmoi
+function rclone-config
+    rclone config
+    echo "Syncing rclone config to chezmoi..."
+    chezmoi re-add ~/.config/rclone/rclone.conf
+    echo "Done. Commit with: chezmoi git add -A && chezmoi git commit -m 'Update rclone config'"
+end
+
 # Starship prompt
 starship init fish | source
 

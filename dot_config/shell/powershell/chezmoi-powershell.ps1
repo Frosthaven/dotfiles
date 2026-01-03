@@ -95,3 +95,78 @@ $env:Path += ";$env:USERPROFILE\.cargo\bin"
 # Add PNPM to path
 $env:PNPM_HOME = "$env:USERPROFILE\.local\share\pnpm"
 $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
+
+# SSH AGENT + PROTON PASS *****************************************************
+# *****************************************************************************
+# Load SSH keys from Proton Pass into the SSH agent
+
+function Initialize-SshAgent {
+    # Start ssh-agent if not running
+    $sshAgent = Get-Process ssh-agent -ErrorAction SilentlyContinue
+    if (-not $sshAgent) {
+        Start-Service ssh-agent -ErrorAction SilentlyContinue
+    }
+
+    # Check if pass-cli is available
+    $passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
+    if (-not $passCli) {
+        return
+    }
+
+    # Check if logged in to Proton Pass
+    $loginStatus = pass-cli status 2>&1
+    if ($loginStatus -match "not logged in" -or $LASTEXITCODE -ne 0) {
+        Write-Host "[Proton Pass] Not logged in. Run 'pass-cli login' to load SSH keys." -ForegroundColor Yellow
+        return
+    }
+
+    # Load SSH keys from Proton Pass
+    try {
+        pass-cli ssh-agent load 2>&1 | Out-Null
+    } catch {
+        # Silently ignore errors
+    }
+}
+
+Initialize-SshAgent
+
+# RCLONE **********************************************************************
+# *****************************************************************************
+# Set rclone config password from Proton Pass
+
+function Initialize-RclonePassword {
+    # Check if pass-cli is available
+    $passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
+    if (-not $passCli) {
+        return
+    }
+
+    # Check if logged in to Proton Pass
+    $loginStatus = pass-cli status 2>&1
+    if ($loginStatus -match "not logged in" -or $LASTEXITCODE -ne 0) {
+        return
+    }
+
+    # Get rclone password from Proton Pass
+    try {
+        $password = pass-cli item get "pass://Personal/rclone/password" --field password 2>&1
+        if ($LASTEXITCODE -eq 0 -and $password) {
+            $env:RCLONE_CONFIG_PASS = $password
+        }
+    } catch {
+        # Silently ignore errors
+    }
+}
+
+Initialize-RclonePassword
+
+# Helper function: Edit rclone config and re-add to chezmoi
+function rclone-config {
+    rclone config
+    if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
+        $rcloneConfigPath = "$env:USERPROFILE\.config\rclone\rclone.conf"
+        if (Test-Path $rcloneConfigPath) {
+            chezmoi re-add $rcloneConfigPath
+        }
+    }
+}

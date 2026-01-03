@@ -12,6 +12,7 @@ $env.config.show_banner = false
 
 source ./sources/_env_path.nu
 source ./sources/ssh-agent.nu
+source ./sources/rclone.nu
 source ./sources/themes/catppuccin-mocha.nu
 source ./sources/cargo.nu
 source ./sources/nvim-bob.nu

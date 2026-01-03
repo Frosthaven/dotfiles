@@ -187,6 +187,16 @@ packages:
         mac: sudo -v ; curl https://rclone.org/install.sh | sudo bash
         apt: sudo -v ; curl https://rclone.org/install.sh | sudo bash
         pac: yes | sudo pacman -S --needed rclone
+    cli-proton-pass: # password manager cli for secrets management
+        win: $installScript = "$env:TEMP\pass-cli-install.ps1"; Invoke-WebRequest -Uri https://proton.me/download/pass-cli/install.ps1 -OutFile $installScript; & $installScript; Remove-Item $installScript -ErrorAction SilentlyContinue
+        mac: brew install protonpass/tap/pass-cli
+        apt: curl -fsSL https://proton.me/download/pass-cli/install.sh | bash
+        pac: yay -S --noconfirm proton-pass-cli-bin
+    desktop-proton-pass: # password manager desktop app
+        win: winget install --id Proton.ProtonPass
+        mac: brew install --cask proton-pass
+        apt: flatpak install flathub me.proton.Pass -y
+        pac: yay -S --noconfirm proton-pass-bin
     cli-stripe-cli: # stripe cli
         win: winget install --id Stripe.StripeCli
         mac: brew install stripe-cli

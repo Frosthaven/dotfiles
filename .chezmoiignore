@@ -1,6 +1,15 @@
 README.md
 **/history.txt
 
+# SSH - only manage config, not keys (keys are in Proton Pass)
+.ssh/id_*
+.ssh/*.pem
+.ssh/known_hosts
+.ssh/known_hosts.old
+.ssh/authorized_keys
+.ssh/clients
+.ssh/iww
+
 {{ if ne .chezmoi.os "windows" }}
 **/*windows_*
 .config/komorebi
