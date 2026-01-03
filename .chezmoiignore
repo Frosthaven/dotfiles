@@ -29,7 +29,7 @@ README.md
 {{ end }}
 
 # Personal identity files - only for repo owner
-{{ if not .isRepoOwner }}
+{{ if not (dig "isRepoOwner" false .) }}
 private_dot_ssh/
 encrypted_dot_gitconfig.age
 dot_gitconfigs/
