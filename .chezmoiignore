@@ -27,3 +27,12 @@ README.md
 {{ if ne .chezmoi.os "linux" }}
 **/*linux_*
 {{ end }}
+
+# Personal identity files - only for repo owner
+{{ if not .isRepoOwner }}
+private_dot_ssh/
+dot_gitconfig
+dot_gitconfigs/
+dot_gitignore_global
+dot_config/rclone/
+{{ end }}
