@@ -1,6 +1,6 @@
 # Frosthaven's dotfiles (managed by [chezmoi](https://github.com/twpayne/chezmoi))
 
-This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
+A cross-platform dotfiles setup providing a consistent tiling window manager and developer experience on Arch Linux, macOS, and Windows. Favors cross-platform packages where possible.
 
 ## First-Time Setup
 
@@ -42,15 +42,11 @@ Identity files (SSH config, git config, rclone config) are encrypted with age. B
    chezmoi apply
    ```
 
-See [docs/IDENTITY.md](docs/IDENTITY.md) for details on managing SSH keys, git config, and rclone.
+For full documentation on managing SSH keys, git identities, and rclone configuration, see [docs/IDENTITY.md](docs/IDENTITY.md).
 
-## Automatic Deployment
+## Automatic Deployment (Windows)
 
-<details>
-
-<summary>Windows</summary>
-
-Run the following in an Administrator Powershell terminal and reboot the machine afterward:
+Run the following in an Administrator PowerShell terminal and reboot afterward:
 
 ```ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
@@ -90,55 +86,57 @@ if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest 
 chezmoi update
 ```
 
-</details>
-
 ## Manual Deployment
 
-1. Clone this repository into `~/.local/share/chezmoi`.
-2. Run `chezmoi -v apply`.
-3. Apply optional configurations:
-    <details>
-    <summary>Windows - Automatically start tiling window manager</summary>
+1. Install [chezmoi](https://www.chezmoi.io/install/)
+2. Run `chezmoi init <repo-url>` and follow the prompts
+3. Run `chezmoi apply`
 
-    - create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
-    </details>
+## Platform-Specific Configuration
 
-    <details>
-    <summary>Windows - Fix Wezterm Transparency on Nvidia GPUs</summary>
+<details>
+<summary>Windows - Automatically start tiling window manager</summary>
 
-    - Open NVIDIA Control Panel
-    - Go to `Manage 3D Settings`
-    - Click the `Program Settings` tab
-    - Add wezterm if it isn't already in the list
-    - Change `OpenGL GDI Compatibility` to `Prefer compatible`
-    - Click Apply
-    </details>
+Create a shortcut in `shell:startup` with a value of `komorebic.exe start --bar --whkd`
 
-    <details>
-    <summary>Windows - Autohide the cursor</summary>
+</details>
 
-    - Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html) somewhere safe
-    - Run the downloaded exe
-    - Enable `Start with Windows`
-    - Enable `Hide when a key is pressed`
-    - Set the timer range to `3 seconds`
-    - Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
-    </details>
+<details>
+<summary>Windows - Fix Wezterm Transparency on Nvidia GPUs</summary>
 
-    <details>
-    <summary>MacOS - Autohide the cursor</summary>
+1. Open NVIDIA Control Panel
+2. Go to `Manage 3D Settings`
+3. Click the `Program Settings` tab
+4. Add wezterm if it isn't already in the list
+5. Change `OpenGL GDI Compatibility` to `Prefer compatible`
+6. Click Apply
 
-    - Access `cursorcerer` from the settings panel or spotlight search
-    - Set the automatic timeout to below 5 seconds
-    </details>
+</details>
 
-    <details>
-    <summary>MacOS - Disable Conflicting Hotkeys</summary>
+<details>
+<summary>Windows - Autohide the cursor</summary>
 
-    - Open `System Settings` -> `Keyboard` -> `Keyboard Shortcuts` -> `Mission Control`
-    - Disable or change all entries that use `ctrl + arrow` keys
-    </details>
+1. Download & save [AutoHideMouseCursor](https://www.majorgeeks.com/files/details/autohidemousecursor.html) somewhere safe
+2. Run the downloaded exe
+3. Enable `Start with Windows`
+4. Enable `Hide when a key is pressed`
+5. Set the timer range to `3 seconds`
+6. Set the strategy to aggressive via `# Options` > `Hide Mouse` > `New Strategy + Aggressive`
 
+</details>
 
+<details>
+<summary>macOS - Autohide the cursor</summary>
 
+1. Access `cursorcerer` from the settings panel or spotlight search
+2. Set the automatic timeout to below 5 seconds
 
+</details>
+
+<details>
+<summary>macOS - Disable Conflicting Hotkeys</summary>
+
+1. Open `System Settings` -> `Keyboard` -> `Keyboard Shortcuts` -> `Mission Control`
+2. Disable or change all entries that use `ctrl + arrow` keys
+
+</details>

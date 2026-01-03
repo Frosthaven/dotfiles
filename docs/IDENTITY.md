@@ -24,12 +24,12 @@ Identity files are encrypted with age. Before running `chezmoi apply`:
    | macOS | `brew install age` |
    | Windows | `winget install FiloSottile.age` |
 
-2. **Install Proton Pass CLI** (installed automatically via Chezmoi packages, or manually):
+2. **Install Proton Pass CLI** (installed automatically via chezmoi packages, or manually):
    | Platform | Command |
    |----------|---------|
    | Arch | `yay -S proton-pass-cli-bin` |
    | macOS | `brew install protonpass/tap/pass-cli` |
-   | Windows | Download from proton.me |
+   | Windows | `winget install Proton.ProtonPass` |
 
 3. **Login to Proton Pass**:
    ```bash
