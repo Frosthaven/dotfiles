@@ -2,6 +2,19 @@
 
 This collection of personal dotfiles attempts to provide a consistant tiling window manager and developer experience on all patforms. It does this by favoring cross-platform packages where possible.
 
+## First-Time Setup
+
+When you run `chezmoi init`, you'll be prompted:
+
+```
+Are you the GitHub repository owner for this chezmoi configuration (y/n)?
+```
+
+- **Answer `y`** if you're Frosthaven - you'll get the full config including SSH, git, and rclone identity files
+- **Answer `n`** if you're someone else - identity files are skipped so you can set up your own
+
+See [docs/IDENTITY.md](docs/IDENTITY.md) for details on managing SSH keys, git config, and rclone.
+
 ## Automatic Deployment
 
 <details>
