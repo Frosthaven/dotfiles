@@ -2,47 +2,19 @@
 
 A cross-platform dotfiles setup providing a consistent tiling window manager and developer experience on Arch Linux, macOS, and Windows. Favors cross-platform packages where possible.
 
-## First-Time Setup
+## Setup
 
-When you run `chezmoi init`, you'll be prompted:
-
-```
-Are you the GitHub repository owner for this chezmoi configuration (y/n)?
-```
-
-- **Answer `y`** if you're Frosthaven - you'll get the full config including SSH, git, and rclone identity files
-- **Answer `n`** if you're someone else - identity files are skipped so you can set up your own
-
-### Repo Owner Setup (Frosthaven only)
-
-Identity files (SSH config, git config, rclone config) are encrypted with age. Before running `chezmoi apply`, you need to:
-
-1. **Install age and Proton Pass CLI**:
-   | Platform | Commands |
-   |----------|----------|
-   | Arch | `sudo pacman -S age` and `yay -S proton-pass-cli-bin` |
-   | macOS | `brew install age protonpass/tap/pass-cli` |
-   | Windows | `winget install FiloSottile.age Proton.ProtonPass` |
-
-2. **Login to Proton Pass**:
+1. Install [chezmoi](https://www.chezmoi.io/install/)
+2. Run:
    ```bash
-   pass-cli login
-   ```
-
-3. **Fetch the age decryption key**:
-   ```bash
-   mkdir -p ~/.config/chezmoi
-   pass-cli item view --vault-name "Personal" --item-title "chezmoi/age-key" --field private_key > ~/.config/chezmoi/key.txt
-   chmod 600 ~/.config/chezmoi/key.txt
-   ```
-
-4. **Run chezmoi**:
-   ```bash
-   chezmoi init <repo-url>
+   chezmoi init https://github.com/Frosthaven/dotfiles
    chezmoi apply
    ```
+3. When prompted "Are you the GitHub repository owner?", answer `n`
 
-For full documentation on managing SSH keys, git identities, and rclone configuration, see [docs/IDENTITY.md](docs/IDENTITY.md).
+That's it! Identity files (SSH, git, rclone) are skipped - set up your own as needed.
+
+> **Frosthaven?** See [docs/OWNER.md](docs/OWNER.md) for repo owner setup.
 
 ## Automatic Deployment (Windows)
 
@@ -85,12 +57,6 @@ if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) { Invoke-WebRequest 
 
 chezmoi update
 ```
-
-## Manual Deployment
-
-1. Install [chezmoi](https://www.chezmoi.io/install/)
-2. Run `chezmoi init <repo-url>` and follow the prompts
-3. Run `chezmoi apply`
 
 ## Platform-Specific Configuration
 
