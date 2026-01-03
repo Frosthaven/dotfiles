@@ -17,19 +17,32 @@ if command -v pacman &>/dev/null && [[ "$XDG_CURRENT_DESKTOP" == "COSMIC" ]]; th
     fi
 fi
 
-# Load SSH keys from Proton Pass (all vaults)
+# Load SSH keys from Proton Pass (only if agent is empty)
 if command -v pass-cli &>/dev/null; then
-    if pass-cli info &>/dev/null 2>&1; then
-        pass-cli ssh-agent load &>/dev/null
-        # Set rclone config password
-        RCLONE_CONFIG_PASS=$(pass-cli view "pass://Personal/rclone/password" 2>/dev/null)
-        if [[ -n "$RCLONE_CONFIG_PASS" ]]; then
-            export RCLONE_CONFIG_PASS
-        fi
+    # Check if keys are already loaded (fast check)
+    if ssh-add -l &>/dev/null; then
+        # Keys already loaded, skip pass-cli calls
+        export PROTON_PASS_LOGGED_IN="true"
     else
-        echo "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys."
+        # No keys loaded, check if logged in to Proton Pass
+        if pass-cli info &>/dev/null 2>&1; then
+            export PROTON_PASS_LOGGED_IN="true"
+            pass-cli ssh-agent load &>/dev/null
+        else
+            export PROTON_PASS_LOGGED_IN="false"
+            echo "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys."
+        fi
     fi
 fi
+
+# Wrapper: rclone with lazy password loading
+function rclone {
+    if [[ -z "$RCLONE_CONFIG_PASS" ]]; then
+        RCLONE_CONFIG_PASS=$(pass-cli item view "pass://Personal/rclone/password" --field password 2>/dev/null)
+        export RCLONE_CONFIG_PASS
+    fi
+    command rclone "$@"
+}
 
 # Helper: rclone-config - runs rclone config and syncs to chezmoi
 function rclone-config {

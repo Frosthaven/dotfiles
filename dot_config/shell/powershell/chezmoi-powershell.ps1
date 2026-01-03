@@ -98,7 +98,7 @@ $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
 
 # SSH AGENT + PROTON PASS *****************************************************
 # *****************************************************************************
-# Load SSH keys from Proton Pass into the SSH agent
+# Load SSH keys from Proton Pass into the SSH agent (only if agent is empty)
 
 function Initialize-SshAgent {
     # Start ssh-agent if not running
@@ -113,18 +113,27 @@ function Initialize-SshAgent {
         return
     }
 
-    # Check if logged in to Proton Pass
-    $loginStatus = pass-cli status 2>&1
-    if ($loginStatus -match "not logged in" -or $LASTEXITCODE -ne 0) {
-        Write-Host "[Proton Pass] Not logged in. Run 'pass-cli login' to load SSH keys." -ForegroundColor Yellow
+    # Check if keys are already loaded (fast check)
+    $agentKeys = ssh-add -l 2>&1
+    if ($LASTEXITCODE -eq 0 -and $agentKeys) {
+        # Keys already loaded, skip pass-cli calls
+        $env:PROTON_PASS_LOGGED_IN = "true"
         return
     }
 
-    # Load SSH keys from Proton Pass
-    try {
-        pass-cli ssh-agent load 2>&1 | Out-Null
-    } catch {
-        # Silently ignore errors
+    # No keys loaded, check if logged in to Proton Pass
+    $loginStatus = pass-cli info 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $env:PROTON_PASS_LOGGED_IN = "true"
+        # Load SSH keys from Proton Pass
+        try {
+            pass-cli ssh-agent load 2>&1 | Out-Null
+        } catch {
+            # Silently ignore errors
+        }
+    } else {
+        $env:PROTON_PASS_LOGGED_IN = "false"
+        Write-Host "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys." -ForegroundColor Yellow
     }
 }
 
@@ -132,33 +141,26 @@ Initialize-SshAgent
 
 # RCLONE **********************************************************************
 # *****************************************************************************
-# Set rclone config password from Proton Pass
+# Wrapper: lazy load rclone password on first use
 
-function Initialize-RclonePassword {
-    # Check if pass-cli is available
-    $passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
-    if (-not $passCli) {
-        return
-    }
-
-    # Check if logged in to Proton Pass
-    $loginStatus = pass-cli status 2>&1
-    if ($loginStatus -match "not logged in" -or $LASTEXITCODE -ne 0) {
-        return
-    }
-
-    # Get rclone password from Proton Pass
-    try {
-        $password = pass-cli item get "pass://Personal/rclone/password" --field password 2>&1
-        if ($LASTEXITCODE -eq 0 -and $password) {
-            $env:RCLONE_CONFIG_PASS = $password
+function rclone {
+    # Lazy load password if not set
+    if (-not $env:RCLONE_CONFIG_PASS) {
+        $passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
+        if ($passCli) {
+            try {
+                $password = pass-cli item view "pass://Personal/rclone/password" --field password 2>&1
+                if ($LASTEXITCODE -eq 0 -and $password) {
+                    $env:RCLONE_CONFIG_PASS = $password
+                }
+            } catch {
+                # Silently ignore errors
+            }
         }
-    } catch {
-        # Silently ignore errors
     }
+    # Call the actual rclone binary
+    & (Get-Command rclone -CommandType Application) @args
 }
-
-Initialize-RclonePassword
 
 # Helper function: Edit rclone config and re-add to chezmoi
 function rclone-config {

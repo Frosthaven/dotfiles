@@ -1,16 +1,16 @@
 # Rclone Integration with Proton Pass
-# - Sets RCLONE_CONFIG_PASS from Proton Pass
+# - Lazy loads RCLONE_CONFIG_PASS on first rclone use
 # - Provides rclone-config helper that syncs to chezmoi
 
-# Set rclone config password from Proton Pass
-if (which pass-cli | is-not-empty) {
-    let login_check = (do { pass-cli info } | complete)
-    if $login_check.exit_code == 0 {
-        let password_result = (do { pass-cli view "pass://Personal/rclone/password" } | complete)
+# Wrapper: rclone with lazy password loading
+def --env --wrapped rclone [...args] {
+    if ($env.RCLONE_CONFIG_PASS? | default "" | is-empty) {
+        let password_result = (do { pass-cli item view "pass://Personal/rclone/password" --field password } | complete)
         if $password_result.exit_code == 0 {
             $env.RCLONE_CONFIG_PASS = ($password_result.stdout | str trim)
         }
     }
+    ^rclone ...$args
 }
 
 # Helper: rclone-config
