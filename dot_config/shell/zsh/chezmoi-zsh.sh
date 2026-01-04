@@ -96,4 +96,4 @@ if [[ -d "$HOME/.cargo/bin" ]]; then
 fi
 
 # Source additional functions
-source "$HOME/.config/shell/zsh/sources/proton-unpack-ssh.zsh"
+source "$HOME/.config/shell/zsh/sources/pass-ssh-unpack.zsh"

@@ -104,4 +104,4 @@ if test -d "$HOME/.cargo/bin"
 end
 
 # Source additional functions
-source "$HOME/.config/shell/fish/sources/proton-unpack-ssh.fish"
+source "$HOME/.config/shell/fish/sources/pass-ssh-unpack.fish"

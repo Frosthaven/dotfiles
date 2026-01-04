@@ -106,4 +106,4 @@ if [ -d "$HOME/.cargo/bin" ]; then
 fi
 
 # Source additional functions
-source "$HOME/.config/shell/bash/sources/proton-unpack-ssh.bash"
+source "$HOME/.config/shell/bash/sources/pass-ssh-unpack.bash"

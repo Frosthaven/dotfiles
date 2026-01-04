@@ -16,6 +16,11 @@ That's it! Identity files (SSH, git, rclone) are skipped - set up your own as ne
 
 > **Frosthaven?** See [docs/OWNER.md](docs/OWNER.md) for repo owner setup.
 
+## Documentation
+
+- [pass-ssh-unpack](docs/pass-ssh-unpack.md) - Extract SSH keys from Proton Pass to local files
+- [Identity Setup](docs/IDENTITY.md) - Configure identity files (SSH, git, rclone)
+
 ## Automatic Deployment (Windows)
 
 Run the following in an Administrator PowerShell terminal and reboot afterward:
