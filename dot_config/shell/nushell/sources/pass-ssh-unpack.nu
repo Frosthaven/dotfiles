@@ -14,23 +14,18 @@ def --wrapped pass-ssh-unpack [...args] {
     let rclone_pass_path = "pass://Personal/rclone/password"
     let full_args = ($args | prepend ["--rclone-password-path", $rclone_pass_path])
 
-    # Run the actual binary
-    let result = if (which pass-ssh-unpack-bin | is-not-empty) {
-        do { ^pass-ssh-unpack-bin ...$full_args } | complete
+    # Run the actual binary directly (preserves TTY for progress bars)
+    if (which pass-ssh-unpack-bin | is-not-empty) {
+        ^pass-ssh-unpack-bin ...$full_args
     } else {
-        do { ^$cargo_bin ...$full_args } | complete
+        ^$cargo_bin ...$full_args
     }
 
-    # Print output
-    if ($result.stdout | is-not-empty) {
-        print $result.stdout
-    }
-    if ($result.stderr | is-not-empty) {
-        print -e $result.stderr
-    }
+    # Capture exit code after direct execution
+    let exit_code = $env.LAST_EXIT_CODE
 
     # Skip chezmoi sync if command failed or dry-run
-    if $result.exit_code != 0 {
+    if $exit_code != 0 {
         return
     }
 
