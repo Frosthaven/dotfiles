@@ -107,3 +107,4 @@ fi
 
 # Source additional functions
 source "$HOME/.config/shell/bash/sources/pass-ssh-unpack.bash"
+source "$HOME/.config/shell/bash/sources/system-update.bash"

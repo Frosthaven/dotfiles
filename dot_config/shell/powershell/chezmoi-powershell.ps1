@@ -175,3 +175,4 @@ function rclone-config {
 
 # Source additional functions
 . "$env:USERPROFILE\.config\shell\powershell\sources\pass-ssh-unpack.ps1"
+. "$env:USERPROFILE\.config\shell\powershell\sources\system-update.ps1"

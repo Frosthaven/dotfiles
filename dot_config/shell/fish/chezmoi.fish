@@ -105,3 +105,4 @@ end
 
 # Source additional functions
 source "$HOME/.config/shell/fish/sources/pass-ssh-unpack.fish"
+source "$HOME/.config/shell/fish/sources/system-update.fish"

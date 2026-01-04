@@ -97,3 +97,4 @@ fi
 
 # Source additional functions
 source "$HOME/.config/shell/zsh/sources/pass-ssh-unpack.zsh"
+source "$HOME/.config/shell/zsh/sources/system-update.zsh"

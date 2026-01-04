@@ -227,6 +227,16 @@ def sysup [] {
         chezmoi update
     }
 
+    if (which pass-cli | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Syncing SSH keys from Proton Pass --------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        pass-ssh-unpack
+    }
+
     if (which bob | is-empty) {
         # nothing
     } else {
