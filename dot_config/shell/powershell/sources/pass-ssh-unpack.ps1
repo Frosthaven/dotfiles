@@ -400,17 +400,37 @@ function pass-ssh-unpack {
             }
             
             # Collect rclone entry data
+            # Format: remote_name|host|user|key_file|other_aliases
+            # remote_name = first alias (or title), other_aliases = remaining aliases
             $rcloneKeyFile = if ($hasKey) {
                 "~/.ssh/proton-pass/$vault/$safeTitle"
             } else {
                 ""
             }
-            $aliasesCsv = $aliasesList -join ","
+            
+            # Parse aliases to get first as remote_name, rest as other_aliases
+            $remoteName = ""
+            $otherAliasesList = @()
+            foreach ($aliasItem in $aliasesList) {
+                if ([string]::IsNullOrEmpty($remoteName)) {
+                    $remoteName = $aliasItem
+                } else {
+                    $otherAliasesList += $aliasItem
+                }
+            }
+            
+            # Fallback to title if no aliases
+            if ([string]::IsNullOrEmpty($remoteName)) {
+                $remoteName = $title
+            }
+            
+            $otherAliasesCsv = $otherAliasesList -join ","
             $rcloneEntries += @{
+                RemoteName = $remoteName
                 Host = $hostField
                 User = $usernameField
                 KeyFile = $rcloneKeyFile
-                Aliases = $aliasesCsv
+                OtherAliases = $otherAliasesCsv
             }
         }
 
@@ -564,37 +584,39 @@ function Sync-RcloneRemotes {
     $skippedCount = 0
     
     # Process each entry
+    # Format: RemoteName|Host|User|KeyFile|OtherAliases
     foreach ($entry in $Entries) {
+        $remoteName = $entry.RemoteName
         $hostName = $entry.Host
         $user = $entry.User
         $keyFile = $entry.KeyFile
-        $aliases = $entry.Aliases
+        $otherAliases = $entry.OtherAliases
         
-        if ([string]::IsNullOrEmpty($hostName)) { continue }
+        if ([string]::IsNullOrEmpty($remoteName)) { continue }
         
         # Check if remote exists without our marker (unmanaged)
-        $existingRemote = $currentConfig[$hostName]
+        $existingRemote = $currentConfig[$remoteName]
         $existingDesc = if ($existingRemote) { $existingRemote.description } else { "" }
         
         if ($existingRemote -and $existingDesc -ne "managed by pass-ssh-unpack") {
-            Write-RLog "  Skipping ${hostName}: existing unmanaged remote"
+            Write-RLog "  Skipping ${remoteName}: existing unmanaged remote"
             $skippedCount++
             continue
         }
         
-        # Create/update primary SFTP remote
+        # Create/update primary SFTP remote (named after first alias, connects to host)
         if (-not [string]::IsNullOrEmpty($keyFile)) {
-            rclone config create $hostName sftp host=$hostName user=$user key_file=$keyFile description="managed by pass-ssh-unpack" 2>$null | Out-Null
+            rclone config create $remoteName sftp host=$hostName user=$user key_file=$keyFile description="managed by pass-ssh-unpack" 2>$null | Out-Null
         } else {
-            rclone config create $hostName sftp host=$hostName user=$user ask_password=true description="managed by pass-ssh-unpack" 2>$null | Out-Null
+            rclone config create $remoteName sftp host=$hostName user=$user ask_password=true description="managed by pass-ssh-unpack" 2>$null | Out-Null
         }
         $createdCount++
         
-        # Create alias remotes
-        if (-not [string]::IsNullOrEmpty($aliases)) {
-            $aliasesList = $aliases -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        # Create alias remotes for remaining aliases
+        if (-not [string]::IsNullOrEmpty($otherAliases)) {
+            $aliasesList = $otherAliases -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
             foreach ($aliasName in $aliasesList) {
-                if ($aliasName -eq $hostName) { continue }
+                if ($aliasName -eq $remoteName) { continue }
                 
                 # Check for unmanaged conflict
                 $aliasRemote = $currentConfig[$aliasName]
@@ -606,7 +628,7 @@ function Sync-RcloneRemotes {
                     continue
                 }
                 
-                rclone config create $aliasName alias remote="${hostName}:" description="managed by pass-ssh-unpack" 2>$null | Out-Null
+                rclone config create $aliasName alias remote="${remoteName}:" description="managed by pass-ssh-unpack" 2>$null | Out-Null
                 $createdCount++
             }
         }
@@ -662,13 +684,29 @@ function Sync-RcloneRemotes {
         }
     }
     
-    # Re-add to chezmoi if managed
+    # Re-add to chezmoi if managed, then auto-commit/push
     $chezmoiCmd = Get-Command chezmoi -ErrorAction SilentlyContinue
     if ($chezmoiCmd) {
         $managed = chezmoi managed 2>$null
         if ($managed -match "rclone/rclone.conf") {
             chezmoi re-add ~/.config/rclone/rclone.conf 2>$null | Out-Null
             Write-RLog "  Synced $createdCount remotes to chezmoi."
+            
+            # Auto-commit if there are changes
+            $diffResult = chezmoi git -- diff --quiet dot_config/rclone/private_rclone.conf 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                chezmoi git -- add dot_config/rclone/private_rclone.conf 2>$null | Out-Null
+                chezmoi git -- commit -m "chore: update rclone config via pass-ssh-unpack" 2>$null | Out-Null
+                
+                # Auto-push if only 1 commit ahead
+                $aheadCount = chezmoi git -- rev-list --count "@{u}..HEAD" 2>$null
+                if ($aheadCount -eq "1") {
+                    chezmoi git push 2>$null | Out-Null
+                    Write-RLog "  Committed and pushed rclone config."
+                } else {
+                    Write-RLog "  Committed rclone config. Run 'chezmoi git push' to sync ($aheadCount commits ahead)."
+                }
+            }
         } else {
             Write-RLog "  Synced $createdCount remotes."
         }

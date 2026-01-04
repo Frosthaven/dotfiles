@@ -425,12 +425,36 @@ pass-ssh-unpack() {
             done
             
             # Collect rclone entry data
-            # Format: host|user|key_file|aliases (key_file uses ~ for home)
+            # Format: remote_name|host|user|key_file|other_aliases
+            # remote_name = first alias (or title), other_aliases = remaining aliases
             local rclone_key_file=""
             if [[ "$has_key" == "true" ]]; then
                 rclone_key_file="~/.ssh/proton-pass/$vault/$safe_title"
             fi
-            echo "$host_field|${username_field:-}|${rclone_key_file}|${aliases_list}" >> "$base_dir/.rclone_entries_tmp"
+            
+            # Parse aliases to get first as remote_name, rest as other_aliases
+            IFS=',' read -ra rclone_alias_array <<< "$aliases_list"
+            local remote_name=""
+            local other_aliases=""
+            for idx in "${!rclone_alias_array[@]}"; do
+                local trimmed_alias
+                trimmed_alias=$(echo "${rclone_alias_array[$idx]}" | xargs)
+                [[ -z "$trimmed_alias" ]] && continue
+                if [[ -z "$remote_name" ]]; then
+                    remote_name="$trimmed_alias"
+                else
+                    if [[ -z "$other_aliases" ]]; then
+                        other_aliases="$trimmed_alias"
+                    else
+                        other_aliases="$other_aliases,$trimmed_alias"
+                    fi
+                fi
+            done
+            
+            # Fallback to title if no aliases
+            [[ -z "$remote_name" ]] && remote_name="$title"
+            
+            echo "$remote_name|$host_field|${username_field:-}|${rclone_key_file}|${other_aliases}" >> "$base_dir/.rclone_entries_tmp"
         done
         
         _log ""
@@ -585,44 +609,45 @@ _sync_rclone_remotes() {
     local -a created_primaries=()
     
     # Process each entry
-    while IFS='|' read -r host user key_file aliases; do
-        [[ -z "$host" ]] && continue
+    # Format: remote_name|host|user|key_file|other_aliases
+    while IFS='|' read -r remote_name host user key_file other_aliases; do
+        [[ -z "$remote_name" ]] && continue
         
         # Check if remote exists without our marker (unmanaged)
         local existing_desc
-        existing_desc=$(echo "$current_config" | jq -r --arg name "$host" '.[$name].description // ""' 2>/dev/null)
+        existing_desc=$(echo "$current_config" | jq -r --arg name "$remote_name" '.[$name].description // ""' 2>/dev/null)
         local existing_remote
-        existing_remote=$(echo "$current_config" | jq -r --arg name "$host" '.[$name] // empty' 2>/dev/null)
+        existing_remote=$(echo "$current_config" | jq -r --arg name "$remote_name" '.[$name] // empty' 2>/dev/null)
         
         if [[ -n "$existing_remote" ]] && [[ "$existing_desc" != "managed by pass-ssh-unpack" ]]; then
-            _log "  Skipping $host: existing unmanaged remote"
+            _log "  Skipping $remote_name: existing unmanaged remote"
             ((skipped_count++))
             continue
         fi
         
-        # Create/update primary SFTP remote
+        # Create/update primary SFTP remote (named after first alias, connects to host)
         if [[ -n "$key_file" ]]; then
-            rclone config create "$host" sftp \
+            rclone config create "$remote_name" sftp \
                 host="$host" \
                 user="$user" \
                 key_file="$key_file" \
                 description="managed by pass-ssh-unpack" &>/dev/null
         else
-            rclone config create "$host" sftp \
+            rclone config create "$remote_name" sftp \
                 host="$host" \
                 user="$user" \
                 ask_password=true \
                 description="managed by pass-ssh-unpack" &>/dev/null
         fi
         ((created_count++))
-        created_primaries+=("$host")
+        created_primaries+=("$remote_name")
         
-        # Create alias remotes
-        IFS=',' read -ra alias_array <<< "$aliases"
+        # Create alias remotes for remaining aliases
+        IFS=',' read -ra alias_array <<< "$other_aliases"
         for alias_name in "${alias_array[@]}"; do
             alias_name=$(echo "$alias_name" | xargs)
             [[ -z "$alias_name" ]] && continue
-            [[ "$alias_name" == "$host" ]] && continue
+            [[ "$alias_name" == "$remote_name" ]] && continue
             
             # Check for unmanaged conflict
             existing_desc=$(echo "$current_config" | jq -r --arg name "$alias_name" '.[$name].description // ""' 2>/dev/null)
@@ -635,7 +660,7 @@ _sync_rclone_remotes() {
             fi
             
             rclone config create "$alias_name" alias \
-                remote="$host:" \
+                remote="$remote_name:" \
                 description="managed by pass-ssh-unpack" &>/dev/null
             ((created_count++))
         done
@@ -686,11 +711,29 @@ _sync_rclone_remotes() {
         fi
     done <<< "$alias_remotes"
     
-    # Re-add to chezmoi if managed
+    # Re-add to chezmoi if managed, then auto-commit/push
     if command -v chezmoi &>/dev/null; then
         if chezmoi managed 2>/dev/null | grep -q "rclone/rclone.conf"; then
             chezmoi re-add ~/.config/rclone/rclone.conf &>/dev/null
             _log "  Synced $created_count remotes to chezmoi."
+            
+            # Auto-commit if there are changes
+            if chezmoi git -- diff --quiet dot_config/rclone/private_rclone.conf 2>/dev/null; then
+                : # No changes to commit
+            else
+                chezmoi git -- add dot_config/rclone/private_rclone.conf &>/dev/null
+                chezmoi git -- commit -m "chore: update rclone config via pass-ssh-unpack" &>/dev/null
+                
+                # Auto-push if only 1 commit ahead
+                local ahead_count
+                ahead_count=$(chezmoi git -- rev-list --count "@{u}..HEAD" 2>/dev/null || echo "0")
+                if [[ "$ahead_count" == "1" ]]; then
+                    chezmoi git push &>/dev/null
+                    _log "  Committed and pushed rclone config."
+                else
+                    _log "  Committed rclone config. Run 'chezmoi git push' to sync ($ahead_count commits ahead)."
+                fi
+            fi
         else
             _log "  Synced $created_count remotes."
         fi

@@ -384,17 +384,32 @@ def pass-ssh-unpack [
             }
             
             # Collect rclone entry data
+            # remote_name = first alias (or title), other_aliases = remaining aliases
             let rclone_key_file = if $has_key {
                 $"~/.ssh/proton-pass/($vault)/($safe_title)"
             } else {
                 ""
             }
-            let aliases_csv = ($aliases_list | str join ",")
+            
+            # Parse aliases to get first as remote_name, rest as other_aliases
+            let remote_name = if ($aliases_list | is-not-empty) {
+                $aliases_list | first
+            } else {
+                $title
+            }
+            let other_aliases = if ($aliases_list | length) > 1 {
+                $aliases_list | skip 1
+            } else {
+                []
+            }
+            let other_aliases_csv = ($other_aliases | str join ",")
+            
             $rclone_entries = ($rclone_entries | append {
+                remote_name: $remote_name,
                 host: $host_field,
                 user: $username_field,
                 key_file: $rclone_key_file,
-                aliases: $aliases_csv
+                other_aliases: $other_aliases_csv
             })
         }
         
@@ -471,7 +486,7 @@ def pass-ssh-unpack [
 
 # Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
 def sync-rclone-remotes [
-    entries: list<record<host: string, user: string, key_file: string, aliases: string>>,
+    entries: list<record<remote_name: string, host: string, user: string, key_file: string, other_aliases: string>>,
     full_mode: bool,
     quiet_mode: bool
 ] {
@@ -537,42 +552,43 @@ def sync-rclone-remotes [
     
     # Process each entry
     for entry in $entries {
+        let remote_name = $entry.remote_name
         let host = $entry.host
         let user = $entry.user
         let key_file = $entry.key_file
-        let aliases = $entry.aliases
+        let other_aliases = $entry.other_aliases
         
-        if ($host | is-empty) {
+        if ($remote_name | is-empty) {
             continue
         }
         
         # Check if remote exists without our marker (unmanaged)
-        let existing_remote = ($current_config | get -o $host | default null)
+        let existing_remote = ($current_config | get -o $remote_name | default null)
         let existing_desc = if $existing_remote != null { $existing_remote.description? | default "" } else { "" }
         
         if $existing_remote != null and $existing_desc != "managed by pass-ssh-unpack" {
-            rlog $"  Skipping ($host): existing unmanaged remote"
+            rlog $"  Skipping ($remote_name): existing unmanaged remote"
             $skipped_count = $skipped_count + 1
             continue
         }
         
-        # Create/update primary SFTP remote
+        # Create/update primary SFTP remote (named after first alias, connects to host)
         if ($key_file | is-not-empty) {
             do { with-env $rclone_env {
-                ^rclone config create $host sftp $"host=($host)" $"user=($user)" $"key_file=($key_file)" "description=managed by pass-ssh-unpack"
+                ^rclone config create $remote_name sftp $"host=($host)" $"user=($user)" $"key_file=($key_file)" "description=managed by pass-ssh-unpack"
             } } | complete | ignore
         } else {
             do { with-env $rclone_env {
-                ^rclone config create $host sftp $"host=($host)" $"user=($user)" "ask_password=true" "description=managed by pass-ssh-unpack"
+                ^rclone config create $remote_name sftp $"host=($host)" $"user=($user)" "ask_password=true" "description=managed by pass-ssh-unpack"
             } } | complete | ignore
         }
         $created_count = $created_count + 1
         
-        # Create alias remotes
-        if ($aliases | is-not-empty) {
-            let alias_list = ($aliases | split row "," | each { |a| $a | str trim } | where { |a| $a | is-not-empty })
+        # Create alias remotes for remaining aliases
+        if ($other_aliases | is-not-empty) {
+            let alias_list = ($other_aliases | split row "," | each { |a| $a | str trim } | where { |a| $a | is-not-empty })
             for alias_name in $alias_list {
-                if $alias_name == $host {
+                if $alias_name == $remote_name {
                     continue
                 }
                 
@@ -587,7 +603,7 @@ def sync-rclone-remotes [
                 }
                 
                 do { with-env $rclone_env {
-                    ^rclone config create $alias_name alias $"remote=($host):" "description=managed by pass-ssh-unpack"
+                    ^rclone config create $alias_name alias $"remote=($remote_name):" "description=managed by pass-ssh-unpack"
                 } } | complete | ignore
                 $created_count = $created_count + 1
             }
@@ -642,12 +658,34 @@ def sync-rclone-remotes [
         }
     }
     
-    # Re-add to chezmoi if managed
+    # Re-add to chezmoi if managed, then auto-commit/push
     if (which chezmoi | is-not-empty) {
         let managed_result = (do { chezmoi managed } | complete)
         if $managed_result.exit_code == 0 and ($managed_result.stdout | str contains "rclone/rclone.conf") {
             do { chezmoi re-add ~/.config/rclone/rclone.conf } | complete | ignore
             rlog $"  Synced ($created_count) remotes to chezmoi."
+            
+            # Auto-commit if there are changes
+            let diff_result = (do { chezmoi git -- diff --quiet dot_config/rclone/private_rclone.conf } | complete)
+            if $diff_result.exit_code != 0 {
+                do { chezmoi git -- add dot_config/rclone/private_rclone.conf } | complete | ignore
+                do { chezmoi git -- commit -m "chore: update rclone config via pass-ssh-unpack" } | complete | ignore
+                
+                # Auto-push if only 1 commit ahead
+                let ahead_result = (do { chezmoi git -- rev-list --count "@{u}..HEAD" } | complete)
+                let ahead_count = if $ahead_result.exit_code == 0 {
+                    $ahead_result.stdout | str trim | into int
+                } else {
+                    0
+                }
+                
+                if $ahead_count == 1 {
+                    do { chezmoi git push } | complete | ignore
+                    rlog "  Committed and pushed rclone config."
+                } else {
+                    rlog $"  Committed rclone config. Run 'chezmoi git push' to sync \(($ahead_count) commits ahead\)."
+                }
+            }
         } else {
             rlog $"  Synced ($created_count) remotes."
         }
