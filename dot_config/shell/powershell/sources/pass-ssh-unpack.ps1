@@ -22,8 +22,8 @@ function pass-ssh-unpack {
         return
     }
 
-    # Run the actual binary
-    & $binaryPath @Arguments
+    # Run the actual binary with rclone password path
+    & $binaryPath --rclone-password-path "pass://Personal/rclone/password" @Arguments
     $exitCode = $LASTEXITCODE
 
     # Skip chezmoi sync if command failed
