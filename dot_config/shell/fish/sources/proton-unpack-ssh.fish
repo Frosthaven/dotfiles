@@ -117,9 +117,9 @@ function proton-unpack-ssh
                 end
                 
                 # Track for duplicate handling
-                # Format: host|title|pubkey_path|username|is_alias
+                # Format: host|title|pubkey_path|username|is_alias|original_host
                 # Primary host entry (is_alias=0)
-                echo "$host_field|$title|$pubkey_path|$username_field|0" >> "$tmp_file"
+                echo "$host_field|$title|$pubkey_path|$username_field|0|" >> "$tmp_file"
                 
                 # Build list of aliases
                 set -l aliases_list
@@ -132,12 +132,12 @@ function proton-unpack-ssh
                     set -a aliases_list $title
                 end
                 
-                # Add alias entries (is_alias=1)
+                # Add alias entries (is_alias=1, include original host)
                 for alias_entry in $aliases_list
                     test -z "$alias_entry"; and continue
                     # Skip if alias is same as host
                     test "$alias_entry" = "$host_field"; and continue
-                    echo "$alias_entry|$title|$pubkey_path|$username_field|1" >> "$tmp_file"
+                    echo "$alias_entry|$title|$pubkey_path|$username_field|1|$host_field" >> "$tmp_file"
                 end
             else
                 echo "    -> failed to generate public key"
@@ -181,11 +181,12 @@ function proton-unpack-ssh
             set -l selected_path (echo "$selected_line" | cut -d'|' -f3)
             set -l selected_user (echo "$selected_line" | cut -d'|' -f4)
             set -l selected_is_alias (echo "$selected_line" | cut -d'|' -f5)
+            set -l selected_original_host (echo "$selected_line" | cut -d'|' -f6)
             
             # Append to config (quote path for spaces)
             echo "" >> "$config_path"
             if test "$selected_is_alias" = "1"
-                echo "# Alias" >> "$config_path"
+                echo "# Alias of $selected_original_host" >> "$config_path"
             end
             echo "Host $host" >> "$config_path"
             echo "    IdentityFile \"$selected_path\"" >> "$config_path"

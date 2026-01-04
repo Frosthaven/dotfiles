@@ -151,6 +151,7 @@ function proton-unpack-ssh {
                         Path = $pubkeyPath
                         User = $usernameField
                         IsAlias = $false
+                        OriginalHost = ""
                     }
                     
                     # Build list of aliases
@@ -162,7 +163,7 @@ function proton-unpack-ssh {
                         $aliasesList = @($title)
                     }
                     
-                    # Track alias entries (IsAlias=$true)
+                    # Track alias entries (IsAlias=$true, include original host)
                     foreach ($aliasEntry in $aliasesList) {
                         if ([string]::IsNullOrEmpty($aliasEntry)) { continue }
                         # Skip if alias is same as host
@@ -173,6 +174,7 @@ function proton-unpack-ssh {
                             Path = $pubkeyPath
                             User = $usernameField
                             IsAlias = $true
+                            OriginalHost = $hostField
                         }
                     }
                 } else {
@@ -216,7 +218,7 @@ function proton-unpack-ssh {
         $selectedPathUnix = $selectedKey.Path -replace '\\', '/'
         Add-Content -Path $configPath -Value ""
         if ($selectedKey.IsAlias) {
-            Add-Content -Path $configPath -Value "# Alias"
+            Add-Content -Path $configPath -Value "# Alias of $($selectedKey.OriginalHost)"
         }
         Add-Content -Path $configPath -Value "Host $h"
         Add-Content -Path $configPath -Value "    IdentityFile `"$selectedPathUnix`""

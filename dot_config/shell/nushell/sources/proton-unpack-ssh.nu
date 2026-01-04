@@ -43,8 +43,8 @@ def proton-unpack-ssh [] {
     let vaults = (pass-cli vault list --output json | from json | get vaults | get name)
     
     # Track host -> key mappings for duplicate handling
-    # Each entry: {host: string, title: string, path: string, user: string, is_alias: bool}
-    mut host_keys: list<record<host: string, title: string, path: string, user: string, is_alias: bool>> = []
+    # Each entry: {host: string, title: string, path: string, user: string, is_alias: bool, original_host: string}
+    mut host_keys: list<record<host: string, title: string, path: string, user: string, is_alias: bool, original_host: string>> = []
     
     for vault in $vaults {
         print $"[($vault)]"
@@ -130,7 +130,7 @@ def proton-unpack-ssh [] {
             }
             
             # Track primary host entry (is_alias=false)
-            $host_keys = ($host_keys | append {host: $host_field, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: false})
+            $host_keys = ($host_keys | append {host: $host_field, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: false, original_host: ""})
             
             # Build list of aliases
             let aliases_list = if ($aliases_field | is-not-empty) {
@@ -140,11 +140,11 @@ def proton-unpack-ssh [] {
                 [$title]
             }
             
-            # Track alias entries (is_alias=true)
+            # Track alias entries (is_alias=true, include original host)
             for alias_entry in $aliases_list {
                 # Skip if alias is same as host
                 if $alias_entry != $host_field {
-                    $host_keys = ($host_keys | append {host: $alias_entry, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: true})
+                    $host_keys = ($host_keys | append {host: $alias_entry, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: true, original_host: $host_field})
                 }
             }
         }
@@ -178,7 +178,7 @@ def proton-unpack-ssh [] {
         # Build config entry (quote path for spaces)
         mut config_entry = ""
         if $selected_key.is_alias {
-            $config_entry = $"\n# Alias\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
+            $config_entry = $"\n# Alias of ($selected_key.original_host)\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
         } else {
             $config_entry = $"\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
         }

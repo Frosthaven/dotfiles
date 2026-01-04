@@ -120,9 +120,9 @@ proton-unpack-ssh() {
                 fi
                 
                 # Track for duplicate handling (append to temp file since we're in subshell)
-                # Format: host|title|pubkey_path|username|is_alias
+                # Format: host|title|pubkey_path|username|is_alias|original_host
                 # Primary host entry (is_alias=0)
-                echo "$host_field|$title|$pubkey_path|$username_field|0" >> "$base_dir/.host_keys_tmp"
+                echo "$host_field|$title|$pubkey_path|$username_field|0|" >> "$base_dir/.host_keys_tmp"
                 
                 # Build list of aliases
                 local aliases_list=""
@@ -133,14 +133,14 @@ proton-unpack-ssh() {
                     aliases_list="$title"
                 fi
                 
-                # Add alias entries (is_alias=1)
+                # Add alias entries (is_alias=1, include original host)
                 IFS=',' read -ra alias_array <<< "$aliases_list"
                 for alias_entry in "${alias_array[@]}"; do
                     alias_entry=$(echo "$alias_entry" | xargs)  # trim whitespace
                     [ -z "$alias_entry" ] && continue
                     # Skip if alias is same as host
                     [ "$alias_entry" = "$host_field" ] && continue
-                    echo "$alias_entry|$title|$pubkey_path|$username_field|1" >> "$base_dir/.host_keys_tmp"
+                    echo "$alias_entry|$title|$pubkey_path|$username_field|1|$host_field" >> "$base_dir/.host_keys_tmp"
                 done
             else
                 echo "    -> failed to generate public key"
@@ -187,11 +187,12 @@ proton-unpack-ssh() {
             selected_path=$(echo "$selected_line" | cut -d'|' -f3)
             selected_user=$(echo "$selected_line" | cut -d'|' -f4)
             selected_is_alias=$(echo "$selected_line" | cut -d'|' -f5)
+            selected_original_host=$(echo "$selected_line" | cut -d'|' -f6)
             
             # Append to config (quote path for spaces)
             echo "" >> "$config_path"
             if [ "$selected_is_alias" = "1" ]; then
-                echo "# Alias" >> "$config_path"
+                echo "# Alias of $selected_original_host" >> "$config_path"
             fi
             echo "Host $host" >> "$config_path"
             echo "    IdentityFile \"$selected_path\"" >> "$config_path"
