@@ -9,6 +9,7 @@ README.md
 .ssh/authorized_keys
 .ssh/clients
 .ssh/iww
+.ssh/from-proton/
 
 {{ if ne .chezmoi.os "windows" }}
 **/*windows_*

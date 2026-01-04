@@ -102,3 +102,6 @@ end
 if test -d "$HOME/.cargo/bin"
     set -gx PATH $HOME/.cargo/bin $PATH
 end
+
+# Source additional functions
+source "$HOME/.config/shell/fish/sources/proton-unpack-ssh.fish"

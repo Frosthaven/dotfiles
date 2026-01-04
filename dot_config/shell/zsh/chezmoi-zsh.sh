@@ -94,3 +94,6 @@ function sf {
 if [[ -d "$HOME/.cargo/bin" ]]; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
+
+# Source additional functions
+source "$HOME/.config/shell/zsh/sources/proton-unpack-ssh.zsh"

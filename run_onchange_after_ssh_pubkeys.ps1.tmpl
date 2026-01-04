@@ -1,0 +1,34 @@
+{{ if and (eq .chezmoi.os "windows") .isRepoOwner }}
+# Generate SSH public keys from Proton Pass
+# This script runs on chezmoi apply and prompts to generate public keys
+
+# Check if pass-cli is available
+$passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
+if (-not $passCli) {
+    exit 0
+}
+
+# Check if logged into Proton Pass
+$null = pass-cli info 2>&1
+if ($LASTEXITCODE -ne 0) {
+    exit 0
+}
+
+Write-Host ""
+$reply = Read-Host -Prompt "Generate SSH public keys from Proton Pass? (N/y)"
+if ($reply -notmatch '^[Yy]$') {
+    Write-Host "Skipping SSH public key generation."
+    exit 0
+}
+
+# Source the function and run it
+$funcPath = "$env:USERPROFILE\.config\shell\powershell\sources\proton-unpack-ssh.ps1"
+if (Test-Path $funcPath) {
+    . $funcPath
+    proton-unpack-ssh
+} else {
+    Write-Host "proton-unpack-ssh function not found. Run 'chezmoi apply' first."
+    exit 1
+}
+
+{{ end }}

@@ -1,0 +1,35 @@
+{{ if and (ne .chezmoi.os "windows") .isRepoOwner -}}
+#!/bin/bash
+
+# Generate SSH public keys from Proton Pass
+# This script runs on chezmoi apply and prompts to generate public keys
+
+# Check if pass-cli is available
+if ! command -v pass-cli &>/dev/null; then
+    exit 0
+fi
+
+# Check if logged into Proton Pass
+if ! pass-cli info &>/dev/null 2>&1; then
+    exit 0
+fi
+
+echo ""
+if read -r -p "Generate SSH public keys from Proton Pass? (N/y) " REPLY && [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+    echo "Skipping SSH public key generation."
+    exit 0
+fi
+
+# Source the function and run it
+if [ -f "$HOME/.config/shell/bash/sources/proton-unpack-ssh.bash" ]; then
+    source "$HOME/.config/shell/bash/sources/proton-unpack-ssh.bash"
+    proton-unpack-ssh
+elif [ -f "$HOME/.config/shell/zsh/sources/proton-unpack-ssh.zsh" ]; then
+    source "$HOME/.config/shell/zsh/sources/proton-unpack-ssh.zsh"
+    proton-unpack-ssh
+else
+    echo "proton-unpack-ssh function not found. Run 'chezmoi apply' first."
+    exit 1
+fi
+
+{{ end -}}

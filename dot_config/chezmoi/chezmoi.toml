@@ -1,5 +1,0 @@
-# Chezmoi configuration
-# Uses Proton Pass CLI for secret management
-
-[secret]
-command = "pass-cli"

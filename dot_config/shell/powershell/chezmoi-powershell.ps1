@@ -172,3 +172,6 @@ function rclone-config {
         }
     }
 }
+
+# Source additional functions
+. "$env:USERPROFILE\.config\shell\powershell\sources\proton-unpack-ssh.ps1"
