@@ -132,6 +132,11 @@ packages:
         mac: cargo install bob-nvim;
         apt: cargo install bob-nvim;
         pac: cargo install bob-nvim;
+    cli-cargo-release: # rust release automation
+        win: cargo install cargo-release
+        mac: cargo install cargo-release
+        apt: cargo install cargo-release
+        pac: cargo install cargo-release
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
