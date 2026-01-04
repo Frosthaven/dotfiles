@@ -1,723 +1,81 @@
-# pass-ssh-unpack: Extract SSH keys from Proton Pass to local files
+# pass-ssh-unpack wrapper: Syncs chezmoi after running the binary
 # See: docs/pass-ssh-unpack.md
 
 function pass-ssh-unpack {
     [CmdletBinding()]
     param(
-        [Parameter()]
-        [Alias("v")]
-        [string[]]$Vault,
-        
-        [Parameter()]
-        [Alias("i")]
-        [string[]]$Item,
-        
-        [Parameter()]
-        [Alias("f")]
-        [switch]$Full,
-        
-        [Parameter()]
-        [Alias("q")]
-        [switch]$Quiet,
-        
-        [Parameter()]
-        [switch]$NoRclone,
-        
-        [Parameter()]
-        [switch]$Purge
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Arguments
     )
+
+    # Find the binary
+    $binaryPath = $null
     
-    # Helper function for output
-    function Write-Log {
-        param([string]$Message)
-        if (-not $Quiet) {
-            Write-Host $Message
-        }
-    }
-    
-    # =========================================================================
-    # Dependency checks
-    # =========================================================================
-    $passCli = Get-Command pass-cli -ErrorAction SilentlyContinue
-    if (-not $passCli) {
-        Write-Host "(pass-ssh-unpack) pass-cli not found. Install Proton Pass CLI first." -ForegroundColor Red
-        return
-    }
-
-    $null = pass-cli info 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "(pass-ssh-unpack) Not logged into Proton Pass. Run 'pass-cli login' first." -ForegroundColor Red
-        return
-    }
-
-    $sshKeygen = Get-Command ssh-keygen -ErrorAction SilentlyContinue
-    if (-not $sshKeygen) {
-        Write-Host "(pass-ssh-unpack) ssh-keygen not found. Install OpenSSH first." -ForegroundColor Red
-        return
-    }
-
-    # =========================================================================
-    # Purge mode: delete everything and exit
-    # =========================================================================
-    if ($Purge) {
-        $baseDir = Join-Path $env:USERPROFILE ".ssh\proton-pass"
-        
-        Write-Log "Purging all managed SSH keys and rclone remotes..."
-        
-        # Delete SSH keys folder
-        if (Test-Path $baseDir) {
-            Remove-Item -Path $baseDir -Recurse -Force
-            Write-Log "  Removed $baseDir"
-        } else {
-            Write-Log "  $baseDir does not exist"
-        }
-        
-        # Delete managed rclone remotes
-        $rcloneCmd = Get-Command rclone -ErrorAction SilentlyContinue
-        if ($rcloneCmd) {
-            if (-not $env:RCLONE_CONFIG_PASS) {
-                $env:RCLONE_CONFIG_PASS = (pass-cli item view "pass://Personal/rclone/password" --field password 2>$null)
-            }
-            
-            if ($env:RCLONE_CONFIG_PASS) {
-                $currentConfig = (rclone config dump 2>$null) | ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue
-                if (-not $currentConfig) { $currentConfig = @{} }
-                
-                $deletedCount = 0
-                foreach ($remoteName in $currentConfig.Keys) {
-                    $remote = $currentConfig[$remoteName]
-                    if ($remote.description -eq "managed by pass-ssh-unpack") {
-                        rclone config delete $remoteName 2>$null
-                        $deletedCount++
-                    }
-                }
-                
-                if ($deletedCount -gt 0) {
-                    Write-Log "  Removed $deletedCount rclone remotes"
-                    
-                    # Re-add to chezmoi if managed
-                    $chezmoiCmd = Get-Command chezmoi -ErrorAction SilentlyContinue
-                    if ($chezmoiCmd) {
-                        $managed = chezmoi managed 2>$null
-                        if ($managed -match "rclone[/\\]rclone.conf") {
-                            chezmoi re-add ~/.config/rclone/rclone.conf 2>$null
-                            Write-Log "  Synced rclone config to chezmoi"
-                        }
-                    }
-                } else {
-                    Write-Log "  No managed rclone remotes found"
-                }
-            } else {
-                Write-Log "  (skipped rclone - could not get password)"
-            }
-        } else {
-            Write-Log "  (rclone not installed)"
-        }
-        
-        Write-Log "Done."
-        return
-    }
-
-    Write-Log "Extracting SSH keys from Proton Pass..."
-    Write-Log ""
-
-    # =========================================================================
-    # Setup
-    # =========================================================================
-    $currentHostname = $env:COMPUTERNAME.ToLower()
-    $baseDir = Join-Path $env:USERPROFILE ".ssh\proton-pass"
-    
-    # Full mode: delete entire folder and start fresh
-    if ($Full -and (Test-Path $baseDir)) {
-        Write-Log "Full regeneration: clearing $baseDir..."
-        Remove-Item -Path $baseDir -Recurse -Force
-    }
-    
-    if (-not (Test-Path $baseDir)) {
-        New-Item -ItemType Directory -Path $baseDir -Force | Out-Null
-    }
-
-    $configPath = Join-Path $baseDir "config"
-    $configHeader = @"
-# =============================================================================
-# DO NOT EDIT THIS FILE - IT IS AUTO-GENERATED BY pass-ssh-unpack
-# =============================================================================
-# Any manual changes will be lost on the next run.
-#
-# To use these keys, add the following to your ~/.ssh/config:
-#     Include ~/.ssh/proton-pass/config
-#
-# To regenerate: pass-ssh-unpack
-# To regenerate fully: pass-ssh-unpack -Full
-# =============================================================================
-"@
-
-    # =========================================================================
-    # Load existing config (for incremental updates)
-    # =========================================================================
-    $existingHosts = @{}
-    
-    if (-not $Full -and (Test-Path $configPath)) {
-        $currentHost = ""
-        $currentBlock = ""
-        $inBlock = $false
-        
-        foreach ($line in (Get-Content $configPath)) {
-            # Skip header comments
-            if ($line -match "DO NOT EDIT" -or $line -match "=====" -or $line -match "Include" -or $line -match "regenerate" -or $line -match "To use") {
-                continue
-            }
-            
-            if ($line -match "^Host (.+)$") {
-                # Save previous block if exists
-                if ($currentHost) {
-                    $existingHosts[$currentHost] = $currentBlock
-                }
-                $currentHost = $Matches[1]
-                $currentBlock = $line
-                $inBlock = $true
-            } elseif ($inBlock -and $line) {
-                $currentBlock = "$currentBlock`n$line"
-            }
-        }
-        
-        # Save last block
-        if ($currentHost) {
-            $existingHosts[$currentHost] = $currentBlock
-        }
-    }
-
-    # =========================================================================
-    # Get vaults to process
-    # =========================================================================
-    $vaultsJson = pass-cli vault list --output json | ConvertFrom-Json
-    $allVaults = $vaultsJson.vaults | ForEach-Object { $_.name }
-    
-    $vaultsToProcess = @()
-    if (-not $Vault -or $Vault.Count -eq 0) {
-        $vaultsToProcess = $allVaults
+    if (Get-Command pass-ssh-unpack-bin -ErrorAction SilentlyContinue) {
+        $binaryPath = "pass-ssh-unpack-bin"
+    } elseif (Test-Path "$env:USERPROFILE\.cargo\bin\pass-ssh-unpack.exe") {
+        $binaryPath = "$env:USERPROFILE\.cargo\bin\pass-ssh-unpack.exe"
+    } elseif (Test-Path "$HOME/.cargo/bin/pass-ssh-unpack") {
+        $binaryPath = "$HOME/.cargo/bin/pass-ssh-unpack"
     } else {
-        # Filter vaults with wildcard support
-        foreach ($pattern in $Vault) {
-            $matched = $false
-            foreach ($v in $allVaults) {
-                if ($v -like $pattern) {
-                    if ($vaultsToProcess -notcontains $v) {
-                        $vaultsToProcess += $v
-                    }
-                    $matched = $true
-                }
-            }
-            if (-not $matched) {
-                Write-Log "Warning: No vaults matching '$pattern' found"
-            }
-        }
-    }
-
-    # =========================================================================
-    # Helper: Check if title matches any pattern
-    # =========================================================================
-    function Test-PatternMatch {
-        param([string]$Title, [string[]]$Patterns)
-        
-        if (-not $Patterns -or $Patterns.Count -eq 0) {
-            return $true
-        }
-        
-        foreach ($pattern in $Patterns) {
-            if ($Title -like $pattern) {
-                return $true
-            }
-        }
-        return $false
-    }
-
-    # =========================================================================
-    # Process vaults and extract keys
-    # =========================================================================
-    $newHosts = @{}
-    $processedKeys = @()
-    $rcloneEntries = @()
-
-    foreach ($vault in $vaultsToProcess) {
-        if ([string]::IsNullOrEmpty($vault)) { continue }
-
-        Write-Log "[$vault]"
-
-        $keysJson = pass-cli item list $vault --filter-type ssh-key --output json 2>$null
-        if ([string]::IsNullOrEmpty($keysJson)) {
-            Write-Log "  (no SSH keys)"
-            Write-Log ""
-            continue
-        }
-
-        try {
-            $keys = $keysJson | ConvertFrom-Json
-        } catch {
-            Write-Log "  (no SSH keys)"
-            Write-Log ""
-            continue
-        }
-
-        if (-not $keys.items -or $keys.items.Count -eq 0) {
-            Write-Log "  (no SSH keys)"
-            Write-Log ""
-            continue
-        }
-
-        $vaultDir = Join-Path $baseDir $vault
-        if (-not (Test-Path $vaultDir)) {
-            New-Item -ItemType Directory -Path $vaultDir -Force | Out-Null
-        }
-
-        foreach ($item in $keys.items) {
-            $title = $item.content.title
-            
-            # Check if title matches patterns
-            if (-not (Test-PatternMatch -Title $title -Patterns $Item)) {
-                continue
-            }
-            
-            # Check machine-specific suffix
-            if ($title -match '/') {
-                $titleSuffix = ($title -split '/')[-1].ToLower()
-                if ($titleSuffix -ne $currentHostname) {
-                    Write-Log "  Skipping: $title (not for this machine)"
-                    continue
-                }
-            }
-            
-            Write-Log "  Processing: $title"
-
-            $privateKey = $item.content.content.SshKey.private_key
-            $existingPubkey = $item.content.content.SshKey.public_key
-
-            # Get fields from extra_fields
-            $hostField = $null
-            $usernameField = $null
-            $aliasesField = $null
-            foreach ($field in $item.content.extra_fields) {
-                if ($field.name -eq "Host" -and $field.content.Text) {
-                    $hostField = $field.content.Text
-                }
-                if ($field.name -eq "Username" -and $field.content.Text) {
-                    $usernameField = $field.content.Text
-                }
-                if ($field.name -eq "Aliases" -and $field.content.Text) {
-                    $aliasesField = $field.content.Text
-                }
-            }
-
-            if ([string]::IsNullOrEmpty($hostField)) {
-                Write-Log "    -> skipped (no Host field)"
-                continue
-            }
-
-            # Sanitize title for filename
-            $safeTitle = $title -replace '/', '-' -replace ' ', '_'
-
-            $privkeyPath = Join-Path $vaultDir $safeTitle
-            $pubkeyPath = Join-Path $vaultDir "$safeTitle.pub"
-
-            # Check if there's a private key
-            $hasKey = $false
-            $identityPath = ""
-
-            if (-not [string]::IsNullOrEmpty($privateKey)) {
-                # Write private key
-                "$privateKey`n" | Set-Content -Path $privkeyPath -NoNewline
-                
-                # Set file permissions (Windows equivalent of chmod 600)
-                $acl = Get-Acl $privkeyPath
-                $acl.SetAccessRuleProtection($true, $false)
-                $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-                    [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
-                    "FullControl",
-                    "Allow"
-                )
-                $acl.SetAccessRule($rule)
-                Set-Acl -Path $privkeyPath -AclObject $acl
-                
-                # Track this key file
-                $processedKeys += $privkeyPath
-
-                # Generate public key
-                $generatedPubkey = ssh-keygen -y -f $privkeyPath 2>$null
-                if ($LASTEXITCODE -eq 0 -and $generatedPubkey) {
-                    $generatedPubkey | Set-Content -Path $pubkeyPath -NoNewline
-                    $hasKey = $true
-                    $identityPath = "%d/.ssh/proton-pass/$vault/$safeTitle"
-
-                    # Save public key back to Proton Pass if empty
-                    if ([string]::IsNullOrEmpty($existingPubkey)) {
-                        $null = pass-cli item update --vault-name $vault --item-title $title --field "public_key=$generatedPubkey" 2>&1
-                        if ($LASTEXITCODE -eq 0) {
-                            Write-Log "    -> $safeTitle (saved pubkey to Proton Pass)"
-                        } else {
-                            Write-Log "    -> $safeTitle (failed to save pubkey to Proton Pass)"
-                        }
-                    } else {
-                        Write-Log "    -> $safeTitle"
-                    }
-                } else {
-                    Write-Log "    -> $safeTitle (failed to generate public key)"
-                    Remove-Item $privkeyPath -Force -ErrorAction SilentlyContinue
-                }
-            } else {
-                Write-Log "    -> $safeTitle (no key, password auth)"
-            }
-
-            # Build config entries (with or without key)
-            $configBlock = "Host $hostField"
-            if ($hasKey) {
-                $configBlock = "$configBlock`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
-            }
-            if (-not [string]::IsNullOrEmpty($usernameField)) {
-                $configBlock = "$configBlock`n    User $usernameField"
-            }
-            $newHosts[$hostField] = $configBlock
-            
-            # Alias entries
-            $aliasesList = @()
-            if (-not [string]::IsNullOrEmpty($aliasesField)) {
-                $aliasesList = $aliasesField -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-            } else {
-                $aliasesList = @($title)
-            }
-            
-            foreach ($aliasEntry in $aliasesList) {
-                if ([string]::IsNullOrEmpty($aliasEntry)) { continue }
-                if ($aliasEntry -eq $hostField) { continue }
-                
-                $aliasBlock = "# Alias of $hostField`nHost $aliasEntry"
-                if ($hasKey) {
-                    $aliasBlock = "$aliasBlock`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
-                }
-                if (-not [string]::IsNullOrEmpty($usernameField)) {
-                    $aliasBlock = "$aliasBlock`n    User $usernameField"
-                }
-                $newHosts[$aliasEntry] = $aliasBlock
-            }
-            
-            # Collect rclone entry data
-            # Format: remote_name|host|user|key_file|other_aliases
-            # remote_name = first alias (or title), other_aliases = remaining aliases
-            $rcloneKeyFile = if ($hasKey) {
-                "~/.ssh/proton-pass/$vault/$safeTitle"
-            } else {
-                ""
-            }
-            
-            # Parse aliases to get first as remote_name, rest as other_aliases
-            $remoteName = ""
-            $otherAliasesList = @()
-            foreach ($aliasItem in $aliasesList) {
-                if ([string]::IsNullOrEmpty($remoteName)) {
-                    $remoteName = $aliasItem
-                } else {
-                    $otherAliasesList += $aliasItem
-                }
-            }
-            
-            # Fallback to title if no aliases
-            if ([string]::IsNullOrEmpty($remoteName)) {
-                $remoteName = $title
-            }
-            
-            $otherAliasesCsv = $otherAliasesList -join ","
-            $rcloneEntries += @{
-                RemoteName = $remoteName
-                Host = $hostField
-                User = $usernameField
-                KeyFile = $rcloneKeyFile
-                OtherAliases = $otherAliasesCsv
-            }
-        }
-
-        Write-Log ""
-    }
-
-    # =========================================================================
-    # Merge configs and auto-prune
-    # =========================================================================
-    Write-Log "Generating SSH config..."
-    
-    # Merge: new hosts override existing, keep existing if not touched
-    $finalHosts = @{}
-    
-    # Start with existing hosts (if incremental mode)
-    if (-not $Full) {
-        foreach ($key in $existingHosts.Keys) {
-            $finalHosts[$key] = $existingHosts[$key]
-        }
-    }
-    
-    # Override/add new hosts
-    foreach ($key in $newHosts.Keys) {
-        $finalHosts[$key] = $newHosts[$key]
-    }
-    
-    # Auto-prune: remove entries whose key files don't exist
-    # (only prune entries that have an IdentityFile - password-only entries are kept)
-    $hostsToRemove = @()
-    foreach ($host in $finalHosts.Keys) {
-        $block = $finalHosts[$host]
-        if ($block -match 'IdentityFile "([^"]*)"') {
-            $idFile = $Matches[1] -replace '%d', $env:USERPROFILE
-            if ($idFile -and -not (Test-Path $idFile)) {
-                $hostsToRemove += $host
-            }
-        }
-    }
-    
-    $prunedCount = $hostsToRemove.Count
-    foreach ($host in $hostsToRemove) {
-        $finalHosts.Remove($host)
-    }
-
-    # =========================================================================
-    # Write final config
-    # =========================================================================
-    $configHeader | Set-Content -Path $configPath
-    
-    # Sort hosts for consistent output
-    $sortedHosts = $finalHosts.Keys | Sort-Object
-    
-    foreach ($host in $sortedHosts) {
-        Add-Content -Path $configPath -Value ""
-        Add-Content -Path $configPath -Value $finalHosts[$host]
-    }
-
-    # =========================================================================
-    # Summary
-    # =========================================================================
-    $totalHosts = $sortedHosts.Count
-    $totalAliases = ($finalHosts.Values | Where-Object { $_ -match "# Alias of" }).Count
-    $primaryHosts = $totalHosts - $totalAliases
-
-    Write-Log ""
-    Write-Log "Done! Generated config has $primaryHosts hosts and $totalAliases aliases."
-    if ($prunedCount -gt 0) {
-        Write-Log "Pruned $prunedCount orphaned entries."
-    }
-    Write-Log "SSH config written to: $configPath"
-    
-    # =========================================================================
-    # Sync rclone remotes
-    # =========================================================================
-    if (-not $NoRclone) {
-        Sync-RcloneRemotes -Entries $rcloneEntries -FullMode $Full -QuietMode $Quiet
-    }
-}
-
-# Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
-function Sync-RcloneRemotes {
-    param(
-        [array]$Entries,
-        [bool]$FullMode,
-        [bool]$QuietMode
-    )
-    
-    function Write-RLog {
-        param([string]$Message)
-        if (-not $QuietMode) {
-            Write-Host $Message
-        }
-    }
-    
-    # Skip if rclone not available
-    $rcloneCmd = Get-Command rclone -ErrorAction SilentlyContinue
-    if (-not $rcloneCmd) {
+        Write-Host "(pass-ssh-unpack) Binary not found. Install with: cargo install pass-ssh-unpack" -ForegroundColor Red
         return
     }
-    
-    # Skip if no entries to process
-    if (-not $Entries -or $Entries.Count -eq 0) {
+
+    # Run the actual binary
+    & $binaryPath @Arguments
+    $exitCode = $LASTEXITCODE
+
+    # Skip chezmoi sync if command failed
+    if ($exitCode -ne 0) {
         return
     }
-    
-    Write-RLog ""
-    Write-RLog "Syncing rclone remotes..."
-    
-    # Get rclone password if not set
-    if (-not $env:RCLONE_CONFIG_PASS) {
-        $passResult = pass-cli item view "pass://Personal/rclone/password" --field password 2>$null
-        if ([string]::IsNullOrEmpty($passResult)) {
-            Write-RLog "  (skipped - could not get rclone password)"
-            return
-        }
-        $env:RCLONE_CONFIG_PASS = $passResult.Trim()
+
+    # Skip chezmoi sync if dry-run
+    if ($Arguments -contains "--dry-run") {
+        return
     }
-    
-    # Get current config
-    $configJson = rclone config dump 2>$null
-    $currentConfig = @{}
-    if (-not [string]::IsNullOrEmpty($configJson)) {
-        try {
-            $currentConfig = $configJson | ConvertFrom-Json -AsHashtable
-        } catch {
-            $currentConfig = @{}
-        }
+
+    # Skip chezmoi sync if chezmoi not available
+    if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) {
+        return
     }
-    
-    # Full mode: delete all managed remotes first
-    if ($FullMode) {
-        foreach ($remoteName in @($currentConfig.Keys)) {
-            $remote = $currentConfig[$remoteName]
-            if ($remote.description -eq "managed by pass-ssh-unpack") {
-                rclone config delete $remoteName 2>$null | Out-Null
-            }
-        }
-        # Refresh config after deletions
-        $configJson = rclone config dump 2>$null
-        $currentConfig = @{}
-        if (-not [string]::IsNullOrEmpty($configJson)) {
-            try {
-                $currentConfig = $configJson | ConvertFrom-Json -AsHashtable
-            } catch {
-                $currentConfig = @{}
-            }
-        }
+
+    # Check if rclone config is managed by chezmoi
+    $managed = chezmoi managed 2>$null
+    if (-not ($managed -match "rclone/rclone.conf")) {
+        return
     }
-    
-    $createdCount = 0
-    $skippedCount = 0
-    
-    # Process each entry
-    # Format: RemoteName|Host|User|KeyFile|OtherAliases
-    foreach ($entry in $Entries) {
-        $remoteName = $entry.RemoteName
-        $hostName = $entry.Host
-        $user = $entry.User
-        $keyFile = $entry.KeyFile
-        $otherAliases = $entry.OtherAliases
-        
-        if ([string]::IsNullOrEmpty($remoteName)) { continue }
-        
-        # Check if remote exists without our marker (unmanaged)
-        $existingRemote = $currentConfig[$remoteName]
-        $existingDesc = if ($existingRemote) { $existingRemote.description } else { "" }
-        
-        if ($existingRemote -and $existingDesc -ne "managed by pass-ssh-unpack") {
-            Write-RLog "  Skipping ${remoteName}: existing unmanaged remote"
-            $skippedCount++
-            continue
-        }
-        
-        # Create/update primary SFTP remote (named after first alias, connects to host)
-        if (-not [string]::IsNullOrEmpty($keyFile)) {
-            rclone config create $remoteName sftp host=$hostName user=$user key_file=$keyFile description="managed by pass-ssh-unpack" 2>$null | Out-Null
-        } else {
-            rclone config create $remoteName sftp host=$hostName user=$user ask_password=true description="managed by pass-ssh-unpack" 2>$null | Out-Null
-        }
-        $createdCount++
-        
-        # Create alias remotes for remaining aliases
-        if (-not [string]::IsNullOrEmpty($otherAliases)) {
-            $aliasesList = $otherAliases -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-            foreach ($aliasName in $aliasesList) {
-                if ($aliasName -eq $remoteName) { continue }
-                
-                # Check for unmanaged conflict
-                $aliasRemote = $currentConfig[$aliasName]
-                $aliasDesc = if ($aliasRemote) { $aliasRemote.description } else { "" }
-                
-                if ($aliasRemote -and $aliasDesc -ne "managed by pass-ssh-unpack") {
-                    Write-RLog "  Skipping alias ${aliasName}: existing unmanaged remote"
-                    $skippedCount++
-                    continue
-                }
-                
-                rclone config create $aliasName alias remote="${remoteName}:" description="managed by pass-ssh-unpack" 2>$null | Out-Null
-                $createdCount++
-            }
-        }
-    }
-    
-    # Auto-prune: managed sftp remotes whose key_file doesn't exist
-    $configJson = rclone config dump 2>$null
-    $updatedConfig = @{}
-    if (-not [string]::IsNullOrEmpty($configJson)) {
-        try {
-            $updatedConfig = $configJson | ConvertFrom-Json -AsHashtable
-        } catch {
-            $updatedConfig = @{}
-        }
-    }
-    
-    $prunedCount = 0
-    
-    # Get managed sftp remotes and prune those with missing key files
-    foreach ($remoteName in @($updatedConfig.Keys)) {
-        $remote = $updatedConfig[$remoteName]
-        if ($remote.type -eq "sftp" -and $remote.description -eq "managed by pass-ssh-unpack") {
-            $keyPath = $remote.key_file
-            if (-not [string]::IsNullOrEmpty($keyPath)) {
-                $expandedPath = $keyPath -replace '^~', $env:USERPROFILE
-                if (-not (Test-Path $expandedPath)) {
-                    rclone config delete $remoteName 2>$null | Out-Null
-                    $prunedCount++
-                }
-            }
-        }
-    }
-    
-    # Prune alias remotes whose target was deleted
-    $configJson = rclone config dump 2>$null
-    $updatedConfig = @{}
-    if (-not [string]::IsNullOrEmpty($configJson)) {
-        try {
-            $updatedConfig = $configJson | ConvertFrom-Json -AsHashtable
-        } catch {
-            $updatedConfig = @{}
-        }
-    }
-    
-    foreach ($remoteName in @($updatedConfig.Keys)) {
-        $remote = $updatedConfig[$remoteName]
-        if ($remote.type -eq "alias" -and $remote.description -eq "managed by pass-ssh-unpack") {
-            $target = $remote.remote -replace ':$', ''
-            if (-not $updatedConfig.ContainsKey($target)) {
-                rclone config delete $remoteName 2>$null | Out-Null
-                $prunedCount++
-            }
-        }
-    }
-    
-    # Re-add to chezmoi if managed, then auto-commit/push
-    $chezmoiCmd = Get-Command chezmoi -ErrorAction SilentlyContinue
-    if ($chezmoiCmd) {
-        $managed = chezmoi managed 2>$null
-        if ($managed -match "rclone/rclone.conf") {
-            chezmoi re-add ~/.config/rclone/rclone.conf 2>$null | Out-Null
-            Write-RLog "  Synced $createdCount remotes to chezmoi."
-            
-            # Auto-commit if there are changes
-            $diffResult = chezmoi git -- diff --quiet dot_config/rclone/private_rclone.conf 2>$null
-            if ($LASTEXITCODE -ne 0) {
-                chezmoi git -- add dot_config/rclone/private_rclone.conf 2>$null | Out-Null
-                chezmoi git -- commit -m "chore: update rclone config via pass-ssh-unpack" 2>$null | Out-Null
-                
-                # Auto-push if only 1 commit ahead
-                $aheadCount = chezmoi git -- rev-list --count "@{u}..HEAD" 2>$null
-                if ($aheadCount -eq "1") {
-                    chezmoi git push 2>$null | Out-Null
-                    Write-RLog "  Committed and pushed rclone config."
-                } else {
-                    Write-RLog "  Committed rclone config. Run 'chezmoi git push' to sync ($aheadCount commits ahead)."
-                }
-            }
-        } else {
-            Write-RLog "  Synced $createdCount remotes."
-        }
+
+    # Re-add rclone config
+    $rcloneConf = if ($IsWindows -or $env:OS -match "Windows") {
+        "$env:USERPROFILE\.config\rclone\rclone.conf"
     } else {
-        Write-RLog "  Synced $createdCount remotes."
+        "$HOME/.config/rclone/rclone.conf"
     }
-    
-    if ($skippedCount -gt 0) {
-        Write-RLog "  Skipped $skippedCount (unmanaged conflicts)."
+    chezmoi re-add $rcloneConf 2>$null
+
+    # Check if there are changes to commit
+    $diffResult = chezmoi git -- diff --quiet dot_config/rclone/private_rclone.conf 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        # No changes
+        return
     }
-    if ($prunedCount -gt 0) {
-        Write-RLog "  Pruned $prunedCount orphaned remotes."
+
+    # Commit changes
+    chezmoi git -- add dot_config/rclone/private_rclone.conf 2>$null
+    chezmoi git -- commit -m "chore: update rclone config via pass-ssh-unpack" 2>$null
+
+    # Check how many commits ahead
+    $aheadCount = chezmoi git -- rev-list --count "@{u}..HEAD" 2>$null
+    if (-not $aheadCount) { $aheadCount = "0" }
+
+    if ($aheadCount -eq "1") {
+        chezmoi git push 2>$null
+        Write-Host "  Synced rclone config to chezmoi (committed and pushed)."
+    } elseif ([int]$aheadCount -gt 1) {
+        Write-Host "  Synced rclone config to chezmoi ($aheadCount commits ahead - run 'chezmoi git push' to sync)."
+    } else {
+        Write-Host "  Synced rclone config to chezmoi."
     }
 }

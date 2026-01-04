@@ -4,34 +4,35 @@ Extract SSH keys from Proton Pass to local files and generate SSH config.
 
 ## Overview
 
-`pass-ssh-unpack` pulls SSH keys stored in your Proton Pass vaults, saves them to disk with proper permissions, generates matching SSH config entries, and optionally saves derived public keys back to Proton Pass.
+`pass-ssh-unpack` is a cross-platform Rust CLI tool that pulls SSH keys stored in your Proton Pass vaults, saves them to disk with proper permissions, generates matching SSH config entries, and optionally syncs rclone SFTP remotes.
 
 **Key features:**
+- Cross-platform (Linux, macOS, Windows)
 - Incremental updates (only updates entries for unpacked keys)
 - Auto-prune (removes config entries whose key files no longer exist)
 - Wildcard matching for vault names and item titles
 - Machine-specific key filtering (e.g., `github/hostname`)
 - Portable paths using SSH's `%d` token
 - Password-only entries (items without private keys still get config entries)
+- Encrypted rclone config support
+- Progress indicators with spinners and progress bars
 
 ## Requirements
 
 - [Proton Pass CLI](https://proton.me/support/pass-cli) (`pass-cli`)
 - OpenSSH (`ssh-keygen`)
-- `jq` (Bash/Zsh/Fish only)
+- [rclone](https://rclone.org/) (optional, for SFTP remote sync)
 - Logged into Proton Pass (`pass-cli login`)
 
 ## Installation
 
-The command is automatically available when sourcing your shell config files managed by chezmoi.
+Install via cargo:
 
-| Shell      | Source File                                              |
-|------------|----------------------------------------------------------|
-| Bash       | `~/.config/shell/bash/sources/pass-ssh-unpack.bash`      |
-| Zsh        | `~/.config/shell/zsh/sources/pass-ssh-unpack.zsh`        |
-| Fish       | `~/.config/shell/fish/sources/pass-ssh-unpack.fish`      |
-| Nushell    | `~/.config/shell/nushell/sources/pass-ssh-unpack.nu`     |
-| PowerShell | `~/.config/shell/powershell/sources/pass-ssh-unpack.ps1` |
+```bash
+cargo install pass-ssh-unpack
+```
+
+The shell wrappers in chezmoi automatically find and call the binary, adding chezmoi sync functionality on top.
 
 ## Usage
 
@@ -41,15 +42,25 @@ pass-ssh-unpack [OPTIONS]
 
 ### Options
 
-| Option              | Short | Repeatable | Description                                |
-|---------------------|-------|------------|--------------------------------------------|
-| `--vault <PATTERN>` | `-v`  | Yes        | Vault(s) to process, supports `*` and `?` wildcards |
-| `--item <PATTERN>`  | `-i`  | Yes        | Item title pattern(s), supports `*` and `?` wildcards |
-| `--full`            | `-f`  | No         | Full regeneration (clear config first)     |
-| `--quiet`           | `-q`  | No         | Suppress output                            |
-| `--no-rclone`       |       | No         | Skip rclone remote sync                    |
-| `--purge`           |       | No         | Remove all managed SSH keys and rclone remotes, then exit |
-| `--help`            | `-h`  | No         | Show help message                          |
+CLI options override corresponding config file settings.
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--vault <PATTERN>` | `-v` | Vault(s) to process (repeatable, supports wildcards) |
+| `--item <PATTERN>` | `-i` | Item title pattern(s) (repeatable, supports wildcards) |
+| `--full` | `-f` | Full regeneration (clear config first) |
+| `--dry-run` | | Show what would be done without making changes |
+| `--quiet` | `-q` | Suppress output |
+| `--ssh` | | Only process SSH keys (skip rclone sync) |
+| `--rclone` | | Only process rclone remotes (skip SSH extraction) |
+| `--purge` | | Remove all managed SSH keys and rclone remotes |
+| `--config <PATH>` | `-c` | Custom config file path |
+| `--output-dir <PATH>` | `-o` | Override SSH output directory |
+| `--sync-public-key <MODE>` | | Override public key sync mode (never/if-empty/always) |
+| `--rclone-password-path <PATH>` | | Override rclone password path in Proton Pass |
+| `--always-encrypt` | | Force rclone config encryption after operations |
+| `--help` | `-h` | Show help |
+| `--version` | `-V` | Show version |
 
 ### Examples
 
@@ -78,11 +89,46 @@ pass-ssh-unpack -v "Dragon*" -i '*.dev'
 # Full regeneration (clears config first)
 pass-ssh-unpack --full
 
+# Only process SSH keys (skip rclone)
+pass-ssh-unpack --ssh
+
+# Only process rclone remotes (skip SSH)
+pass-ssh-unpack --rclone
+
 # Purge all managed data without regenerating
 pass-ssh-unpack --purge
 
 # Quiet mode (for scripting)
 pass-ssh-unpack -q
+```
+
+## Configuration
+
+On first run, a default config file is created at `~/.config/pass-ssh-unpack/config.toml`:
+
+```toml
+# Directory where SSH keys and config are written
+ssh_output_dir = "~/.ssh/proton-pass"
+
+# Default vault filter(s) - applied when no --vault flag is given
+default_vaults = []
+
+# Default item filter(s) - applied when no --item flag is given
+default_items = []
+
+# When to sync generated public keys back to Proton Pass
+# Options: "never", "if_empty" (default), "always"
+sync_public_key = "if_empty"
+
+[rclone]
+# Enable rclone SFTP remote sync
+enabled = true
+
+# Path in Proton Pass to rclone config password (if encrypted)
+password_path = ""
+
+# Always ensure rclone config is encrypted after operations
+always_encrypt = false
 ```
 
 ## Proton Pass SSH Key Structure
@@ -91,20 +137,20 @@ Each SSH key item in Proton Pass should have:
 
 ### Required Fields
 
-| Field                        | Description                          |
-|------------------------------|--------------------------------------|
-| `content.title`              | Item name (e.g., `github/cachycosmic`) |
+| Field | Description |
+|-------|-------------|
+| `content.title` | Item name (e.g., `github/cachycosmic`) |
 | `content.content.SshKey.private_key` | The private key content (can be empty for password auth) |
 
 ### Extra Fields (Custom)
 
 Add these as custom text fields in Proton Pass:
 
-| Field Name | Description                                    | Example              |
-|------------|------------------------------------------------|----------------------|
-| `Host`     | SSH hostname for config **(required)**         | `github.com`         |
-| `Username` | SSH user for config                            | `git`                |
-| `Aliases`  | Comma-separated alias hostnames                | `gh, github`         |
+| Field Name | Description | Example |
+|------------|-------------|---------|
+| `Host` | SSH hostname for config **(required)** | `github.com` |
+| `Username` | SSH user for config | `git` |
+| `Aliases` | Comma-separated alias hostnames | `gh, github` |
 
 If `Aliases` is empty, the item title is used as an alias.
 
@@ -128,7 +174,6 @@ If `Aliases` is empty, the item title is used as an alias.
 # =============================================================================
 # DO NOT EDIT THIS FILE - IT IS AUTO-GENERATED BY pass-ssh-unpack
 # =============================================================================
-# ...
 
 Host github.com
     IdentityFile "%d/.ssh/proton-pass/Personal/github-cachycosmic"
@@ -142,17 +187,6 @@ Host gh
     User git
 ```
 
-### Password-Only Entries
-
-For SSH items that have no private key stored (empty `private_key` field), the command generates a minimal config entry without `IdentityFile` or `IdentitiesOnly`. This allows SSH to prompt for a password.
-
-```ssh-config
-Host home.thedragon.dev
-    User frosthaven
-```
-
-This is useful for servers that use password authentication or when you want to store SSH connection info without the key itself.
-
 ### Using the Config
 
 Add this line to your `~/.ssh/config`:
@@ -165,86 +199,43 @@ Include ~/.ssh/proton-pass/config
 
 ### Incremental Updates (default)
 
-Running without `--full` preserves existing config entries and key files. Only entries for keys that are actually unpacked are updated. This allows you to run the command for a subset of keys without losing other entries.
+Running without `--full` preserves existing config entries and key files. Only entries for keys that are actually unpacked are updated.
 
 ### Full Regeneration (`--full`)
 
-Running with `--full` deletes the entire `~/.ssh/proton-pass` folder first, then regenerates everything from scratch. Use this when you want a guaranteed clean slate with no orphaned files.
+Running with `--full` deletes the entire `~/.ssh/proton-pass` folder first, then regenerates everything from scratch.
 
 ### Purge Only (`--purge`)
 
 Running with `--purge` removes all managed data without regenerating:
 1. Deletes the entire `~/.ssh/proton-pass/` folder
 2. Deletes all rclone remotes with `description = "managed by pass-ssh-unpack"`
-3. Syncs rclone config to chezmoi if managed
-4. Exits without extracting any keys
-
-This is useful when you want to clean up before switching accounts or troubleshooting.
+3. Exits without extracting any keys
 
 ### Auto-Prune
 
-On every run, entries whose referenced key files don't exist on disk are automatically removed from the config. This keeps the config clean when keys are deleted from Proton Pass.
+On every run, entries whose referenced key files don't exist on disk are automatically removed from the config.
 
 ### Machine-Specific Keys
 
 If an item title contains a `/` (e.g., `github/cachycosmic`), the part after the last `/` is compared to the current hostname. The key is only extracted if they match (case-insensitive).
 
-This allows storing multiple machine-specific keys for the same service:
-- `github/cachycosmic` - Only extracted on machine `cachycosmic`
-- `github/frosthaven-mbp14` - Only extracted on machine `frosthaven-mbp14`
-
 ### Public Key Generation
 
 If the `public_key` field in Proton Pass is empty, `pass-ssh-unpack` generates the public key from the private key and attempts to save it back to Proton Pass.
 
-## Troubleshooting
-
-### "pass-cli not found"
-
-Install the Proton Pass CLI from https://proton.me/support/pass-cli
-
-### "Not logged into Proton Pass"
-
-Run `pass-cli login` to authenticate.
-
-### "ssh-keygen not found"
-
-Install OpenSSH. On most systems this is pre-installed.
-
-### "jq not found" (Bash/Zsh/Fish only)
-
-Install `jq`:
-- Arch: `sudo pacman -S jq`
-- macOS: `brew install jq`
-- Ubuntu/Debian: `sudo apt install jq`
-
-### Keys not appearing in config
-
-1. Ensure the item has a `Host` field in extra_fields
-2. Check if the item title has a machine suffix that doesn't match your hostname
-3. Run with `--full` to do a clean regeneration
-
-### Permission denied errors
-
-SSH requires private keys to have strict permissions. The command sets `chmod 600` automatically, but if issues persist, verify permissions manually:
-
-```bash
-chmod 600 ~/.ssh/proton-pass/VaultName/key-name
-```
-
 ## Rclone Integration
 
-When `rclone` is available and configured, `pass-ssh-unpack` automatically creates SFTP remotes for each SSH entry, enabling seamless file transfers to your servers.
+When `rclone` is available and configured, `pass-ssh-unpack` automatically creates SFTP remotes for each SSH entry.
 
 ### Requirements
 
 - `rclone` command available in PATH
-- rclone config password stored in Proton Pass at `pass://Personal/rclone/password`
-- `jq` for JSON parsing (Bash/Zsh/Fish only)
+- rclone config password stored in Proton Pass (optional, for encrypted configs)
 
 ### Generated Remotes
 
-For each SSH entry with a private key, an SFTP remote is created:
+For each SSH entry with a private key:
 
 ```ini
 [thedragon.dev]
@@ -266,24 +257,9 @@ ask_password = true
 description = managed by pass-ssh-unpack
 ```
 
-Alias remotes use rclone's `alias` type to reference the primary remote:
-
-```ini
-[dragon]
-type = alias
-remote = thedragon.dev:
-description = managed by pass-ssh-unpack
-```
-
 ### Conflict Handling
 
-If an existing rclone remote has the same name but wasn't created by `pass-ssh-unpack` (missing the `description = "managed by pass-ssh-unpack"` marker), the command will skip it with a warning:
-
-```
-  Skipping thedragon.dev: existing unmanaged remote
-```
-
-This prevents overwriting user-created remotes.
+Existing rclone remotes without the `description = "managed by pass-ssh-unpack"` marker are skipped to prevent overwriting user-created remotes.
 
 ### Auto-Prune Behavior
 
@@ -291,24 +267,40 @@ On every run:
 - Managed SFTP remotes whose `key_file` no longer exists are deleted
 - Managed alias remotes whose target remote was deleted are also deleted
 
-### Chezmoi Integration
+## Chezmoi Integration
 
-If `~/.config/rclone/rclone.conf` is managed by chezmoi, changes are automatically synced using `chezmoi re-add` after updating remotes.
+The shell wrappers automatically sync rclone config changes to chezmoi after running the binary:
 
-### Skipping Rclone Sync
+1. If `~/.config/rclone/rclone.conf` is managed by chezmoi, it's re-added after changes
+2. Changes are auto-committed with message "chore: update rclone config via pass-ssh-unpack"
+3. If only 1 commit ahead of remote, changes are auto-pushed
 
-Use `--no-rclone` to skip rclone sync entirely:
+This happens automatically when using the shell wrapper function. To skip chezmoi sync, use `--dry-run`.
+
+## Troubleshooting
+
+### "pass-cli not found"
+
+Install the Proton Pass CLI from https://proton.me/support/pass-cli
+
+### "Not logged into Proton Pass"
+
+Run `pass-cli login` to authenticate.
+
+### "ssh-keygen not found"
+
+Install OpenSSH. On most systems this is pre-installed.
+
+### Keys not appearing in config
+
+1. Ensure the item has a `Host` field in extra_fields
+2. Check if the item title has a machine suffix that doesn't match your hostname
+3. Run with `--full` to do a clean regeneration
+
+### Permission denied errors
+
+SSH requires private keys to have strict permissions. The command sets `chmod 600` automatically, but if issues persist, verify permissions manually:
 
 ```bash
-pass-ssh-unpack --no-rclone
+chmod 600 ~/.ssh/proton-pass/VaultName/key-name
 ```
-
-This is useful when you only want to update SSH keys without modifying rclone config.
-
-### Full Regeneration with Rclone
-
-When running with `--full`:
-1. The `~/.ssh/proton-pass/` folder is deleted
-2. All rclone remotes with `description = "managed by pass-ssh-unpack"` are deleted
-3. SSH keys are regenerated from Proton Pass
-4. Fresh rclone remotes are created

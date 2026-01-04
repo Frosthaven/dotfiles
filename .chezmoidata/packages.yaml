@@ -137,6 +137,11 @@ packages:
         mac: cargo install cargo-release
         apt: cargo install cargo-release
         pac: cargo install cargo-release
+    cli-pass-ssh-unpack: # extract ssh keys from proton pass
+        win: cargo install pass-ssh-unpack
+        mac: cargo install pass-ssh-unpack
+        apt: cargo install pass-ssh-unpack
+        pac: cargo install pass-ssh-unpack
     cli-ripgrep: # search tool
         win: cargo install ripgrep #winget install --id BurntSushi.ripgrep.MSVC
         mac: cargo install ripgrep
