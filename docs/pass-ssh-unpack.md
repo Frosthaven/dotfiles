@@ -160,7 +160,11 @@ Include ~/.ssh/proton-pass/config
 
 ### Incremental Updates (default)
 
-Running without `--full` preserves existing config entries. Only entries for keys that are actually unpacked are updated. This allows you to run the command for a subset of keys without losing other entries.
+Running without `--full` preserves existing config entries and key files. Only entries for keys that are actually unpacked are updated. This allows you to run the command for a subset of keys without losing other entries.
+
+### Full Regeneration (`--full`)
+
+Running with `--full` deletes the entire `~/.ssh/proton-pass` folder first, then regenerates everything from scratch. Use this when you want a guaranteed clean slate with no orphaned files.
 
 ### Auto-Prune
 

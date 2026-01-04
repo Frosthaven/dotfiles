@@ -90,6 +90,13 @@ function pass-ssh-unpack
     # =========================================================================
     set -l current_hostname (hostname | tr '[:upper:]' '[:lower:]')
     set -l base_dir "$HOME/.ssh/proton-pass"
+    
+    # Full mode: delete entire folder and start fresh
+    if test "$full_mode" = "true"; and test -d "$base_dir"
+        _log "Full regeneration: clearing $base_dir..."
+        rm -rf "$base_dir"
+    end
+    
     mkdir -p "$base_dir"
     
     set -l config_path "$base_dir/config"

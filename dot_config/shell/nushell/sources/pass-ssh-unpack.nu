@@ -84,6 +84,13 @@ def pass-ssh-unpack [
     # =========================================================================
     let current_hostname = (hostname | str trim | str downcase)
     let base_dir = ($env.HOME | path join ".ssh" "proton-pass")
+    
+    # Full mode: delete entire folder and start fresh
+    if $full and ($base_dir | path exists) {
+        log $"Full regeneration: clearing ($base_dir)..."
+        rm -rf $base_dir
+    }
+    
     mkdir $base_dir
     
     let config_path = ($base_dir | path join "config")

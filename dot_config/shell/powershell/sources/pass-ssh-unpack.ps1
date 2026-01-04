@@ -58,6 +58,13 @@ function pass-ssh-unpack {
     # =========================================================================
     $currentHostname = $env:COMPUTERNAME.ToLower()
     $baseDir = Join-Path $env:USERPROFILE ".ssh\proton-pass"
+    
+    # Full mode: delete entire folder and start fresh
+    if ($Full -and (Test-Path $baseDir)) {
+        Write-Log "Full regeneration: clearing $baseDir..."
+        Remove-Item -Path $baseDir -Recurse -Force
+    }
+    
     if (-not (Test-Path $baseDir)) {
         New-Item -ItemType Directory -Path $baseDir -Force | Out-Null
     }
