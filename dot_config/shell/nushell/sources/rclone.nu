@@ -20,6 +20,20 @@ def rclone-config [] {
     print "Syncing rclone config to chezmoi..."
     chezmoi re-add ~/.config/rclone/rclone.conf
     chezmoi git -- add dot_config/rclone/private_rclone.conf
-    chezmoi git commit -m "chore: update rclone config"
-    print "Done. Run 'chezmoi git push' to sync to remote."
+    chezmoi git -- commit -m "chore: update rclone config"
+    
+    # Auto-push if only 1 commit ahead, otherwise warn user
+    let ahead_result = (do { chezmoi git -- rev-list --count "@{u}..HEAD" } | complete)
+    let ahead_count = if $ahead_result.exit_code == 0 {
+        $ahead_result.stdout | str trim | into int
+    } else {
+        0
+    }
+    
+    if $ahead_count == 1 {
+        chezmoi git push
+        print "Done. Changes pushed to remote."
+    } else {
+        print "Done. Multiple unpushed commits detected - run 'chezmoi git push' to sync to remote."
+    }
 }

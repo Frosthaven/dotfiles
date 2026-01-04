@@ -488,11 +488,11 @@ def sync-rclone-remotes [
         # Create/update primary SFTP remote
         if ($key_file | is-not-empty) {
             do { with-env $rclone_env {
-                rclone config create $host sftp host=$host user=$user key_file=$key_file description="managed by pass-ssh-unpack"
+                ^rclone config create $host sftp $"host=($host)" $"user=($user)" $"key_file=($key_file)" "description=managed by pass-ssh-unpack"
             } } | complete | ignore
         } else {
             do { with-env $rclone_env {
-                rclone config create $host sftp host=$host user=$user ask_password=true description="managed by pass-ssh-unpack"
+                ^rclone config create $host sftp $"host=($host)" $"user=($user)" "ask_password=true" "description=managed by pass-ssh-unpack"
             } } | complete | ignore
         }
         $created_count = $created_count + 1
@@ -516,7 +516,7 @@ def sync-rclone-remotes [
                 }
                 
                 do { with-env $rclone_env {
-                    rclone config create $alias_name alias remote=$"($host):" description="managed by pass-ssh-unpack"
+                    ^rclone config create $alias_name alias $"remote=($host):" "description=managed by pass-ssh-unpack"
                 } } | complete | ignore
                 $created_count = $created_count + 1
             }
