@@ -2,7 +2,7 @@
 # See: docs/pass-ssh-unpack.md
 
 # Wrapper for pass-ssh-unpack that syncs rclone config to chezmoi after running
-def pass-ssh-unpack [...args: string] {
+def --wrapped pass-ssh-unpack [...args] {
     # Check if binary exists
     if (which pass-ssh-unpack-bin | is-empty) {
         # Fall back to the cargo-installed binary name
