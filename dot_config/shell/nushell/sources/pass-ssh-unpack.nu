@@ -4,19 +4,17 @@
 # Wrapper for pass-ssh-unpack that syncs rclone config to chezmoi after running
 def --wrapped pass-ssh-unpack [...args] {
     # Check if binary exists
-    if (which pass-ssh-unpack-bin | is-empty) {
-        # Fall back to the cargo-installed binary name
-        if (which ~/.cargo/bin/pass-ssh-unpack | is-empty) {
-            print "(pass-ssh-unpack) Binary not found. Install with: cargo install pass-ssh-unpack"
-            return
-        }
+    let cargo_bin = ($env.HOME | path join ".cargo/bin/pass-ssh-unpack")
+    if (which pass-ssh-unpack-bin | is-empty) and (not ($cargo_bin | path exists)) {
+        print "(pass-ssh-unpack) Binary not found. Install with: cargo install pass-ssh-unpack"
+        return
     }
 
     # Run the actual binary
     let result = if (which pass-ssh-unpack-bin | is-not-empty) {
         do { ^pass-ssh-unpack-bin ...$args } | complete
     } else {
-        do { ^~/.cargo/bin/pass-ssh-unpack ...$args } | complete
+        do { ^$cargo_bin ...$args } | complete
     }
 
     # Print output
