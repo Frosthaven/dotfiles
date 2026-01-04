@@ -28,12 +28,14 @@ def matches-pattern [title: string, patterns: list<string>]: nothing -> bool {
 #   pass-ssh-unpack -i ['github/*' 'thedragon*']     # Multiple patterns
 #   pass-ssh-unpack --full                           # Full regeneration
 #   pass-ssh-unpack --no-rclone                      # Skip rclone sync
+#   pass-ssh-unpack --purge                          # Remove all managed data
 def pass-ssh-unpack [
     --vault (-v): any   # Vault(s) to process - string or list, supports * and ? wildcards
     --item (-i): any    # Item title pattern(s) - string or list, supports * and ? wildcards
     --full (-f)         # Full regeneration (clear config first)
     --quiet (-q)        # Suppress output
     --no-rclone         # Skip rclone remote sync
+    --purge             # Remove all managed SSH keys and rclone remotes, then exit
 ] {
     # Normalize inputs to lists
     let vault_filter = if ($vault | is-empty) {
@@ -75,6 +77,75 @@ def pass-ssh-unpack [
     
     if (which ssh-keygen | is-empty) {
         print "(pass-ssh-unpack) ssh-keygen not found. Install OpenSSH first."
+        return
+    }
+    
+    # =========================================================================
+    # Purge mode: delete everything and exit
+    # =========================================================================
+    if $purge {
+        let base_dir = ($env.HOME | path join ".ssh" "proton-pass")
+        
+        log "Purging all managed SSH keys and rclone remotes..."
+        
+        # Delete SSH keys folder
+        if ($base_dir | path exists) {
+            rm -rf $base_dir
+            log $"  Removed ($base_dir)"
+        } else {
+            log $"  ($base_dir) does not exist"
+        }
+        
+        # Delete managed rclone remotes
+        if (which rclone | is-not-empty) {
+            mut rclone_pass = ($env.RCLONE_CONFIG_PASS? | default "")
+            if ($rclone_pass | is-empty) {
+                let pass_result = (do { pass-cli item view "pass://Personal/rclone/password" --field password } | complete)
+                if $pass_result.exit_code == 0 {
+                    $rclone_pass = ($pass_result.stdout | str trim)
+                }
+            }
+            
+            if ($rclone_pass | is-not-empty) {
+                let rclone_env = { RCLONE_CONFIG_PASS: $rclone_pass }
+                
+                let config_result = (do { with-env $rclone_env { ^rclone config dump } } | complete)
+                let current_config = if $config_result.exit_code == 0 and ($config_result.stdout | is-not-empty) {
+                    $config_result.stdout | from json
+                } else {
+                    {}
+                }
+                
+                let managed_remotes = ($current_config | transpose name config | where { |r| ($r.config.description? | default "") == "managed by pass-ssh-unpack" } | get name)
+                
+                mut deleted_count = 0
+                for remote in $managed_remotes {
+                    do { with-env $rclone_env { ^rclone config delete $remote } } | complete | ignore
+                    $deleted_count = $deleted_count + 1
+                }
+                
+                if $deleted_count > 0 {
+                    log $"  Removed ($deleted_count) rclone remotes"
+                    
+                    # Re-add to chezmoi if managed
+                    if (which chezmoi | is-not-empty) {
+                        let managed_result = (do { chezmoi managed } | complete)
+                        if $managed_result.exit_code == 0 and ($managed_result.stdout | str contains "rclone/rclone.conf") {
+                            do { chezmoi re-add ~/.config/rclone/rclone.conf } | complete | ignore
+                            log "  Synced rclone config to chezmoi"
+                        }
+                    }
+                } else {
+                    log "  No managed rclone remotes found"
+                }
+            } else {
+                log "  (skipped rclone - could not get password)"
+            }
+        } else {
+            log "  (rclone not installed)"
+        }
+        
+        log "Done."
         return
     }
     

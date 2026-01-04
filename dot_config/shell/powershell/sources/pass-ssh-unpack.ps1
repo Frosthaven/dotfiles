@@ -21,7 +21,10 @@ function pass-ssh-unpack {
         [switch]$Quiet,
         
         [Parameter()]
-        [switch]$NoRclone
+        [switch]$NoRclone,
+        
+        [Parameter()]
+        [switch]$Purge
     )
     
     # Helper function for output
@@ -50,6 +53,68 @@ function pass-ssh-unpack {
     $sshKeygen = Get-Command ssh-keygen -ErrorAction SilentlyContinue
     if (-not $sshKeygen) {
         Write-Host "(pass-ssh-unpack) ssh-keygen not found. Install OpenSSH first." -ForegroundColor Red
+        return
+    }
+
+    # =========================================================================
+    # Purge mode: delete everything and exit
+    # =========================================================================
+    if ($Purge) {
+        $baseDir = Join-Path $env:USERPROFILE ".ssh\proton-pass"
+        
+        Write-Log "Purging all managed SSH keys and rclone remotes..."
+        
+        # Delete SSH keys folder
+        if (Test-Path $baseDir) {
+            Remove-Item -Path $baseDir -Recurse -Force
+            Write-Log "  Removed $baseDir"
+        } else {
+            Write-Log "  $baseDir does not exist"
+        }
+        
+        # Delete managed rclone remotes
+        $rcloneCmd = Get-Command rclone -ErrorAction SilentlyContinue
+        if ($rcloneCmd) {
+            if (-not $env:RCLONE_CONFIG_PASS) {
+                $env:RCLONE_CONFIG_PASS = (pass-cli item view "pass://Personal/rclone/password" --field password 2>$null)
+            }
+            
+            if ($env:RCLONE_CONFIG_PASS) {
+                $currentConfig = (rclone config dump 2>$null) | ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue
+                if (-not $currentConfig) { $currentConfig = @{} }
+                
+                $deletedCount = 0
+                foreach ($remoteName in $currentConfig.Keys) {
+                    $remote = $currentConfig[$remoteName]
+                    if ($remote.description -eq "managed by pass-ssh-unpack") {
+                        rclone config delete $remoteName 2>$null
+                        $deletedCount++
+                    }
+                }
+                
+                if ($deletedCount -gt 0) {
+                    Write-Log "  Removed $deletedCount rclone remotes"
+                    
+                    # Re-add to chezmoi if managed
+                    $chezmoiCmd = Get-Command chezmoi -ErrorAction SilentlyContinue
+                    if ($chezmoiCmd) {
+                        $managed = chezmoi managed 2>$null
+                        if ($managed -match "rclone[/\\]rclone.conf") {
+                            chezmoi re-add ~/.config/rclone/rclone.conf 2>$null
+                            Write-Log "  Synced rclone config to chezmoi"
+                        }
+                    }
+                } else {
+                    Write-Log "  No managed rclone remotes found"
+                }
+            } else {
+                Write-Log "  (skipped rclone - could not get password)"
+            }
+        } else {
+            Write-Log "  (rclone not installed)"
+        }
+        
+        Write-Log "Done."
         return
     }
 

@@ -48,6 +48,7 @@ pass-ssh-unpack [OPTIONS]
 | `--full`            | `-f`  | No         | Full regeneration (clear config first)     |
 | `--quiet`           | `-q`  | No         | Suppress output                            |
 | `--no-rclone`       |       | No         | Skip rclone remote sync                    |
+| `--purge`           |       | No         | Remove all managed SSH keys and rclone remotes, then exit |
 | `--help`            | `-h`  | No         | Show help message                          |
 
 ### Examples
@@ -76,6 +77,9 @@ pass-ssh-unpack -v "Dragon*" -i '*.dev'
 
 # Full regeneration (clears config first)
 pass-ssh-unpack --full
+
+# Purge all managed data without regenerating
+pass-ssh-unpack --purge
 
 # Quiet mode (for scripting)
 pass-ssh-unpack -q
@@ -166,6 +170,16 @@ Running without `--full` preserves existing config entries and key files. Only e
 ### Full Regeneration (`--full`)
 
 Running with `--full` deletes the entire `~/.ssh/proton-pass` folder first, then regenerates everything from scratch. Use this when you want a guaranteed clean slate with no orphaned files.
+
+### Purge Only (`--purge`)
+
+Running with `--purge` removes all managed data without regenerating:
+1. Deletes the entire `~/.ssh/proton-pass/` folder
+2. Deletes all rclone remotes with `description = "managed by pass-ssh-unpack"`
+3. Syncs rclone config to chezmoi if managed
+4. Exits without extracting any keys
+
+This is useful when you want to clean up before switching accounts or troubleshooting.
 
 ### Auto-Prune
 

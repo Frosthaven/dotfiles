@@ -10,6 +10,7 @@ pass-ssh-unpack() {
     local full_mode=false
     local quiet_mode=false
     local skip_rclone=false
+    local purge_mode=false
     
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -33,6 +34,10 @@ pass-ssh-unpack() {
                 skip_rclone=true
                 shift
                 ;;
+            --purge)
+                purge_mode=true
+                shift
+                ;;
             -h|--help)
                 echo "Usage: pass-ssh-unpack [OPTIONS]"
                 echo ""
@@ -45,6 +50,7 @@ pass-ssh-unpack() {
                 echo "  -f, --full                 Full regeneration (clear config first)"
                 echo "  -q, --quiet                Suppress output"
                 echo "  --no-rclone                Skip rclone remote sync"
+                echo "  --purge                    Remove all managed SSH keys and rclone remotes, then exit"
                 echo "  -h, --help                 Show this help message"
                 echo ""
                 echo "Examples:"
@@ -55,6 +61,7 @@ pass-ssh-unpack() {
                 echo "  pass-ssh-unpack -v Personal -i 'github/*'  # Combined filters"
                 echo "  pass-ssh-unpack --full                     # Full regeneration"
                 echo "  pass-ssh-unpack --no-rclone                # Skip rclone sync"
+                echo "  pass-ssh-unpack --purge                    # Remove all managed data"
                 return 0
                 ;;
             *)
@@ -93,6 +100,70 @@ pass-ssh-unpack() {
     if ! command -v jq &>/dev/null; then
         echo "(pass-ssh-unpack) jq not found. Install jq first."
         return 1
+    fi
+    
+    # =========================================================================
+    # Purge mode: delete everything and exit
+    # =========================================================================
+    if [[ "$purge_mode" == "true" ]]; then
+        local base_dir="$HOME/.ssh/proton-pass"
+        
+        _log "Purging all managed SSH keys and rclone remotes..."
+        
+        # Delete SSH keys folder
+        if [[ -d "$base_dir" ]]; then
+            rm -rf "$base_dir"
+            _log "  Removed $base_dir"
+        else
+            _log "  $base_dir does not exist"
+        fi
+        
+        # Delete managed rclone remotes
+        if command -v rclone &>/dev/null; then
+            if [[ -z "$RCLONE_CONFIG_PASS" ]]; then
+                RCLONE_CONFIG_PASS=$(pass-cli item view "pass://Personal/rclone/password" --field password 2>/dev/null)
+                if [[ -n "$RCLONE_CONFIG_PASS" ]]; then
+                    export RCLONE_CONFIG_PASS
+                fi
+            fi
+            
+            if [[ -n "$RCLONE_CONFIG_PASS" ]]; then
+                local current_config
+                current_config=$(rclone config dump 2>/dev/null)
+                [[ -z "$current_config" ]] && current_config="{}"
+                
+                local managed_remotes
+                managed_remotes=$(echo "$current_config" | jq -r 'to_entries[] | select(.value.description == "managed by pass-ssh-unpack") | .key' 2>/dev/null)
+                
+                local deleted_count=0
+                while IFS= read -r remote; do
+                    [[ -z "$remote" ]] && continue
+                    rclone config delete "$remote" &>/dev/null
+                    ((deleted_count++))
+                done <<< "$managed_remotes"
+                
+                if [[ $deleted_count -gt 0 ]]; then
+                    _log "  Removed $deleted_count rclone remotes"
+                    
+                    # Re-add to chezmoi if managed
+                    if command -v chezmoi &>/dev/null; then
+                        if chezmoi managed 2>/dev/null | grep -q "rclone/rclone.conf"; then
+                            chezmoi re-add ~/.config/rclone/rclone.conf &>/dev/null
+                            _log "  Synced rclone config to chezmoi"
+                        fi
+                    fi
+                else
+                    _log "  No managed rclone remotes found"
+                fi
+            else
+                _log "  (skipped rclone - could not get password)"
+            fi
+        else
+            _log "  (rclone not installed)"
+        fi
+        
+        _log "Done."
+        return 0
     fi
     
     _log "Extracting SSH keys from Proton Pass..."
