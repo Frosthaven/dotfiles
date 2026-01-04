@@ -16,7 +16,7 @@ def --env --wrapped rclone [...args] {
 # Helper: rclone-config
 # Runs rclone config and syncs changes to chezmoi
 def rclone-config [] {
-    ^rclone config
+    rclone config
     print "Syncing rclone config to chezmoi..."
     chezmoi re-add ~/.config/rclone/rclone.conf
     print "Done. Commit with: chezmoi git add -A && chezmoi git commit -m 'Update rclone config'"
