@@ -168,7 +168,11 @@ function rclone-config {
     if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
         $rcloneConfigPath = "$env:USERPROFILE\.config\rclone\rclone.conf"
         if (Test-Path $rcloneConfigPath) {
+            Write-Host "Syncing rclone config to chezmoi..."
             chezmoi re-add $rcloneConfigPath
+            chezmoi git add -A
+            chezmoi git commit -m "chore: update rclone config"
+            Write-Host "Done. Changes committed to chezmoi."
         }
     }
 }

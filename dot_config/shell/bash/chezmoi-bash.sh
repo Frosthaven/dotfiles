@@ -53,7 +53,9 @@ rclone-config() {
     rclone config
     echo "Syncing rclone config to chezmoi..."
     chezmoi re-add ~/.config/rclone/rclone.conf
-    echo "Done. Commit with: chezmoi git add -A && chezmoi git commit -m 'Update rclone config'"
+    chezmoi git add -A
+    chezmoi git commit -m "chore: update rclone config"
+    echo "Done. Changes committed to chezmoi."
 }
 
 # Starship prompt
