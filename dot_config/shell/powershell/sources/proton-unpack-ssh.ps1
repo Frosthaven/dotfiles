@@ -226,9 +226,11 @@ function proton-unpack-ssh {
         }
     }
 
-    $totalKeys = $uniqueHosts.Count
+    $totalHosts = $uniqueHosts.Count
+    $totalAliases = ($hostKeys | Where-Object { $_.IsAlias -eq $true }).Count
+    $primaryHosts = $totalHosts - $totalAliases
 
     Write-Host ""
-    Write-Host "Done! Generated config for $totalKeys hosts."
+    Write-Host "Done! Generated config for $primaryHosts hosts ($totalAliases aliases)."
     Write-Host "SSH config written to: $configPath"
 }

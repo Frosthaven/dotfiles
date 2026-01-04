@@ -190,8 +190,9 @@ def proton-unpack-ssh [] {
         $config_entry | save -a $config_path
     }
     
-    let total_keys = ($unique_hosts | length)
+    let total_aliases = ($host_keys | where is_alias == true | length)
+    let primary_hosts = ($unique_hosts | length) - $total_aliases
     print ""
-    print $"Done! Generated config for ($total_keys) hosts."
+    print $"Done! Generated config for ($primary_hosts) hosts \(($total_aliases) aliases\)."
     print $"SSH config written to: ($config_path)"
 }

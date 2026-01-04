@@ -205,10 +205,12 @@ proton-unpack-ssh() {
         rm -f "$base_dir/.host_keys_tmp"
     fi
     
-    local total_keys
-    total_keys=$(grep -c "^Host " "$config_path" 2>/dev/null || echo "0")
+    local total_hosts total_aliases
+    total_hosts=$(grep -c "^Host " "$config_path" 2>/dev/null || echo "0")
+    total_aliases=$(grep -c "^# Alias" "$config_path" 2>/dev/null || echo "0")
+    local primary_hosts=$((total_hosts - total_aliases))
     
     echo ""
-    echo "Done! Generated config for $total_keys hosts."
+    echo "Done! Generated config for $primary_hosts hosts ($total_aliases aliases)."
     echo "SSH config written to: $config_path"
 }
