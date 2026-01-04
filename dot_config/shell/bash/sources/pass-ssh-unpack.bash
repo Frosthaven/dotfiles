@@ -267,64 +267,77 @@ pass-ssh-unpack() {
             privkey_path="$vault_dir/$safe_title"
             pubkey_path="$vault_dir/$safe_title.pub"
             
-            # Write private key
-            echo "$private_key" > "$privkey_path"
-            chmod 600 "$privkey_path"
+            # Check if there's a private key
+            local has_key=false
+            local identity_path=""
             
-            # Track this key file
-            echo "$privkey_path" >> "$base_dir/.processed_keys_tmp"
-            
-            # Generate public key
-            generated_pubkey=$(ssh-keygen -y -f "$privkey_path" 2>/dev/null)
-            
-            if [[ -n "$generated_pubkey" ]]; then
-                echo "$generated_pubkey" > "$pubkey_path"
+            if [[ -n "$private_key" ]] && [[ "$private_key" != "null" ]] && [[ "$private_key" != "" ]]; then
+                # Write private key
+                echo "$private_key" > "$privkey_path"
+                chmod 600 "$privkey_path"
                 
-                # Save public key back to Proton Pass if empty
-                if [[ -z "$existing_pubkey" ]]; then
-                    if pass-cli item update --vault-name "$vault" --item-title "$title" --field "public_key=$generated_pubkey" &>/dev/null; then
-                        _log "    -> $safe_title (saved pubkey to Proton Pass)"
-                    else
-                        _log "    -> $safe_title (failed to save pubkey to Proton Pass)"
-                    fi
-                else
-                    _log "    -> $safe_title"
-                fi
+                # Track this key file
+                echo "$privkey_path" >> "$base_dir/.processed_keys_tmp"
                 
-                # Build config entries
-                local identity_path="%d/.ssh/proton-pass/$vault/$safe_title"
+                # Generate public key
+                generated_pubkey=$(ssh-keygen -y -f "$privkey_path" 2>/dev/null)
                 
-                # Primary host entry
-                local config_block="Host $host_field"$'\n'"    IdentityFile \"$identity_path\""$'\n'"    IdentitiesOnly yes"
-                if [[ -n "$username_field" ]] && [[ "$username_field" != "null" ]]; then
-                    config_block="$config_block"$'\n'"    User $username_field"
-                fi
-                echo "$host_field|$config_block" >> "$base_dir/.new_hosts_tmp"
-                
-                # Alias entries
-                local aliases_list=""
-                if [[ -n "$aliases_field" ]] && [[ "$aliases_field" != "null" ]]; then
-                    aliases_list="$aliases_field"
-                else
-                    aliases_list="$title"
-                fi
-                
-                IFS=',' read -ra alias_array <<< "$aliases_list"
-                for alias_entry in "${alias_array[@]}"; do
-                    alias_entry=$(echo "$alias_entry" | xargs)
-                    [[ -z "$alias_entry" ]] && continue
-                    [[ "$alias_entry" == "$host_field" ]] && continue
+                if [[ -n "$generated_pubkey" ]]; then
+                    echo "$generated_pubkey" > "$pubkey_path"
+                    has_key=true
+                    identity_path="%d/.ssh/proton-pass/$vault/$safe_title"
                     
-                    local alias_block="# Alias of $host_field"$'\n'"Host $alias_entry"$'\n'"    IdentityFile \"$identity_path\""$'\n'"    IdentitiesOnly yes"
-                    if [[ -n "$username_field" ]] && [[ "$username_field" != "null" ]]; then
-                        alias_block="$alias_block"$'\n'"    User $username_field"
+                    # Save public key back to Proton Pass if empty
+                    if [[ -z "$existing_pubkey" ]]; then
+                        if pass-cli item update --vault-name "$vault" --item-title "$title" --field "public_key=$generated_pubkey" &>/dev/null; then
+                            _log "    -> $safe_title (saved pubkey to Proton Pass)"
+                        else
+                            _log "    -> $safe_title (failed to save pubkey to Proton Pass)"
+                        fi
+                    else
+                        _log "    -> $safe_title"
                     fi
-                    echo "$alias_entry|$alias_block" >> "$base_dir/.new_hosts_tmp"
-                done
+                else
+                    _log "    -> $safe_title (failed to generate public key)"
+                    rm -f "$privkey_path"
+                fi
             else
-                _log "    -> failed to generate public key"
-                rm -f "$privkey_path"
+                _log "    -> $safe_title (no key, password auth)"
             fi
+            
+            # Build config entries (with or without key)
+            local config_block="Host $host_field"
+            if [[ "$has_key" == "true" ]]; then
+                config_block="$config_block"$'\n'"    IdentityFile \"$identity_path\""$'\n'"    IdentitiesOnly yes"
+            fi
+            if [[ -n "$username_field" ]] && [[ "$username_field" != "null" ]]; then
+                config_block="$config_block"$'\n'"    User $username_field"
+            fi
+            echo "$host_field|$config_block" >> "$base_dir/.new_hosts_tmp"
+            
+            # Alias entries
+            local aliases_list=""
+            if [[ -n "$aliases_field" ]] && [[ "$aliases_field" != "null" ]]; then
+                aliases_list="$aliases_field"
+            else
+                aliases_list="$title"
+            fi
+            
+            IFS=',' read -ra alias_array <<< "$aliases_list"
+            for alias_entry in "${alias_array[@]}"; do
+                alias_entry=$(echo "$alias_entry" | xargs)
+                [[ -z "$alias_entry" ]] && continue
+                [[ "$alias_entry" == "$host_field" ]] && continue
+                
+                local alias_block="# Alias of $host_field"$'\n'"Host $alias_entry"
+                if [[ "$has_key" == "true" ]]; then
+                    alias_block="$alias_block"$'\n'"    IdentityFile \"$identity_path\""$'\n'"    IdentitiesOnly yes"
+                fi
+                if [[ -n "$username_field" ]] && [[ "$username_field" != "null" ]]; then
+                    alias_block="$alias_block"$'\n'"    User $username_field"
+                fi
+                echo "$alias_entry|$alias_block" >> "$base_dir/.new_hosts_tmp"
+            done
         done
         
         _log ""

@@ -263,73 +263,86 @@ $line"
             set -l privkey_path "$vault_dir/$safe_title"
             set -l pubkey_path "$vault_dir/$safe_title.pub"
             
-            # Write private key
-            echo "$private_key" > "$privkey_path"
-            chmod 600 "$privkey_path"
+            # Check if there's a private key
+            set -l has_key false
+            set -l identity_path ""
             
-            # Track this key file
-            echo "$privkey_path" >> "$processed_keys_file"
-            
-            # Generate public key
-            set -l generated_pubkey (ssh-keygen -y -f "$privkey_path" 2>/dev/null)
-            
-            if test -n "$generated_pubkey"
-                echo "$generated_pubkey" > "$pubkey_path"
+            if test -n "$private_key"; and test "$private_key" != "null"; and test "$private_key" != ""
+                # Write private key
+                echo "$private_key" > "$privkey_path"
+                chmod 600 "$privkey_path"
                 
-                # Save public key back to Proton Pass if empty
-                if test -z "$existing_pubkey"
-                    if pass-cli item update --vault-name "$vault" --item-title "$title" --field "public_key=$generated_pubkey" &>/dev/null
-                        _log "    -> $safe_title (saved pubkey to Proton Pass)"
+                # Track this key file
+                echo "$privkey_path" >> "$processed_keys_file"
+                
+                # Generate public key
+                set -l generated_pubkey (ssh-keygen -y -f "$privkey_path" 2>/dev/null)
+                
+                if test -n "$generated_pubkey"
+                    echo "$generated_pubkey" > "$pubkey_path"
+                    set has_key true
+                    set identity_path "%d/.ssh/proton-pass/$vault/$safe_title"
+                    
+                    # Save public key back to Proton Pass if empty
+                    if test -z "$existing_pubkey"
+                        if pass-cli item update --vault-name "$vault" --item-title "$title" --field "public_key=$generated_pubkey" &>/dev/null
+                            _log "    -> $safe_title (saved pubkey to Proton Pass)"
+                        else
+                            _log "    -> $safe_title (failed to save pubkey to Proton Pass)"
+                        end
                     else
-                        _log "    -> $safe_title (failed to save pubkey to Proton Pass)"
+                        _log "    -> $safe_title"
                     end
                 else
-                    _log "    -> $safe_title"
-                end
-                
-                # Build config entries
-                set -l identity_path "%d/.ssh/proton-pass/$vault/$safe_title"
-                
-                # Primary host entry
-                set -l config_block "Host $host_field
-    IdentityFile \"$identity_path\"
-    IdentitiesOnly yes"
-                if test -n "$username_field"; and test "$username_field" != "null"
-                    set config_block "$config_block
-    User $username_field"
-                end
-                
-                set -l safe_host (string replace -a '/' '_' -- "$host_field" | string replace -a ' ' '_')
-                echo "$config_block" > "$new_hosts_dir/$safe_host"
-                
-                # Alias entries
-                set -l aliases_list
-                if test -n "$aliases_field"; and test "$aliases_field" != "null"
-                    set aliases_list (string split "," -- "$aliases_field" | string trim)
-                else
-                    set aliases_list "$title"
-                end
-                
-                for alias_entry in $aliases_list
-                    set alias_entry (string trim -- "$alias_entry")
-                    test -z "$alias_entry"; and continue
-                    test "$alias_entry" = "$host_field"; and continue
-                    
-                    set -l alias_block "# Alias of $host_field
-Host $alias_entry
-    IdentityFile \"$identity_path\"
-    IdentitiesOnly yes"
-                    if test -n "$username_field"; and test "$username_field" != "null"
-                        set alias_block "$alias_block
-    User $username_field"
-                    end
-                    
-                    set -l safe_alias (string replace -a '/' '_' -- "$alias_entry" | string replace -a ' ' '_')
-                    echo "$alias_block" > "$new_hosts_dir/$safe_alias"
+                    _log "    -> $safe_title (failed to generate public key)"
+                    rm -f "$privkey_path"
                 end
             else
-                _log "    -> failed to generate public key"
-                rm -f "$privkey_path"
+                _log "    -> $safe_title (no key, password auth)"
+            end
+            
+            # Build config entries (with or without key)
+            set -l config_block "Host $host_field"
+            if test "$has_key" = "true"
+                set config_block "$config_block
+    IdentityFile \"$identity_path\"
+    IdentitiesOnly yes"
+            end
+            if test -n "$username_field"; and test "$username_field" != "null"
+                set config_block "$config_block
+    User $username_field"
+            end
+            
+            set -l safe_host (string replace -a '/' '_' -- "$host_field" | string replace -a ' ' '_')
+            echo "$config_block" > "$new_hosts_dir/$safe_host"
+            
+            # Alias entries
+            set -l aliases_list
+            if test -n "$aliases_field"; and test "$aliases_field" != "null"
+                set aliases_list (string split "," -- "$aliases_field" | string trim)
+            else
+                set aliases_list "$title"
+            end
+            
+            for alias_entry in $aliases_list
+                set alias_entry (string trim -- "$alias_entry")
+                test -z "$alias_entry"; and continue
+                test "$alias_entry" = "$host_field"; and continue
+                
+                set -l alias_block "# Alias of $host_field
+Host $alias_entry"
+                if test "$has_key" = "true"
+                    set alias_block "$alias_block
+    IdentityFile \"$identity_path\"
+    IdentitiesOnly yes"
+                end
+                if test -n "$username_field"; and test "$username_field" != "null"
+                    set alias_block "$alias_block
+    User $username_field"
+                end
+                
+                set -l safe_alias (string replace -a '/' '_' -- "$alias_entry" | string replace -a ' ' '_')
+                echo "$alias_block" > "$new_hosts_dir/$safe_alias"
             end
         end
         
@@ -359,6 +372,7 @@ Host $alias_entry
     end
     
     # Auto-prune: remove entries whose key files don't exist
+    # (only prune entries that have an IdentityFile - password-only entries are kept)
     set -l pruned_count 0
     for f in $final_hosts_dir/*
         test -f "$f"; or continue

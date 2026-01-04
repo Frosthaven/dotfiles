@@ -229,42 +229,52 @@ def pass-ssh-unpack [
             let privkey_path = ($vault_dir | path join $safe_title)
             let pubkey_path = ($vault_dir | path join $"($safe_title).pub")
             
-            # Write private key
-            $"($private_key)\n" | save -f $privkey_path
-            chmod 600 $privkey_path
+            # Check if there's a private key
+            mut has_key = false
+            mut identity_path = ""
             
-            # Track this key file
-            $processed_keys = ($processed_keys | append $privkey_path)
-            
-            # Generate public key
-            let keygen_result = (do { ssh-keygen -y -f $privkey_path } | complete)
-            
-            if $keygen_result.exit_code != 0 {
-                log "    -> failed to generate public key"
-                rm -f $privkey_path
-                continue
-            }
-            
-            let generated_pubkey = ($keygen_result.stdout | str trim)
-            $generated_pubkey | save -f $pubkey_path
-            
-            # Save public key back to Proton Pass if empty
-            if ($existing_pubkey | is-empty) and ($generated_pubkey | is-not-empty) {
-                let update_result = (do { pass-cli item update --vault-name $vault --item-title $title --field $"public_key=($generated_pubkey)" } | complete)
-                if $update_result.exit_code == 0 {
-                    log $"    -> ($safe_title) \(saved pubkey to Proton Pass\)"
+            if ($private_key | is-not-empty) and ($private_key != "null") {
+                # Write private key
+                $"($private_key)\n" | save -f $privkey_path
+                chmod 600 $privkey_path
+                
+                # Track this key file
+                $processed_keys = ($processed_keys | append $privkey_path)
+                
+                # Generate public key
+                let keygen_result = (do { ssh-keygen -y -f $privkey_path } | complete)
+                
+                if $keygen_result.exit_code != 0 {
+                    log "    -> failed to generate public key"
+                    rm -f $privkey_path
+                    continue
+                }
+                
+                let generated_pubkey = ($keygen_result.stdout | str trim)
+                $generated_pubkey | save -f $pubkey_path
+                $has_key = true
+                $identity_path = $"%d/.ssh/proton-pass/($vault)/($safe_title)"
+                
+                # Save public key back to Proton Pass if empty
+                if ($existing_pubkey | is-empty) and ($generated_pubkey | is-not-empty) {
+                    let update_result = (do { pass-cli item update --vault-name $vault --item-title $title --field $"public_key=($generated_pubkey)" } | complete)
+                    if $update_result.exit_code == 0 {
+                        log $"    -> ($safe_title) \(saved pubkey to Proton Pass\)"
+                    } else {
+                        log $"    -> ($safe_title) \(failed to save pubkey to Proton Pass\)"
+                    }
                 } else {
-                    log $"    -> ($safe_title) \(failed to save pubkey to Proton Pass\)"
+                    log $"    -> ($safe_title)"
                 }
             } else {
-                log $"    -> ($safe_title)"
+                log $"    -> ($safe_title) \(no key, password auth\)"
             }
             
-            # Build config entries
-            let identity_path = $"%d/.ssh/proton-pass/($vault)/($safe_title)"
-            
-            # Primary host entry
-            mut config_block = $"Host ($host_field)\n    IdentityFile \"($identity_path)\"\n    IdentitiesOnly yes"
+            # Build config entries (with or without key)
+            mut config_block = $"Host ($host_field)"
+            if $has_key {
+                $config_block = $"($config_block)\n    IdentityFile \"($identity_path)\"\n    IdentitiesOnly yes"
+            }
             if ($username_field | is-not-empty) {
                 $config_block = $"($config_block)\n    User ($username_field)"
             }
@@ -282,7 +292,10 @@ def pass-ssh-unpack [
                     continue
                 }
                 
-                mut alias_block = $"# Alias of ($host_field)\nHost ($alias_entry)\n    IdentityFile \"($identity_path)\"\n    IdentitiesOnly yes"
+                mut alias_block = $"# Alias of ($host_field)\nHost ($alias_entry)"
+                if $has_key {
+                    $alias_block = $"($alias_block)\n    IdentityFile \"($identity_path)\"\n    IdentitiesOnly yes"
+                }
                 if ($username_field | is-not-empty) {
                     $alias_block = $"($alias_block)\n    User ($username_field)"
                 }
@@ -311,6 +324,7 @@ def pass-ssh-unpack [
     }
     
     # Auto-prune: remove entries whose key files don't exist
+    # (only prune entries that have an IdentityFile - password-only entries are kept)
     mut pruned_count = 0
     mut pruned_hosts: list<string> = []
     

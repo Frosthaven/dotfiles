@@ -12,6 +12,7 @@ Extract SSH keys from Proton Pass to local files and generate SSH config.
 - Wildcard matching for vault names and item titles
 - Machine-specific key filtering (e.g., `github/hostname`)
 - Portable paths using SSH's `%d` token
+- Password-only entries (items without private keys still get config entries)
 
 ## Requirements
 
@@ -88,7 +89,7 @@ Each SSH key item in Proton Pass should have:
 | Field                        | Description                          |
 |------------------------------|--------------------------------------|
 | `content.title`              | Item name (e.g., `github/cachycosmic`) |
-| `content.content.SshKey.private_key` | The private key content      |
+| `content.content.SshKey.private_key` | The private key content (can be empty for password auth) |
 
 ### Extra Fields (Custom)
 
@@ -135,6 +136,17 @@ Host gh
     IdentitiesOnly yes
     User git
 ```
+
+### Password-Only Entries
+
+For SSH items that have no private key stored (empty `private_key` field), the command generates a minimal config entry without `IdentityFile` or `IdentitiesOnly`. This allows SSH to prompt for a password.
+
+```ssh-config
+Host home.thedragon.dev
+    User frosthaven
+```
+
+This is useful for servers that use password authentication or when you want to store SSH connection info without the key itself.
 
 ### Using the Config
 

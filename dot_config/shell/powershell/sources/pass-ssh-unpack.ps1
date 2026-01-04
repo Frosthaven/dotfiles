@@ -243,71 +243,84 @@ function pass-ssh-unpack {
             $privkeyPath = Join-Path $vaultDir $safeTitle
             $pubkeyPath = Join-Path $vaultDir "$safeTitle.pub"
 
-            # Write private key
-            "$privateKey`n" | Set-Content -Path $privkeyPath -NoNewline
-            
-            # Set file permissions (Windows equivalent of chmod 600)
-            $acl = Get-Acl $privkeyPath
-            $acl.SetAccessRuleProtection($true, $false)
-            $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-                [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
-                "FullControl",
-                "Allow"
-            )
-            $acl.SetAccessRule($rule)
-            Set-Acl -Path $privkeyPath -AclObject $acl
-            
-            # Track this key file
-            $processedKeys += $privkeyPath
+            # Check if there's a private key
+            $hasKey = $false
+            $identityPath = ""
 
-            # Generate public key
-            $generatedPubkey = ssh-keygen -y -f $privkeyPath 2>$null
-            if ($LASTEXITCODE -eq 0 -and $generatedPubkey) {
-                $generatedPubkey | Set-Content -Path $pubkeyPath -NoNewline
+            if (-not [string]::IsNullOrEmpty($privateKey)) {
+                # Write private key
+                "$privateKey`n" | Set-Content -Path $privkeyPath -NoNewline
+                
+                # Set file permissions (Windows equivalent of chmod 600)
+                $acl = Get-Acl $privkeyPath
+                $acl.SetAccessRuleProtection($true, $false)
+                $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+                    [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
+                    "FullControl",
+                    "Allow"
+                )
+                $acl.SetAccessRule($rule)
+                Set-Acl -Path $privkeyPath -AclObject $acl
+                
+                # Track this key file
+                $processedKeys += $privkeyPath
 
-                # Save public key back to Proton Pass if empty
-                if ([string]::IsNullOrEmpty($existingPubkey)) {
-                    $null = pass-cli item update --vault-name $vault --item-title $title --field "public_key=$generatedPubkey" 2>&1
-                    if ($LASTEXITCODE -eq 0) {
-                        Write-Log "    -> $safeTitle (saved pubkey to Proton Pass)"
+                # Generate public key
+                $generatedPubkey = ssh-keygen -y -f $privkeyPath 2>$null
+                if ($LASTEXITCODE -eq 0 -and $generatedPubkey) {
+                    $generatedPubkey | Set-Content -Path $pubkeyPath -NoNewline
+                    $hasKey = $true
+                    $identityPath = "%d/.ssh/proton-pass/$vault/$safeTitle"
+
+                    # Save public key back to Proton Pass if empty
+                    if ([string]::IsNullOrEmpty($existingPubkey)) {
+                        $null = pass-cli item update --vault-name $vault --item-title $title --field "public_key=$generatedPubkey" 2>&1
+                        if ($LASTEXITCODE -eq 0) {
+                            Write-Log "    -> $safeTitle (saved pubkey to Proton Pass)"
+                        } else {
+                            Write-Log "    -> $safeTitle (failed to save pubkey to Proton Pass)"
+                        }
                     } else {
-                        Write-Log "    -> $safeTitle (failed to save pubkey to Proton Pass)"
+                        Write-Log "    -> $safeTitle"
                     }
                 } else {
-                    Write-Log "    -> $safeTitle"
-                }
-
-                # Build config entries
-                $identityPath = "%d/.ssh/proton-pass/$vault/$safeTitle"
-                
-                # Primary host entry
-                $configBlock = "Host $hostField`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
-                if (-not [string]::IsNullOrEmpty($usernameField)) {
-                    $configBlock = "$configBlock`n    User $usernameField"
-                }
-                $newHosts[$hostField] = $configBlock
-                
-                # Alias entries
-                $aliasesList = @()
-                if (-not [string]::IsNullOrEmpty($aliasesField)) {
-                    $aliasesList = $aliasesField -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-                } else {
-                    $aliasesList = @($title)
-                }
-                
-                foreach ($aliasEntry in $aliasesList) {
-                    if ([string]::IsNullOrEmpty($aliasEntry)) { continue }
-                    if ($aliasEntry -eq $hostField) { continue }
-                    
-                    $aliasBlock = "# Alias of $hostField`nHost $aliasEntry`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
-                    if (-not [string]::IsNullOrEmpty($usernameField)) {
-                        $aliasBlock = "$aliasBlock`n    User $usernameField"
-                    }
-                    $newHosts[$aliasEntry] = $aliasBlock
+                    Write-Log "    -> $safeTitle (failed to generate public key)"
+                    Remove-Item $privkeyPath -Force -ErrorAction SilentlyContinue
                 }
             } else {
-                Write-Log "    -> failed to generate public key"
-                Remove-Item $privkeyPath -Force -ErrorAction SilentlyContinue
+                Write-Log "    -> $safeTitle (no key, password auth)"
+            }
+
+            # Build config entries (with or without key)
+            $configBlock = "Host $hostField"
+            if ($hasKey) {
+                $configBlock = "$configBlock`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
+            }
+            if (-not [string]::IsNullOrEmpty($usernameField)) {
+                $configBlock = "$configBlock`n    User $usernameField"
+            }
+            $newHosts[$hostField] = $configBlock
+            
+            # Alias entries
+            $aliasesList = @()
+            if (-not [string]::IsNullOrEmpty($aliasesField)) {
+                $aliasesList = $aliasesField -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+            } else {
+                $aliasesList = @($title)
+            }
+            
+            foreach ($aliasEntry in $aliasesList) {
+                if ([string]::IsNullOrEmpty($aliasEntry)) { continue }
+                if ($aliasEntry -eq $hostField) { continue }
+                
+                $aliasBlock = "# Alias of $hostField`nHost $aliasEntry"
+                if ($hasKey) {
+                    $aliasBlock = "$aliasBlock`n    IdentityFile `"$identityPath`"`n    IdentitiesOnly yes"
+                }
+                if (-not [string]::IsNullOrEmpty($usernameField)) {
+                    $aliasBlock = "$aliasBlock`n    User $usernameField"
+                }
+                $newHosts[$aliasEntry] = $aliasBlock
             }
         }
 
@@ -335,6 +348,7 @@ function pass-ssh-unpack {
     }
     
     # Auto-prune: remove entries whose key files don't exist
+    # (only prune entries that have an IdentityFile - password-only entries are kept)
     $hostsToRemove = @()
     foreach ($host in $finalHosts.Keys) {
         $block = $finalHosts[$host]
