@@ -172,7 +172,15 @@ function rclone-config {
             chezmoi re-add $rcloneConfigPath
             chezmoi git -- add dot_config/rclone/private_rclone.conf
             chezmoi git commit -m "chore: update rclone config"
-            Write-Host "Done. Run 'chezmoi git push' to sync to remote."
+            
+            # Auto-push if only 1 commit ahead, otherwise warn user
+            $aheadCount = chezmoi git -- rev-list --count "@{u}..HEAD" 2>$null
+            if ($aheadCount -eq "1") {
+                chezmoi git push
+                Write-Host "Done. Changes pushed to remote."
+            } else {
+                Write-Host "Done. Multiple unpushed commits detected - run 'chezmoi git push' to sync to remote."
+            }
         }
     }
 }

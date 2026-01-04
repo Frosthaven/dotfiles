@@ -54,7 +54,15 @@ function rclone-config
     chezmoi re-add ~/.config/rclone/rclone.conf
     chezmoi git -- add dot_config/rclone/private_rclone.conf
     chezmoi git commit -m "chore: update rclone config"
-    echo "Done. Run 'chezmoi git push' to sync to remote."
+    
+    # Auto-push if only 1 commit ahead, otherwise warn user
+    set -l ahead_count (chezmoi git -- rev-list --count @{u}..HEAD 2>/dev/null; or echo "0")
+    if test "$ahead_count" = "1"
+        chezmoi git push
+        echo "Done. Changes pushed to remote."
+    else
+        echo "Done. Multiple unpushed commits detected - run 'chezmoi git push' to sync to remote."
+    end
 end
 
 # Starship prompt
