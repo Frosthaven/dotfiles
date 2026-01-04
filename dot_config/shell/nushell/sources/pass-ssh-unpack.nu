@@ -247,7 +247,7 @@ def pass-ssh-unpack [
     # =========================================================================
     mut new_hosts: list<record<host: string, block: string>> = []
     mut processed_keys: list<string> = []
-    mut rclone_entries: list<record<host: string, user: string, key_file: string, aliases: string>> = []
+    mut rclone_entries: list<record<remote_name: string, host: string, user: string, key_file: string, other_aliases: string>> = []
     
     for vault in $vaults_to_process {
         log $"[($vault)]"
