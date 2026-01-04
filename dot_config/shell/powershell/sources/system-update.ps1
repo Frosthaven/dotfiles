@@ -210,7 +210,7 @@ function sysup {
         Write-Host "🔄 Syncing SSH keys from Proton Pass --------------------------"
         Write-Host "---------------------------------------------------------------"
         Write-Host ""
-        pass-ssh-unpack
+        pass-ssh-unpack --vault "* Servers"
     }
 
     # Bob (Neovim version manager)

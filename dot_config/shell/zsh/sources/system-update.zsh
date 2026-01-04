@@ -203,7 +203,7 @@ sysup() {
         echo "🔄 Syncing SSH keys from Proton Pass --------------------------"
         echo "---------------------------------------------------------------"
         echo ""
-        pass-ssh-unpack
+        pass-ssh-unpack --vault "* Servers"
     fi
 
     # Bob (Neovim version manager)

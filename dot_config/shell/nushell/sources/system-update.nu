@@ -234,7 +234,7 @@ def sysup [] {
         print "🔄 Syncing SSH keys from Proton Pass --------------------------"
         print "---------------------------------------------------------------"
         print ""
-        pass-ssh-unpack
+        pass-ssh-unpack --vault "* Servers"
     }
 
     if (which bob | is-empty) {
