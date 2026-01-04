@@ -27,11 +27,13 @@ def matches-pattern [title: string, patterns: list<string>]: nothing -> bool {
 #   pass-ssh-unpack -i 'github/*'                    # Keys matching pattern
 #   pass-ssh-unpack -i ['github/*' 'thedragon*']     # Multiple patterns
 #   pass-ssh-unpack --full                           # Full regeneration
+#   pass-ssh-unpack --no-rclone                      # Skip rclone sync
 def pass-ssh-unpack [
     --vault (-v): any   # Vault(s) to process - string or list, supports * and ? wildcards
     --item (-i): any    # Item title pattern(s) - string or list, supports * and ? wildcards
     --full (-f)         # Full regeneration (clear config first)
     --quiet (-q)        # Suppress output
+    --no-rclone         # Skip rclone remote sync
 ] {
     # Normalize inputs to lists
     let vault_filter = if ($vault | is-empty) {
@@ -174,6 +176,7 @@ def pass-ssh-unpack [
     # =========================================================================
     mut new_hosts: list<record<host: string, block: string>> = []
     mut processed_keys: list<string> = []
+    mut rclone_entries: list<record<host: string, user: string, key_file: string, aliases: string>> = []
     
     for vault in $vaults_to_process {
         log $"[($vault)]"
@@ -308,6 +311,20 @@ def pass-ssh-unpack [
                 }
                 $new_hosts = ($new_hosts | append {host: $alias_entry, block: $alias_block})
             }
+            
+            # Collect rclone entry data
+            let rclone_key_file = if $has_key {
+                $"~/.ssh/proton-pass/($vault)/($safe_title)"
+            } else {
+                ""
+            }
+            let aliases_csv = ($aliases_list | str join ",")
+            $rclone_entries = ($rclone_entries | append {
+                host: $host_field,
+                user: $username_field,
+                key_file: $rclone_key_file,
+                aliases: $aliases_csv
+            })
         }
         
         log ""
@@ -372,4 +389,205 @@ def pass-ssh-unpack [
         log $"Pruned ($pruned_count) orphaned entries."
     }
     log $"SSH config written to: ($config_path)"
+    
+    # =========================================================================
+    # Sync rclone remotes
+    # =========================================================================
+    if not $no_rclone {
+        sync-rclone-remotes $rclone_entries $full $quiet
+    }
+}
+
+# Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
+def sync-rclone-remotes [
+    entries: list<record<host: string, user: string, key_file: string, aliases: string>>,
+    full_mode: bool,
+    quiet_mode: bool
+] {
+    # Helper for logging
+    def rlog [msg: string] {
+        if not $quiet_mode {
+            print $msg
+        }
+    }
+    
+    # Skip if rclone not available
+    if (which rclone | is-empty) {
+        return
+    }
+    
+    # Skip if no entries to process
+    if ($entries | is-empty) {
+        return
+    }
+    
+    rlog ""
+    rlog "Syncing rclone remotes..."
+    
+    # Get rclone password if not set
+    mut rclone_pass = ($env.RCLONE_CONFIG_PASS? | default "")
+    if ($rclone_pass | is-empty) {
+        let pass_result = (do { pass-cli item view "pass://Personal/rclone/password" --field password } | complete)
+        if $pass_result.exit_code != 0 {
+            rlog "  (skipped - could not get rclone password)"
+            return
+        }
+        $rclone_pass = ($pass_result.stdout | str trim)
+    }
+    
+    # Set password for rclone commands
+    let rclone_env = { RCLONE_CONFIG_PASS: $rclone_pass }
+    
+    # Get current config
+    let config_result = (do { with-env $rclone_env { rclone config dump } } | complete)
+    mut current_config = if $config_result.exit_code == 0 and ($config_result.stdout | is-not-empty) {
+        $config_result.stdout | from json
+    } else {
+        {}
+    }
+    
+    # Full mode: delete all managed remotes first
+    if $full_mode {
+        let managed_remotes = ($current_config | transpose name config | where { |r| ($r.config.description? | default "") == "managed by pass-ssh-unpack" } | get name)
+        for remote in $managed_remotes {
+            do { with-env $rclone_env { rclone config delete $remote } } | complete | ignore
+        }
+        # Refresh config after deletions
+        let refresh_result = (do { with-env $rclone_env { rclone config dump } } | complete)
+        $current_config = if $refresh_result.exit_code == 0 and ($refresh_result.stdout | is-not-empty) {
+            $refresh_result.stdout | from json
+        } else {
+            {}
+        }
+    }
+    
+    mut created_count = 0
+    mut skipped_count = 0
+    
+    # Process each entry
+    for entry in $entries {
+        let host = $entry.host
+        let user = $entry.user
+        let key_file = $entry.key_file
+        let aliases = $entry.aliases
+        
+        if ($host | is-empty) {
+            continue
+        }
+        
+        # Check if remote exists without our marker (unmanaged)
+        let existing_remote = ($current_config | get -o $host | default null)
+        let existing_desc = if $existing_remote != null { $existing_remote.description? | default "" } else { "" }
+        
+        if $existing_remote != null and $existing_desc != "managed by pass-ssh-unpack" {
+            rlog $"  Skipping ($host): existing unmanaged remote"
+            $skipped_count = $skipped_count + 1
+            continue
+        }
+        
+        # Create/update primary SFTP remote
+        if ($key_file | is-not-empty) {
+            do { with-env $rclone_env {
+                rclone config create $host sftp host=$host user=$user key_file=$key_file description="managed by pass-ssh-unpack"
+            } } | complete | ignore
+        } else {
+            do { with-env $rclone_env {
+                rclone config create $host sftp host=$host user=$user ask_password=true description="managed by pass-ssh-unpack"
+            } } | complete | ignore
+        }
+        $created_count = $created_count + 1
+        
+        # Create alias remotes
+        if ($aliases | is-not-empty) {
+            let alias_list = ($aliases | split row "," | each { |a| $a | str trim } | where { |a| $a | is-not-empty })
+            for alias_name in $alias_list {
+                if $alias_name == $host {
+                    continue
+                }
+                
+                # Check for unmanaged conflict
+                let alias_remote = ($current_config | get -o $alias_name | default null)
+                let alias_desc = if $alias_remote != null { $alias_remote.description? | default "" } else { "" }
+                
+                if $alias_remote != null and $alias_desc != "managed by pass-ssh-unpack" {
+                    rlog $"  Skipping alias ($alias_name): existing unmanaged remote"
+                    $skipped_count = $skipped_count + 1
+                    continue
+                }
+                
+                do { with-env $rclone_env {
+                    rclone config create $alias_name alias remote=$"($host):" description="managed by pass-ssh-unpack"
+                } } | complete | ignore
+                $created_count = $created_count + 1
+            }
+        }
+    }
+    
+    # Auto-prune: managed sftp remotes whose key_file doesn't exist
+    let updated_result = (do { with-env $rclone_env { rclone config dump } } | complete)
+    mut updated_config = if $updated_result.exit_code == 0 and ($updated_result.stdout | is-not-empty) {
+        $updated_result.stdout | from json
+    } else {
+        {}
+    }
+    
+    mut pruned_count = 0
+    
+    # Get managed sftp remotes and prune those with missing key files
+    let sftp_remotes = ($updated_config | transpose name config | where { |r|
+        ($r.config.type? | default "") == "sftp" and ($r.config.description? | default "") == "managed by pass-ssh-unpack"
+    })
+    
+    for remote in $sftp_remotes {
+        let key_path = ($remote.config.key_file? | default "")
+        if ($key_path | is-not-empty) {
+            let expanded_path = ($key_path | str replace "~" $env.HOME)
+            if not ($expanded_path | path exists) {
+                do { with-env $rclone_env { rclone config delete $remote.name } } | complete | ignore
+                $pruned_count = $pruned_count + 1
+            }
+        }
+    }
+    
+    # Prune alias remotes whose target was deleted
+    let refresh_result2 = (do { with-env $rclone_env { rclone config dump } } | complete)
+    $updated_config = if $refresh_result2.exit_code == 0 and ($refresh_result2.stdout | is-not-empty) {
+        $refresh_result2.stdout | from json
+    } else {
+        {}
+    }
+    
+    let alias_remotes = ($updated_config | transpose name config | where { |r|
+        ($r.config.type? | default "") == "alias" and ($r.config.description? | default "") == "managed by pass-ssh-unpack"
+    })
+    
+    for remote in $alias_remotes {
+        let target = ($remote.config.remote? | default "")
+        let target_name = ($target | str replace -r ':$' '')
+        
+        if not ($target_name in ($updated_config | columns)) {
+            do { with-env $rclone_env { rclone config delete $remote.name } } | complete | ignore
+            $pruned_count = $pruned_count + 1
+        }
+    }
+    
+    # Re-add to chezmoi if managed
+    if (which chezmoi | is-not-empty) {
+        let managed_result = (do { chezmoi managed } | complete)
+        if $managed_result.exit_code == 0 and ($managed_result.stdout | str contains "rclone/rclone.conf") {
+            do { chezmoi re-add ~/.config/rclone/rclone.conf } | complete | ignore
+            rlog $"  Synced ($created_count) remotes to chezmoi."
+        } else {
+            rlog $"  Synced ($created_count) remotes."
+        }
+    } else {
+        rlog $"  Synced ($created_count) remotes."
+    }
+    
+    if $skipped_count > 0 {
+        rlog $"  Skipped ($skipped_count) \(unmanaged conflicts\)."
+    }
+    if $pruned_count > 0 {
+        rlog $"  Pruned ($pruned_count) orphaned remotes."
+    }
 }

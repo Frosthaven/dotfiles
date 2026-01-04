@@ -9,6 +9,7 @@ pass-ssh-unpack() {
     local -a item_patterns=()
     local full_mode=false
     local quiet_mode=false
+    local skip_rclone=false
     
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -28,6 +29,10 @@ pass-ssh-unpack() {
                 quiet_mode=true
                 shift
                 ;;
+            --no-rclone)
+                skip_rclone=true
+                shift
+                ;;
             -h|--help)
                 echo "Usage: pass-ssh-unpack [OPTIONS]"
                 echo ""
@@ -39,6 +44,7 @@ pass-ssh-unpack() {
                 echo "                             Supports * and ? wildcards"
                 echo "  -f, --full                 Full regeneration (clear config first)"
                 echo "  -q, --quiet                Suppress output"
+                echo "  --no-rclone                Skip rclone remote sync"
                 echo "  -h, --help                 Show this help message"
                 echo ""
                 echo "Examples:"
@@ -48,6 +54,7 @@ pass-ssh-unpack() {
                 echo "  pass-ssh-unpack -i 'github/*'              # Keys matching pattern"
                 echo "  pass-ssh-unpack -v Personal -i 'github/*'  # Combined filters"
                 echo "  pass-ssh-unpack --full                     # Full regeneration"
+                echo "  pass-ssh-unpack --no-rclone                # Skip rclone sync"
                 return 0
                 ;;
             *)
@@ -209,7 +216,7 @@ pass-ssh-unpack() {
     # Process vaults and extract keys
     # =========================================================================
     # Clean up any leftover temp files
-    rm -f "$base_dir/.new_hosts_tmp" "$base_dir/.processed_keys_tmp"
+    rm -f "$base_dir/.new_hosts_tmp" "$base_dir/.processed_keys_tmp" "$base_dir/.rclone_entries_tmp"
     
     for vault in "${vaults_to_process[@]}"; do
         [[ -z "$vault" ]] && continue
@@ -345,6 +352,14 @@ pass-ssh-unpack() {
                 fi
                 echo "$alias_entry|$alias_block" >> "$base_dir/.new_hosts_tmp"
             done
+            
+            # Collect rclone entry data
+            # Format: host|user|key_file|aliases (key_file uses ~ for home)
+            local rclone_key_file=""
+            if [[ "$has_key" == "true" ]]; then
+                rclone_key_file="~/.ssh/proton-pass/$vault/$safe_title"
+            fi
+            echo "$host_field|${username_field:-}|${rclone_key_file}|${aliases_list}" >> "$base_dir/.rclone_entries_tmp"
         done
         
         _log ""
@@ -434,4 +449,188 @@ pass-ssh-unpack() {
         _log "Pruned $pruned_count orphaned entries."
     fi
     _log "SSH config written to: $config_path"
+    
+    # =========================================================================
+    # Sync rclone remotes
+    # =========================================================================
+    if [[ "$skip_rclone" != "true" ]]; then
+        _sync_rclone_remotes
+    fi
+}
+
+# Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
+_sync_rclone_remotes() {
+    local base_dir="$HOME/.ssh/proton-pass"
+    local rclone_entries_file="$base_dir/.rclone_entries_tmp"
+    
+    # Skip if rclone not available
+    if ! command -v rclone &>/dev/null; then
+        rm -f "$rclone_entries_file"
+        return 0
+    fi
+    
+    # Skip if no entries to process
+    if [[ ! -f "$rclone_entries_file" ]]; then
+        return 0
+    fi
+    
+    _log ""
+    _log "Syncing rclone remotes..."
+    
+    # Get rclone password if not set
+    if [[ -z "$RCLONE_CONFIG_PASS" ]]; then
+        RCLONE_CONFIG_PASS=$(pass-cli item view "pass://Personal/rclone/password" --field password 2>/dev/null)
+        if [[ -z "$RCLONE_CONFIG_PASS" ]]; then
+            _log "  (skipped - could not get rclone password)"
+            rm -f "$rclone_entries_file"
+            return 0
+        fi
+        export RCLONE_CONFIG_PASS
+    fi
+    
+    # Get current config
+    local current_config
+    current_config=$(rclone config dump 2>/dev/null)
+    
+    if [[ -z "$current_config" ]]; then
+        current_config="{}"
+    fi
+    
+    # Full mode: delete all managed remotes first
+    if [[ "$full_mode" == "true" ]]; then
+        local managed_remotes
+        managed_remotes=$(echo "$current_config" | jq -r 'to_entries[] | select(.value.description == "managed by pass-ssh-unpack") | .key' 2>/dev/null)
+        while IFS= read -r remote; do
+            [[ -z "$remote" ]] && continue
+            rclone config delete "$remote" &>/dev/null
+        done <<< "$managed_remotes"
+        # Refresh config after deletions
+        current_config=$(rclone config dump 2>/dev/null)
+        [[ -z "$current_config" ]] && current_config="{}"
+    fi
+    
+    local created_count=0
+    local skipped_count=0
+    local -a created_primaries=()
+    
+    # Process each entry
+    while IFS='|' read -r host user key_file aliases; do
+        [[ -z "$host" ]] && continue
+        
+        # Check if remote exists without our marker (unmanaged)
+        local existing_desc
+        existing_desc=$(echo "$current_config" | jq -r --arg name "$host" '.[$name].description // ""' 2>/dev/null)
+        local existing_remote
+        existing_remote=$(echo "$current_config" | jq -r --arg name "$host" '.[$name] // empty' 2>/dev/null)
+        
+        if [[ -n "$existing_remote" ]] && [[ "$existing_desc" != "managed by pass-ssh-unpack" ]]; then
+            _log "  Skipping $host: existing unmanaged remote"
+            ((skipped_count++))
+            continue
+        fi
+        
+        # Create/update primary SFTP remote
+        if [[ -n "$key_file" ]]; then
+            rclone config create "$host" sftp \
+                host="$host" \
+                user="$user" \
+                key_file="$key_file" \
+                description="managed by pass-ssh-unpack" &>/dev/null
+        else
+            rclone config create "$host" sftp \
+                host="$host" \
+                user="$user" \
+                ask_password=true \
+                description="managed by pass-ssh-unpack" &>/dev/null
+        fi
+        ((created_count++))
+        created_primaries+=("$host")
+        
+        # Create alias remotes
+        IFS=',' read -ra alias_array <<< "$aliases"
+        for alias_name in "${alias_array[@]}"; do
+            alias_name=$(echo "$alias_name" | xargs)
+            [[ -z "$alias_name" ]] && continue
+            [[ "$alias_name" == "$host" ]] && continue
+            
+            # Check for unmanaged conflict
+            existing_desc=$(echo "$current_config" | jq -r --arg name "$alias_name" '.[$name].description // ""' 2>/dev/null)
+            existing_remote=$(echo "$current_config" | jq -r --arg name "$alias_name" '.[$name] // empty' 2>/dev/null)
+            
+            if [[ -n "$existing_remote" ]] && [[ "$existing_desc" != "managed by pass-ssh-unpack" ]]; then
+                _log "  Skipping alias $alias_name: existing unmanaged remote"
+                ((skipped_count++))
+                continue
+            fi
+            
+            rclone config create "$alias_name" alias \
+                remote="$host:" \
+                description="managed by pass-ssh-unpack" &>/dev/null
+            ((created_count++))
+        done
+    done < "$rclone_entries_file"
+    
+    rm -f "$rclone_entries_file"
+    
+    # Auto-prune: managed sftp remotes whose key_file doesn't exist
+    local updated_config
+    updated_config=$(rclone config dump 2>/dev/null)
+    [[ -z "$updated_config" ]] && updated_config="{}"
+    
+    local pruned_count=0
+    local -a deleted_primaries=()
+    
+    # Get managed sftp remotes
+    local sftp_remotes
+    sftp_remotes=$(echo "$updated_config" | jq -r 'to_entries[] | select(.value.type == "sftp" and .value.description == "managed by pass-ssh-unpack") | "\(.key)|\(.value.key_file // "")"' 2>/dev/null)
+    
+    while IFS='|' read -r remote_name key_path; do
+        [[ -z "$remote_name" ]] && continue
+        
+        # Expand ~ to $HOME for file check
+        local expanded_path="${key_path/#\~/$HOME}"
+        
+        if [[ -n "$key_path" ]] && [[ ! -f "$expanded_path" ]]; then
+            rclone config delete "$remote_name" &>/dev/null
+            deleted_primaries+=("$remote_name")
+            ((pruned_count++))
+        fi
+    done <<< "$sftp_remotes"
+    
+    # Prune alias remotes whose target was deleted
+    updated_config=$(rclone config dump 2>/dev/null)
+    [[ -z "$updated_config" ]] && updated_config="{}"
+    
+    local alias_remotes
+    alias_remotes=$(echo "$updated_config" | jq -r 'to_entries[] | select(.value.type == "alias" and .value.description == "managed by pass-ssh-unpack") | "\(.key)|\(.value.remote)"' 2>/dev/null)
+    
+    while IFS='|' read -r remote_name target; do
+        [[ -z "$remote_name" ]] && continue
+        local target_name="${target%:}"  # Remove trailing colon
+        
+        # Check if target exists in current config
+        if ! echo "$updated_config" | jq -e --arg name "$target_name" '.[$name]' &>/dev/null; then
+            rclone config delete "$remote_name" &>/dev/null
+            ((pruned_count++))
+        fi
+    done <<< "$alias_remotes"
+    
+    # Re-add to chezmoi if managed
+    if command -v chezmoi &>/dev/null; then
+        if chezmoi managed 2>/dev/null | grep -q "rclone/rclone.conf"; then
+            chezmoi re-add ~/.config/rclone/rclone.conf &>/dev/null
+            _log "  Synced $created_count remotes to chezmoi."
+        else
+            _log "  Synced $created_count remotes."
+        fi
+    else
+        _log "  Synced $created_count remotes."
+    fi
+    
+    if [[ $skipped_count -gt 0 ]]; then
+        _log "  Skipped $skipped_count (unmanaged conflicts)."
+    fi
+    if [[ $pruned_count -gt 0 ]]; then
+        _log "  Pruned $pruned_count orphaned remotes."
+    fi
 }

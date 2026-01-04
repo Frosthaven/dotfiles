@@ -18,7 +18,10 @@ function pass-ssh-unpack {
         
         [Parameter()]
         [Alias("q")]
-        [switch]$Quiet
+        [switch]$Quiet,
+        
+        [Parameter()]
+        [switch]$NoRclone
     )
     
     # Helper function for output
@@ -169,6 +172,7 @@ function pass-ssh-unpack {
     # =========================================================================
     $newHosts = @{}
     $processedKeys = @()
+    $rcloneEntries = @()
 
     foreach ($vault in $vaultsToProcess) {
         if ([string]::IsNullOrEmpty($vault)) { continue }
@@ -329,6 +333,20 @@ function pass-ssh-unpack {
                 }
                 $newHosts[$aliasEntry] = $aliasBlock
             }
+            
+            # Collect rclone entry data
+            $rcloneKeyFile = if ($hasKey) {
+                "~/.ssh/proton-pass/$vault/$safeTitle"
+            } else {
+                ""
+            }
+            $aliasesCsv = $aliasesList -join ","
+            $rcloneEntries += @{
+                Host = $hostField
+                User = $usernameField
+                KeyFile = $rcloneKeyFile
+                Aliases = $aliasesCsv
+            }
         }
 
         Write-Log ""
@@ -398,4 +416,205 @@ function pass-ssh-unpack {
         Write-Log "Pruned $prunedCount orphaned entries."
     }
     Write-Log "SSH config written to: $configPath"
+    
+    # =========================================================================
+    # Sync rclone remotes
+    # =========================================================================
+    if (-not $NoRclone) {
+        Sync-RcloneRemotes -Entries $rcloneEntries -FullMode $Full -QuietMode $Quiet
+    }
+}
+
+# Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
+function Sync-RcloneRemotes {
+    param(
+        [array]$Entries,
+        [bool]$FullMode,
+        [bool]$QuietMode
+    )
+    
+    function Write-RLog {
+        param([string]$Message)
+        if (-not $QuietMode) {
+            Write-Host $Message
+        }
+    }
+    
+    # Skip if rclone not available
+    $rcloneCmd = Get-Command rclone -ErrorAction SilentlyContinue
+    if (-not $rcloneCmd) {
+        return
+    }
+    
+    # Skip if no entries to process
+    if (-not $Entries -or $Entries.Count -eq 0) {
+        return
+    }
+    
+    Write-RLog ""
+    Write-RLog "Syncing rclone remotes..."
+    
+    # Get rclone password if not set
+    if (-not $env:RCLONE_CONFIG_PASS) {
+        $passResult = pass-cli item view "pass://Personal/rclone/password" --field password 2>$null
+        if ([string]::IsNullOrEmpty($passResult)) {
+            Write-RLog "  (skipped - could not get rclone password)"
+            return
+        }
+        $env:RCLONE_CONFIG_PASS = $passResult.Trim()
+    }
+    
+    # Get current config
+    $configJson = rclone config dump 2>$null
+    $currentConfig = @{}
+    if (-not [string]::IsNullOrEmpty($configJson)) {
+        try {
+            $currentConfig = $configJson | ConvertFrom-Json -AsHashtable
+        } catch {
+            $currentConfig = @{}
+        }
+    }
+    
+    # Full mode: delete all managed remotes first
+    if ($FullMode) {
+        foreach ($remoteName in @($currentConfig.Keys)) {
+            $remote = $currentConfig[$remoteName]
+            if ($remote.description -eq "managed by pass-ssh-unpack") {
+                rclone config delete $remoteName 2>$null | Out-Null
+            }
+        }
+        # Refresh config after deletions
+        $configJson = rclone config dump 2>$null
+        $currentConfig = @{}
+        if (-not [string]::IsNullOrEmpty($configJson)) {
+            try {
+                $currentConfig = $configJson | ConvertFrom-Json -AsHashtable
+            } catch {
+                $currentConfig = @{}
+            }
+        }
+    }
+    
+    $createdCount = 0
+    $skippedCount = 0
+    
+    # Process each entry
+    foreach ($entry in $Entries) {
+        $hostName = $entry.Host
+        $user = $entry.User
+        $keyFile = $entry.KeyFile
+        $aliases = $entry.Aliases
+        
+        if ([string]::IsNullOrEmpty($hostName)) { continue }
+        
+        # Check if remote exists without our marker (unmanaged)
+        $existingRemote = $currentConfig[$hostName]
+        $existingDesc = if ($existingRemote) { $existingRemote.description } else { "" }
+        
+        if ($existingRemote -and $existingDesc -ne "managed by pass-ssh-unpack") {
+            Write-RLog "  Skipping ${hostName}: existing unmanaged remote"
+            $skippedCount++
+            continue
+        }
+        
+        # Create/update primary SFTP remote
+        if (-not [string]::IsNullOrEmpty($keyFile)) {
+            rclone config create $hostName sftp host=$hostName user=$user key_file=$keyFile description="managed by pass-ssh-unpack" 2>$null | Out-Null
+        } else {
+            rclone config create $hostName sftp host=$hostName user=$user ask_password=true description="managed by pass-ssh-unpack" 2>$null | Out-Null
+        }
+        $createdCount++
+        
+        # Create alias remotes
+        if (-not [string]::IsNullOrEmpty($aliases)) {
+            $aliasesList = $aliases -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+            foreach ($aliasName in $aliasesList) {
+                if ($aliasName -eq $hostName) { continue }
+                
+                # Check for unmanaged conflict
+                $aliasRemote = $currentConfig[$aliasName]
+                $aliasDesc = if ($aliasRemote) { $aliasRemote.description } else { "" }
+                
+                if ($aliasRemote -and $aliasDesc -ne "managed by pass-ssh-unpack") {
+                    Write-RLog "  Skipping alias ${aliasName}: existing unmanaged remote"
+                    $skippedCount++
+                    continue
+                }
+                
+                rclone config create $aliasName alias remote="${hostName}:" description="managed by pass-ssh-unpack" 2>$null | Out-Null
+                $createdCount++
+            }
+        }
+    }
+    
+    # Auto-prune: managed sftp remotes whose key_file doesn't exist
+    $configJson = rclone config dump 2>$null
+    $updatedConfig = @{}
+    if (-not [string]::IsNullOrEmpty($configJson)) {
+        try {
+            $updatedConfig = $configJson | ConvertFrom-Json -AsHashtable
+        } catch {
+            $updatedConfig = @{}
+        }
+    }
+    
+    $prunedCount = 0
+    
+    # Get managed sftp remotes and prune those with missing key files
+    foreach ($remoteName in @($updatedConfig.Keys)) {
+        $remote = $updatedConfig[$remoteName]
+        if ($remote.type -eq "sftp" -and $remote.description -eq "managed by pass-ssh-unpack") {
+            $keyPath = $remote.key_file
+            if (-not [string]::IsNullOrEmpty($keyPath)) {
+                $expandedPath = $keyPath -replace '^~', $env:USERPROFILE
+                if (-not (Test-Path $expandedPath)) {
+                    rclone config delete $remoteName 2>$null | Out-Null
+                    $prunedCount++
+                }
+            }
+        }
+    }
+    
+    # Prune alias remotes whose target was deleted
+    $configJson = rclone config dump 2>$null
+    $updatedConfig = @{}
+    if (-not [string]::IsNullOrEmpty($configJson)) {
+        try {
+            $updatedConfig = $configJson | ConvertFrom-Json -AsHashtable
+        } catch {
+            $updatedConfig = @{}
+        }
+    }
+    
+    foreach ($remoteName in @($updatedConfig.Keys)) {
+        $remote = $updatedConfig[$remoteName]
+        if ($remote.type -eq "alias" -and $remote.description -eq "managed by pass-ssh-unpack") {
+            $target = $remote.remote -replace ':$', ''
+            if (-not $updatedConfig.ContainsKey($target)) {
+                rclone config delete $remoteName 2>$null | Out-Null
+                $prunedCount++
+            }
+        }
+    }
+    
+    # Re-add to chezmoi if managed
+    $chezmoiCmd = Get-Command chezmoi -ErrorAction SilentlyContinue
+    if ($chezmoiCmd) {
+        $managed = chezmoi managed 2>$null
+        if ($managed -match "rclone/rclone.conf") {
+            chezmoi re-add ~/.config/rclone/rclone.conf 2>$null | Out-Null
+            Write-RLog "  Synced $createdCount remotes to chezmoi."
+        } else {
+            Write-RLog "  Synced $createdCount remotes."
+        }
+    } else {
+        Write-RLog "  Synced $createdCount remotes."
+    }
+    
+    if ($skippedCount -gt 0) {
+        Write-RLog "  Skipped $skippedCount (unmanaged conflicts)."
+    }
+    if ($prunedCount -gt 0) {
+        Write-RLog "  Pruned $prunedCount orphaned remotes."
+    }
 }

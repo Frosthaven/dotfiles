@@ -47,6 +47,7 @@ pass-ssh-unpack [OPTIONS]
 | `--item <PATTERN>`  | `-i`  | Yes        | Item title pattern(s), supports `*` and `?` wildcards |
 | `--full`            | `-f`  | No         | Full regeneration (clear config first)     |
 | `--quiet`           | `-q`  | No         | Suppress output                            |
+| `--no-rclone`       |       | No         | Skip rclone remote sync                    |
 | `--help`            | `-h`  | No         | Show help message                          |
 
 ### Examples
@@ -216,3 +217,84 @@ SSH requires private keys to have strict permissions. The command sets `chmod 60
 ```bash
 chmod 600 ~/.ssh/proton-pass/VaultName/key-name
 ```
+
+## Rclone Integration
+
+When `rclone` is available and configured, `pass-ssh-unpack` automatically creates SFTP remotes for each SSH entry, enabling seamless file transfers to your servers.
+
+### Requirements
+
+- `rclone` command available in PATH
+- rclone config password stored in Proton Pass at `pass://Personal/rclone/password`
+- `jq` for JSON parsing (Bash/Zsh/Fish only)
+
+### Generated Remotes
+
+For each SSH entry with a private key, an SFTP remote is created:
+
+```ini
+[thedragon.dev]
+type = sftp
+host = thedragon.dev
+user = root
+key_file = ~/.ssh/proton-pass/Dragon Servers/thedragon.dev
+description = managed by pass-ssh-unpack
+```
+
+For password-only entries (no private key):
+
+```ini
+[home.thedragon.dev]
+type = sftp
+host = home.thedragon.dev
+user = frosthaven
+ask_password = true
+description = managed by pass-ssh-unpack
+```
+
+Alias remotes use rclone's `alias` type to reference the primary remote:
+
+```ini
+[dragon]
+type = alias
+remote = thedragon.dev:
+description = managed by pass-ssh-unpack
+```
+
+### Conflict Handling
+
+If an existing rclone remote has the same name but wasn't created by `pass-ssh-unpack` (missing the `description = "managed by pass-ssh-unpack"` marker), the command will skip it with a warning:
+
+```
+  Skipping thedragon.dev: existing unmanaged remote
+```
+
+This prevents overwriting user-created remotes.
+
+### Auto-Prune Behavior
+
+On every run:
+- Managed SFTP remotes whose `key_file` no longer exists are deleted
+- Managed alias remotes whose target remote was deleted are also deleted
+
+### Chezmoi Integration
+
+If `~/.config/rclone/rclone.conf` is managed by chezmoi, changes are automatically synced using `chezmoi re-add` after updating remotes.
+
+### Skipping Rclone Sync
+
+Use `--no-rclone` to skip rclone sync entirely:
+
+```bash
+pass-ssh-unpack --no-rclone
+```
+
+This is useful when you only want to update SSH keys without modifying rclone config.
+
+### Full Regeneration with Rclone
+
+When running with `--full`:
+1. The `~/.ssh/proton-pass/` folder is deleted
+2. All rclone remotes with `description = "managed by pass-ssh-unpack"` are deleted
+3. SSH keys are regenerated from Proton Pass
+4. Fresh rclone remotes are created

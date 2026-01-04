@@ -9,6 +9,7 @@ function pass-ssh-unpack
     set -l item_patterns
     set -l full_mode false
     set -l quiet_mode false
+    set -l skip_rclone false
     
     set -l i 1
     while test $i -le (count $argv)
@@ -23,6 +24,8 @@ function pass-ssh-unpack
                 set full_mode true
             case -q --quiet
                 set quiet_mode true
+            case --no-rclone
+                set skip_rclone true
             case -h --help
                 echo "Usage: pass-ssh-unpack [OPTIONS]"
                 echo ""
@@ -34,6 +37,7 @@ function pass-ssh-unpack
                 echo "                             Supports * and ? wildcards"
                 echo "  -f, --full                 Full regeneration (clear config first)"
                 echo "  -q, --quiet                Suppress output"
+                echo "  --no-rclone                Skip rclone remote sync"
                 echo "  -h, --help                 Show this help message"
                 echo ""
                 echo "Examples:"
@@ -43,6 +47,7 @@ function pass-ssh-unpack
                 echo "  pass-ssh-unpack -i 'github/*'              # Keys matching pattern"
                 echo "  pass-ssh-unpack -v Personal -i 'github/*'  # Combined filters"
                 echo "  pass-ssh-unpack --full                     # Full regeneration"
+                echo "  pass-ssh-unpack --no-rclone                # Skip rclone sync"
                 return 0
             case '*'
                 echo "Unknown option: $argv[$i]"
@@ -212,6 +217,9 @@ $line"
     set -l processed_keys_file "$base_dir/.processed_keys_tmp"
     rm -f "$processed_keys_file"
     
+    set -l rclone_entries_file "$base_dir/.rclone_entries_tmp"
+    rm -f "$rclone_entries_file"
+    
     for vault in $vaults_to_process
         test -z "$vault"; and continue
         
@@ -351,6 +359,15 @@ Host $alias_entry"
                 set -l safe_alias (string replace -a '/' '_' -- "$alias_entry" | string replace -a ' ' '_')
                 echo "$alias_block" > "$new_hosts_dir/$safe_alias"
             end
+            
+            # Collect rclone entry data
+            # Format: host|user|key_file|aliases (key_file uses ~ for home)
+            set -l rclone_key_file ""
+            if test "$has_key" = "true"
+                set rclone_key_file "~/.ssh/proton-pass/$vault/$safe_title"
+            end
+            set -l aliases_csv (string join "," -- $aliases_list)
+            echo "$host_field|$username_field|$rclone_key_file|$aliases_csv" >> "$rclone_entries_file"
         end
         
         _log ""
@@ -434,7 +451,207 @@ Host $alias_entry"
     end
     _log "SSH config written to: $config_path"
     
+    # =========================================================================
+    # Sync rclone remotes
+    # =========================================================================
+    if test "$skip_rclone" != "true"
+        _sync_rclone_remotes $full_mode $quiet_mode
+    end
+    
     # Clean up helper function
     functions -e _log
     functions -e _matches_pattern
+end
+
+# Internal helper: Sync rclone SFTP remotes based on extracted SSH keys
+function _sync_rclone_remotes
+    set -l full_mode $argv[1]
+    set -l quiet_mode $argv[2]
+    set -l base_dir "$HOME/.ssh/proton-pass"
+    set -l rclone_entries_file "$base_dir/.rclone_entries_tmp"
+    
+    # Helper for logging
+    function _rlog
+        if test "$quiet_mode" != "true"
+            echo $argv
+        end
+    end
+    
+    # Skip if rclone not available
+    if not command -q rclone
+        rm -f "$rclone_entries_file"
+        functions -e _rlog
+        return 0
+    end
+    
+    # Skip if no entries to process
+    if not test -f "$rclone_entries_file"
+        functions -e _rlog
+        return 0
+    end
+    
+    _rlog ""
+    _rlog "Syncing rclone remotes..."
+    
+    # Get rclone password if not set
+    if test -z "$RCLONE_CONFIG_PASS"
+        set -gx RCLONE_CONFIG_PASS (pass-cli item view "pass://Personal/rclone/password" --field password 2>/dev/null)
+        if test -z "$RCLONE_CONFIG_PASS"
+            _rlog "  (skipped - could not get rclone password)"
+            rm -f "$rclone_entries_file"
+            functions -e _rlog
+            return 0
+        end
+    end
+    
+    # Get current config
+    set -l current_config (rclone config dump 2>/dev/null)
+    if test -z "$current_config"
+        set current_config "{}"
+    end
+    
+    # Full mode: delete all managed remotes first
+    if test "$full_mode" = "true"
+        set -l managed_remotes (echo "$current_config" | jq -r 'to_entries[] | select(.value.description == "managed by pass-ssh-unpack") | .key' 2>/dev/null)
+        for remote in $managed_remotes
+            test -z "$remote"; and continue
+            rclone config delete "$remote" &>/dev/null
+        end
+        # Refresh config after deletions
+        set current_config (rclone config dump 2>/dev/null)
+        test -z "$current_config"; and set current_config "{}"
+    end
+    
+    set -l created_count 0
+    set -l skipped_count 0
+    
+    # Process each entry
+    while read -l line
+        set -l parts (string split "|" -- "$line")
+        set -l host $parts[1]
+        set -l user $parts[2]
+        set -l key_file $parts[3]
+        set -l aliases $parts[4]
+        
+        test -z "$host"; and continue
+        
+        # Check if remote exists without our marker (unmanaged)
+        set -l existing_desc (echo "$current_config" | jq -r --arg name "$host" '.[$name].description // ""' 2>/dev/null)
+        set -l existing_remote (echo "$current_config" | jq -r --arg name "$host" '.[$name] // empty' 2>/dev/null)
+        
+        if test -n "$existing_remote"; and test "$existing_desc" != "managed by pass-ssh-unpack"
+            _rlog "  Skipping $host: existing unmanaged remote"
+            set skipped_count (math $skipped_count + 1)
+            continue
+        end
+        
+        # Create/update primary SFTP remote
+        if test -n "$key_file"
+            rclone config create "$host" sftp \
+                host="$host" \
+                user="$user" \
+                key_file="$key_file" \
+                description="managed by pass-ssh-unpack" &>/dev/null
+        else
+            rclone config create "$host" sftp \
+                host="$host" \
+                user="$user" \
+                ask_password=true \
+                description="managed by pass-ssh-unpack" &>/dev/null
+        end
+        set created_count (math $created_count + 1)
+        
+        # Create alias remotes
+        if test -n "$aliases"
+            for alias_name in (string split "," -- "$aliases")
+                set alias_name (string trim -- "$alias_name")
+                test -z "$alias_name"; and continue
+                test "$alias_name" = "$host"; and continue
+                
+                # Check for unmanaged conflict
+                set existing_desc (echo "$current_config" | jq -r --arg name "$alias_name" '.[$name].description // ""' 2>/dev/null)
+                set existing_remote (echo "$current_config" | jq -r --arg name "$alias_name" '.[$name] // empty' 2>/dev/null)
+                
+                if test -n "$existing_remote"; and test "$existing_desc" != "managed by pass-ssh-unpack"
+                    _rlog "  Skipping alias $alias_name: existing unmanaged remote"
+                    set skipped_count (math $skipped_count + 1)
+                    continue
+                end
+                
+                rclone config create "$alias_name" alias \
+                    remote="$host:" \
+                    description="managed by pass-ssh-unpack" &>/dev/null
+                set created_count (math $created_count + 1)
+            end
+        end
+    end < "$rclone_entries_file"
+    
+    rm -f "$rclone_entries_file"
+    
+    # Auto-prune: managed sftp remotes whose key_file doesn't exist
+    set -l updated_config (rclone config dump 2>/dev/null)
+    test -z "$updated_config"; and set updated_config "{}"
+    
+    set -l pruned_count 0
+    
+    # Get managed sftp remotes
+    set -l sftp_remotes (echo "$updated_config" | jq -r 'to_entries[] | select(.value.type == "sftp" and .value.description == "managed by pass-ssh-unpack") | "\(.key)|\(.value.key_file // "")"' 2>/dev/null)
+    
+    for line in $sftp_remotes
+        set -l parts (string split "|" -- "$line")
+        set -l remote_name $parts[1]
+        set -l key_path $parts[2]
+        
+        test -z "$remote_name"; and continue
+        
+        # Expand ~ to $HOME for file check
+        set -l expanded_path (string replace "~" "$HOME" -- "$key_path")
+        
+        if test -n "$key_path"; and not test -f "$expanded_path"
+            rclone config delete "$remote_name" &>/dev/null
+            set pruned_count (math $pruned_count + 1)
+        end
+    end
+    
+    # Prune alias remotes whose target was deleted
+    set updated_config (rclone config dump 2>/dev/null)
+    test -z "$updated_config"; and set updated_config "{}"
+    
+    set -l alias_remotes (echo "$updated_config" | jq -r 'to_entries[] | select(.value.type == "alias" and .value.description == "managed by pass-ssh-unpack") | "\(.key)|\(.value.remote)"' 2>/dev/null)
+    
+    for line in $alias_remotes
+        set -l parts (string split "|" -- "$line")
+        set -l remote_name $parts[1]
+        set -l target $parts[2]
+        
+        test -z "$remote_name"; and continue
+        set -l target_name (string replace -r ':$' '' -- "$target")
+        
+        # Check if target exists in current config
+        if not echo "$updated_config" | jq -e --arg name "$target_name" '.[$name]' &>/dev/null
+            rclone config delete "$remote_name" &>/dev/null
+            set pruned_count (math $pruned_count + 1)
+        end
+    end
+    
+    # Re-add to chezmoi if managed
+    if command -q chezmoi
+        if chezmoi managed 2>/dev/null | grep -q "rclone/rclone.conf"
+            chezmoi re-add ~/.config/rclone/rclone.conf &>/dev/null
+            _rlog "  Synced $created_count remotes to chezmoi."
+        else
+            _rlog "  Synced $created_count remotes."
+        end
+    else
+        _rlog "  Synced $created_count remotes."
+    end
+    
+    if test $skipped_count -gt 0
+        _rlog "  Skipped $skipped_count (unmanaged conflicts)."
+    end
+    if test $pruned_count -gt 0
+        _rlog "  Pruned $pruned_count orphaned remotes."
+    end
+    
+    functions -e _rlog
 end
