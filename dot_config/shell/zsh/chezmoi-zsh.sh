@@ -49,7 +49,7 @@ function rclone-config {
     rclone config
     echo "Syncing rclone config to chezmoi..."
     chezmoi re-add ~/.config/rclone/rclone.conf
-    chezmoi git add -A
+    chezmoi git -- add dot_config/rclone/private_rclone.conf
     chezmoi git commit -m "chore: update rclone config"
     echo "Done. Changes committed to chezmoi."
 }

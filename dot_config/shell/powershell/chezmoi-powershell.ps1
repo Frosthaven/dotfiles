@@ -170,7 +170,7 @@ function rclone-config {
         if (Test-Path $rcloneConfigPath) {
             Write-Host "Syncing rclone config to chezmoi..."
             chezmoi re-add $rcloneConfigPath
-            chezmoi git add -A
+            chezmoi git -- add dot_config/rclone/private_rclone.conf
             chezmoi git commit -m "chore: update rclone config"
             Write-Host "Done. Changes committed to chezmoi."
         }
