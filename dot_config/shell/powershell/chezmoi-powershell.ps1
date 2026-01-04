@@ -172,7 +172,7 @@ function rclone-config {
             chezmoi re-add $rcloneConfigPath
             chezmoi git -- add dot_config/rclone/private_rclone.conf
             chezmoi git commit -m "chore: update rclone config"
-            Write-Host "Done. Changes committed to chezmoi."
+            Write-Host "Done. Run 'chezmoi git push' to sync to remote."
         }
     }
 }

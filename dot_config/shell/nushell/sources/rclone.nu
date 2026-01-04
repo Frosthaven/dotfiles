@@ -21,5 +21,5 @@ def rclone-config [] {
     chezmoi re-add ~/.config/rclone/rclone.conf
     chezmoi git -- add dot_config/rclone/private_rclone.conf
     chezmoi git commit -m "chore: update rclone config"
-    print "Done. Changes committed to chezmoi."
+    print "Done. Run 'chezmoi git push' to sync to remote."
 }
