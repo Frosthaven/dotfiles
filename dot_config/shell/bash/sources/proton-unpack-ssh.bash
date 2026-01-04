@@ -119,23 +119,28 @@ proton-unpack-ssh() {
                     echo "    -> $safe_title.pub"
                 fi
                 
-                # Build list of hosts (main host + aliases)
-                # If no Aliases field, use the item title as an alias
-                local all_hosts="$host_field"
+                # Track for duplicate handling (append to temp file since we're in subshell)
+                # Format: host|title|pubkey_path|username|is_alias
+                # Primary host entry (is_alias=0)
+                echo "$host_field|$title|$pubkey_path|$username_field|0" >> "$base_dir/.host_keys_tmp"
+                
+                # Build list of aliases
+                local aliases_list=""
                 if [ -n "$aliases_field" ] && [ "$aliases_field" != "null" ]; then
-                    # Split comma-separated aliases and append
-                    all_hosts="$host_field,$(echo "$aliases_field" | tr -d ' ')"
+                    aliases_list="$aliases_field"
                 else
                     # Use title as fallback alias
-                    all_hosts="$host_field,$title"
+                    aliases_list="$title"
                 fi
                 
-                # Track for duplicate handling (append to temp file since we're in subshell)
-                # Format: host|title|pubkey_path|username
-                IFS=',' read -ra host_array <<< "$all_hosts"
-                for host in "${host_array[@]}"; do
-                    [ -z "$host" ] && continue
-                    echo "$host|$title|$pubkey_path|$username_field" >> "$base_dir/.host_keys_tmp"
+                # Add alias entries (is_alias=1)
+                IFS=',' read -ra alias_array <<< "$aliases_list"
+                for alias_entry in "${alias_array[@]}"; do
+                    alias_entry=$(echo "$alias_entry" | xargs)  # trim whitespace
+                    [ -z "$alias_entry" ] && continue
+                    # Skip if alias is same as host
+                    [ "$alias_entry" = "$host_field" ] && continue
+                    echo "$alias_entry|$title|$pubkey_path|$username_field|1" >> "$base_dir/.host_keys_tmp"
                 done
             else
                 echo "    -> failed to generate public key"
@@ -181,9 +186,13 @@ proton-unpack-ssh() {
             
             selected_path=$(echo "$selected_line" | cut -d'|' -f3)
             selected_user=$(echo "$selected_line" | cut -d'|' -f4)
+            selected_is_alias=$(echo "$selected_line" | cut -d'|' -f5)
             
             # Append to config (quote path for spaces)
             echo "" >> "$config_path"
+            if [ "$selected_is_alias" = "1" ]; then
+                echo "# Alias" >> "$config_path"
+            fi
             echo "Host $host" >> "$config_path"
             echo "    IdentityFile \"$selected_path\"" >> "$config_path"
             echo "    IdentitiesOnly yes" >> "$config_path"

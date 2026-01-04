@@ -116,24 +116,28 @@ function proton-unpack-ssh
                     echo "    -> $safe_title.pub"
                 end
                 
-                # Build list of hosts (main host + aliases)
-                # If no Aliases field, use the item title as an alias
-                set -l all_hosts $host_field
+                # Track for duplicate handling
+                # Format: host|title|pubkey_path|username|is_alias
+                # Primary host entry (is_alias=0)
+                echo "$host_field|$title|$pubkey_path|$username_field|0" >> "$tmp_file"
+                
+                # Build list of aliases
+                set -l aliases_list
                 if test -n "$aliases_field"; and test "$aliases_field" != "null"
-                    # Split comma-separated aliases and append
                     for alias in (string split "," -- "$aliases_field" | string trim)
-                        set -a all_hosts $alias
+                        set -a aliases_list $alias
                     end
                 else
                     # Use title as fallback alias
-                    set -a all_hosts $title
+                    set -a aliases_list $title
                 end
                 
-                # Track for duplicate handling
-                # Format: host|title|pubkey_path|username
-                for host in $all_hosts
-                    test -z "$host"; and continue
-                    echo "$host|$title|$pubkey_path|$username_field" >> "$tmp_file"
+                # Add alias entries (is_alias=1)
+                for alias_entry in $aliases_list
+                    test -z "$alias_entry"; and continue
+                    # Skip if alias is same as host
+                    test "$alias_entry" = "$host_field"; and continue
+                    echo "$alias_entry|$title|$pubkey_path|$username_field|1" >> "$tmp_file"
                 end
             else
                 echo "    -> failed to generate public key"
@@ -176,9 +180,13 @@ function proton-unpack-ssh
             
             set -l selected_path (echo "$selected_line" | cut -d'|' -f3)
             set -l selected_user (echo "$selected_line" | cut -d'|' -f4)
+            set -l selected_is_alias (echo "$selected_line" | cut -d'|' -f5)
             
             # Append to config (quote path for spaces)
             echo "" >> "$config_path"
+            if test "$selected_is_alias" = "1"
+                echo "# Alias" >> "$config_path"
+            end
             echo "Host $host" >> "$config_path"
             echo "    IdentityFile \"$selected_path\"" >> "$config_path"
             echo "    IdentitiesOnly yes" >> "$config_path"

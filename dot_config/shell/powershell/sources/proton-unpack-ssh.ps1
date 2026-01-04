@@ -51,7 +51,7 @@ function proton-unpack-ssh {
     $vaults = $vaultsJson.vaults | ForEach-Object { $_.name }
 
     # Track host -> key mappings
-    # Each entry: @{Host, Title, Path, User}
+    # Each entry: @{Host, Title, Path, User, IsAlias}
     $hostKeys = @()
 
     foreach ($vault in $vaults) {
@@ -144,25 +144,35 @@ function proton-unpack-ssh {
                         Write-Host "    -> $safeTitle.pub"
                     }
 
-                    # Build list of hosts (main host + aliases)
-                    # If no Aliases field, use the item title as an alias
-                    $allHosts = @($hostField)
+                    # Track primary host entry (IsAlias=$false)
+                    $hostKeys += @{
+                        Host = $hostField
+                        Title = $title
+                        Path = $pubkeyPath
+                        User = $usernameField
+                        IsAlias = $false
+                    }
+                    
+                    # Build list of aliases
+                    $aliasesList = @()
                     if (-not [string]::IsNullOrEmpty($aliasesField)) {
-                        $aliases = $aliasesField -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-                        $allHosts += $aliases
+                        $aliasesList = $aliasesField -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
                     } else {
                         # Use title as fallback alias
-                        $allHosts += $title
+                        $aliasesList = @($title)
                     }
-
-                    # Track for duplicate handling
-                    foreach ($h in $allHosts) {
-                        if ([string]::IsNullOrEmpty($h)) { continue }
+                    
+                    # Track alias entries (IsAlias=$true)
+                    foreach ($aliasEntry in $aliasesList) {
+                        if ([string]::IsNullOrEmpty($aliasEntry)) { continue }
+                        # Skip if alias is same as host
+                        if ($aliasEntry -eq $hostField) { continue }
                         $hostKeys += @{
-                            Host = $h
+                            Host = $aliasEntry
                             Title = $title
                             Path = $pubkeyPath
                             User = $usernameField
+                            IsAlias = $true
                         }
                     }
                 } else {
@@ -205,6 +215,9 @@ function proton-unpack-ssh {
         # Append to config (use forward slashes for SSH config compatibility, quote for spaces)
         $selectedPathUnix = $selectedKey.Path -replace '\\', '/'
         Add-Content -Path $configPath -Value ""
+        if ($selectedKey.IsAlias) {
+            Add-Content -Path $configPath -Value "# Alias"
+        }
         Add-Content -Path $configPath -Value "Host $h"
         Add-Content -Path $configPath -Value "    IdentityFile `"$selectedPathUnix`""
         Add-Content -Path $configPath -Value "    IdentitiesOnly yes"

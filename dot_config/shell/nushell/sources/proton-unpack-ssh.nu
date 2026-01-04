@@ -43,8 +43,8 @@ def proton-unpack-ssh [] {
     let vaults = (pass-cli vault list --output json | from json | get vaults | get name)
     
     # Track host -> key mappings for duplicate handling
-    # Each entry: {host: string, title: string, path: string, user: string}
-    mut host_keys: list<record<host: string, title: string, path: string, user: string>> = []
+    # Each entry: {host: string, title: string, path: string, user: string, is_alias: bool}
+    mut host_keys: list<record<host: string, title: string, path: string, user: string, is_alias: bool>> = []
     
     for vault in $vaults {
         print $"[($vault)]"
@@ -129,20 +129,23 @@ def proton-unpack-ssh [] {
                 print $"    -> ($safe_title).pub"
             }
             
-            # Build list of hosts (main host + aliases)
-            # If no Aliases field, use the item title as an alias
-            mut all_hosts = [$host_field]
-            if ($aliases_field | is-not-empty) {
-                let aliases = ($aliases_field | split row "," | each { |a| $a | str trim } | where { |a| $a | is-not-empty })
-                $all_hosts = ($all_hosts | append $aliases)
+            # Track primary host entry (is_alias=false)
+            $host_keys = ($host_keys | append {host: $host_field, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: false})
+            
+            # Build list of aliases
+            let aliases_list = if ($aliases_field | is-not-empty) {
+                $aliases_field | split row "," | each { |a| $a | str trim } | where { |a| $a | is-not-empty }
             } else {
                 # Use title as fallback alias
-                $all_hosts = ($all_hosts | append $title)
+                [$title]
             }
             
-            # Track for duplicate handling
-            for host in $all_hosts {
-                $host_keys = ($host_keys | append {host: $host, title: $title, path: ($pubkey_path | into string), user: $username_field})
+            # Track alias entries (is_alias=true)
+            for alias_entry in $aliases_list {
+                # Skip if alias is same as host
+                if $alias_entry != $host_field {
+                    $host_keys = ($host_keys | append {host: $alias_entry, title: $title, path: ($pubkey_path | into string), user: $username_field, is_alias: true})
+                }
             }
         }
         
@@ -173,7 +176,12 @@ def proton-unpack-ssh [] {
         }
         
         # Build config entry (quote path for spaces)
-        mut config_entry = $"\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
+        mut config_entry = ""
+        if $selected_key.is_alias {
+            $config_entry = $"\n# Alias\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
+        } else {
+            $config_entry = $"\nHost ($host)\n    IdentityFile \"($selected_key.path)\"\n    IdentitiesOnly yes"
+        }
         if ($selected_key.user | is-not-empty) {
             $config_entry = $"($config_entry)\n    User ($selected_key.user)"
         }
