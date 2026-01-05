@@ -98,7 +98,7 @@ $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
 
 # SSH AGENT + PROTON PASS *****************************************************
 # *****************************************************************************
-# Load SSH keys from Proton Pass into the SSH agent (only if agent is empty)
+# Set PROTON_PASS_LOGGED_IN based on pass-cli status
 
 function Initialize-SshAgent {
     # Start ssh-agent if not running
@@ -113,27 +113,12 @@ function Initialize-SshAgent {
         return
     }
 
-    # Check if keys are already loaded (fast check)
-    $agentKeys = ssh-add -l 2>&1
-    if ($LASTEXITCODE -eq 0 -and $agentKeys) {
-        # Keys already loaded, skip pass-cli calls
-        $env:PROTON_PASS_LOGGED_IN = "true"
-        return
-    }
-
-    # No keys loaded, check if logged in to Proton Pass
+    # Set PROTON_PASS_LOGGED_IN based on login status
     $loginStatus = pass-cli info 2>&1
     if ($LASTEXITCODE -eq 0) {
         $env:PROTON_PASS_LOGGED_IN = "true"
-        # Load SSH keys from Proton Pass
-        try {
-            pass-cli ssh-agent load 2>&1 | Out-Null
-        } catch {
-            # Silently ignore errors
-        }
     } else {
         $env:PROTON_PASS_LOGGED_IN = "false"
-        Write-Host "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys." -ForegroundColor Yellow
     }
 }
 

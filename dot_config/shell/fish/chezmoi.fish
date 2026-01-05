@@ -21,21 +21,12 @@ if command -v pacman &>/dev/null; and test "$XDG_CURRENT_DESKTOP" = "COSMIC"
     end
 end
 
-# Load SSH keys from Proton Pass (only if agent is empty)
+# Set PROTON_PASS_LOGGED_IN based on pass-cli status
 if command -v pass-cli &>/dev/null
-    # Check if keys are already loaded (fast check)
-    if ssh-add -l &>/dev/null
-        # Keys already loaded, skip pass-cli calls
+    if pass-cli info &>/dev/null 2>&1
         set -gx PROTON_PASS_LOGGED_IN "true"
     else
-        # No keys loaded, check if logged in to Proton Pass
-        if pass-cli info &>/dev/null 2>&1
-            set -gx PROTON_PASS_LOGGED_IN "true"
-            pass-cli ssh-agent load &>/dev/null
-        else
-            set -gx PROTON_PASS_LOGGED_IN "false"
-            echo "(proton pass) Not logged in. Run 'pass-cli login' to load SSH keys."
-        end
+        set -gx PROTON_PASS_LOGGED_IN "false"
     end
 end
 
