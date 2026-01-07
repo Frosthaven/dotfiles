@@ -10,15 +10,11 @@ def --wrapped pass-ssh-unpack [...args] {
         return
     }
 
-    # Always include rclone password path
-    let rclone_pass_path = "pass://Personal/rclone/password"
-    let full_args = ($args | prepend ["--rclone-password-path", $rclone_pass_path])
-
     # Run the actual binary directly (preserves TTY for progress bars)
     if (which pass-ssh-unpack-bin | is-not-empty) {
-        ^pass-ssh-unpack-bin ...$full_args
+        ^pass-ssh-unpack-bin ...$args
     } else {
-        ^$cargo_bin ...$full_args
+        ^$cargo_bin ...$args
     }
 
     # Capture exit code after direct execution
