@@ -44,6 +44,20 @@ return {
             },
             formatters = {
                 biome = {
+                    command = function(self, ctx)
+                        local root = vim.fs.find({ 'biome.json', 'biome.jsonc' }, {
+                            upward = true,
+                            path = ctx and ctx.dirname or vim.fn.getcwd(),
+                        })[1]
+                        if root then
+                            local project_dir = vim.fn.fnamemodify(root, ':h')
+                            local local_biome = project_dir .. '/node_modules/.bin/biome'
+                            if vim.fn.executable(local_biome) == 1 then
+                                return local_biome
+                            end
+                        end
+                        return 'biome'
+                    end,
                     condition = function(self, ctx)
                         return vim.fs.find({ 'biome.json', 'biome.jsonc' }, {
                             upward = true,
