@@ -12,12 +12,4 @@ if (which pacman | is-not-empty) and (($env.XDG_CURRENT_DESKTOP? | default "" | 
     }
 }
 
-# Set PROTON_PASS_LOGGED_IN based on pass-cli status (for rclone.nu)
-if (which pass-cli | is-not-empty) {
-    let login_check = (do { pass-cli info } | complete)
-    if $login_check.exit_code == 0 {
-        $env.PROTON_PASS_LOGGED_IN = "true"
-    } else {
-        $env.PROTON_PASS_LOGGED_IN = "false"
-    }
-}
+
