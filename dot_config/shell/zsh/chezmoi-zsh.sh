@@ -4,6 +4,9 @@ export PATH="/usr/local/bin:$PATH"
 # add $HOME/.local/bin binaries to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+# Add bun to PATH
+export PATH="$HOME/.bun/bin:$PATH"
+
 # Add nvim-bob (stable and nightly) to PATH
 export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/share/bob/nightly/bin:$PATH"
 

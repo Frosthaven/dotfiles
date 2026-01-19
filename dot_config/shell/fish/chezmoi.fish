@@ -4,6 +4,9 @@ set -gx PATH /usr/local/bin $PATH
 # Add $HOME/.local/bin to PATH
 set -gx PATH $HOME/.local/bin $PATH
 
+# Add bun to PATH
+set -gx PATH $HOME/.bun/bin $PATH
+
 # Add nvim-bob (stable and nightly) to PATH
 set -gx PATH $HOME/.local/share/bob/nvim-bin $HOME/.local/share/bob/nightly/bin $PATH
 

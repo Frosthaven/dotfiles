@@ -14,6 +14,7 @@ source ./sources/_env_path.nu
 source ./sources/ssh-agent.nu
 source ./sources/rclone.nu
 source ./sources/themes/catppuccin-mocha.nu
+source ./sources/bun.nu
 source ./sources/cargo.nu
 source ./sources/nvim-bob.nu
 source ./sources/pnpm.nu
