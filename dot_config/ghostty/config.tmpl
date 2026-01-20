@@ -1,7 +1,8 @@
 # Font (matching your Linux WezTerm config)
 font-family = "JetBrainsMono Nerd Font"
 font-style = Medium
-font-size = 16
+# font-size = 16
+font-size = {{ if eq .chezmoi.os "linux" }}10{{ else }}16{{ end }}
 
 # macOS font thickening for better visibility
 font-thicken = true
