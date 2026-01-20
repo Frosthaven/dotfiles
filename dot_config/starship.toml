@@ -26,6 +26,9 @@ disabled = true
 [git_branch]
 symbol = " "
 
+[git_status]
+show_untracked = false
+
 [nodejs]
 format = "[ $version]($style) "
 
