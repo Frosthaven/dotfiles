@@ -1,7 +1,7 @@
 # Font (matching your Linux WezTerm config)
 font-family = "JetBrainsMono Nerd Font"
 font-style = Medium
-font-size = 10.5
+font-size = 16
 
 # macOS font thickening for better visibility
 font-thicken = true
