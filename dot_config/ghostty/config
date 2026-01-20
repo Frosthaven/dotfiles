@@ -12,9 +12,9 @@ window-decoration = auto
 window-theme = ghostty
 window-titlebar-background = #11111D
 
-# Cell adjustments (approximating line-height 1.3 and cell-width 1.1)
-adjust-cell-height = 30%
+# Cell adjustments
 adjust-cell-width = 10%
+adjust-cell-height = 15%
 
 # Theme (Catppuccin Mocha)
 theme = Catppuccin Mocha
@@ -27,7 +27,7 @@ background-opacity = 0.94
 
 # Minimal padding for editor comfort
 window-padding-x = 24
-window-padding-y = 12,12
+window-padding-y = 0
 
 # Balance extra padding across all edges
 window-padding-balance = true
