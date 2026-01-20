@@ -38,3 +38,6 @@ keybind = ctrl+t=new_tab
 keybind = ctrl+n=new_window
 keybind = ctrl+w=close_tab
 keybind = ctrl+shift+w=close_window
+
+# Behaviors
+copy-on-select = clipboard
