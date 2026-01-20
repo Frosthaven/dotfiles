@@ -20,11 +20,16 @@ packages:
         mac: brew install mas
     1-package-manager-appinstaller: # microsoft
         win: $pkg = "Microsoft.AppInstaller"; if (-not (winget list --id $pkg | Select-String $pkg)) { winget install --id $pkg }; try { winget pin add $pkg } catch {}
-    1-langauge-package-manager-nodejs:
+    1-language-package-manager-nodejs:
         win: winget install -e --id OpenJS.NodeJS
         mac: brew install node
         apt: sudo apt install nodejs npm
         pac: yes | sudo pacman -S --needed nodejs npm
+    1-language-package-manager-bun:
+        win: powershell -c "irm bun.sh/install.ps1 | iex"
+        mac: curl -fsSL https://bun.sh/install | bash
+        apt: sudo apt install -y unzip && curl -fsSL https://bun.sh/install | bash
+        pac: curl -fsSL https://bun.sh/install | bash
     1-language-package-manager-pnpm:
         win: if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { $old=$env:PNPM_HOME; Remove-Item Env:PNPM_HOME -ErrorAction SilentlyContinue; Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression; $env:PNPM_HOME="$env:USERPROFILE\.local\share\pnpm"; $env:Path+=";$env:PNPM_HOME"; [Environment]::SetEnvironmentVariable("PNPM_HOME",$env:PNPM_HOME,"User"); [Environment]::SetEnvironmentVariable("Path",$env:Path,"User"); if($old){$env:PNPM_HOME=$old} }
         mac: if (! (command -v pnpm >/dev/null 2>&1)) { export PNPM_HOME="$HOME/.local/share/pnpm"; export PATH="$PNPM_HOME:$PATH"; curl -fsSL https://get.pnpm.io/install.sh | sh - }
@@ -77,6 +82,11 @@ packages:
         mac: brew install wezterm
         apt: flatpak install flathub org.wezfurlong.wezterm -y
         pac: flatpak install flathub org.wezfurlong.wezterm -y
+    terminal-ghostty:
+        win: echo "Ghostty is not yet available on Windows. Install from https://ghostty.org when available."
+        mac: brew install --cask ghostty
+        apt: flatpak install flathub com.mitchellh.ghostty -y
+        pac: yay -S --noconfirm ghostty
 
     # shells ******************************************************************
     # *************************************************************************

@@ -1,0 +1,36 @@
+# Font (matching your Linux WezTerm config)
+font-family = "JetBrainsMono Nerd Font"
+font-style = Medium
+font-size = 10.5
+
+# Titlebar settings
+window-decoration = auto
+window-theme = ghostty
+window-titlebar-background = #11111D
+
+# Cell adjustments (approximating line-height 1.3 and cell-width 1.1)
+adjust-cell-height = 30%
+adjust-cell-width = 10%
+
+# Theme (Catppuccin Mocha)
+theme = Catppuccin Mocha
+
+# Override background color
+background = #11111D
+
+# Window opacity
+background-opacity = 0.94
+
+# Minimal padding for editor comfort
+window-padding-x = 24
+window-padding-y = 0
+
+# Balance extra padding across all edges
+window-padding-balance = true
+window-padding-color = extend-always
+
+# Keybindings
+keybind = ctrl+t=new_tab
+keybind = ctrl+n=new_window
+keybind = ctrl+w=close_tab
+keybind = ctrl+shift+w=close_window
