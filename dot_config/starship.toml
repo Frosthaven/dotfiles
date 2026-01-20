@@ -27,7 +27,7 @@ disabled = true
 symbol = " "
 
 [git_status]
-show_untracked = false
+untracked = ""
 
 [nodejs]
 format = "[ $version]($style) "
