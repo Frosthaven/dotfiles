@@ -14,7 +14,7 @@ window-titlebar-background = #11111D
 
 # Cell adjustments
 adjust-cell-width = 10%
-adjust-cell-height = 15%
+adjust-cell-height = 20%
 
 # Theme (Catppuccin Mocha)
 theme = Catppuccin Mocha
