@@ -27,7 +27,7 @@ background-opacity = 0.94
 
 # Minimal padding for editor comfort
 window-padding-x = 24
-window-padding-y = 0
+window-padding-y = 12,12
 
 # Balance extra padding across all edges
 window-padding-balance = true
