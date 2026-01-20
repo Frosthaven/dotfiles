@@ -31,13 +31,15 @@ untracked = ""
 
 [nodejs]
 format = "[ $version]($style) "
+detect_extensions = []
 detect_folders = []
-detect_files = [".node-version", ".nvmrc"]
+detect_files = [".node-version", ".nvmrc", "package.json"]
 
 [bun]
 symbol = " "
+detect_extensions = []
 detect_folders = []
-detect_files = ["bun.lockb", "bunfig.toml"]
+detect_files = ["bun.lockb", "bunfig.toml", "bun.lock"]
 
 [php]
 format = "[ $version]($style) "
