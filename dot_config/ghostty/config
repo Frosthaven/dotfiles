@@ -41,3 +41,4 @@ keybind = ctrl+shift+w=close_window
 
 # Behaviors
 copy-on-select = clipboard
+confirm-close-surface = true
