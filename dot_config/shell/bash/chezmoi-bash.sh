@@ -15,9 +15,10 @@ export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
 # SSH Agent configuration for Arch-based distros with COSMIC desktop
+export TERM="xterm-256color"
 if command -v pacman &>/dev/null && [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
-    
+
     # Auto-start service if not running
     if ! systemctl --user is-active --quiet ssh-agent.service; then
         systemctl --user start ssh-agent.service
@@ -49,7 +50,7 @@ rclone-config() {
     chezmoi re-add ~/.config/rclone/rclone.conf
     chezmoi git -- add dot_config/rclone/private_rclone.conf
     chezmoi git commit -m "chore: update rclone config"
-    
+
     # Auto-push if only 1 commit ahead, otherwise warn user
     local ahead_count
     ahead_count=$(chezmoi git -- rev-list --count @{u}..HEAD 2>/dev/null || echo "0")

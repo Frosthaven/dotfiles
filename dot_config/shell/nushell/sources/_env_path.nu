@@ -15,3 +15,4 @@ path add ($env.HOME | path join ".local" "share" "pnpm")
 if ($nu.os-info.family == "unix") {
     path add "/usr/local/bin"
 }
+

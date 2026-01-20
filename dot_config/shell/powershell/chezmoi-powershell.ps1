@@ -104,6 +104,9 @@ $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
 # Set PROTON_PASS_LOGGED_IN based on pass-cli status
 
 function Initialize-SshAgent {
+    # set terminal type
+    $env:TERM = "xterm-256color"
+
     # Start ssh-agent if not running
     $sshAgent = Get-Process ssh-agent -ErrorAction SilentlyContinue
     if (-not $sshAgent) {
@@ -160,7 +163,7 @@ function rclone-config {
             chezmoi re-add $rcloneConfigPath
             chezmoi git -- add dot_config/rclone/private_rclone.conf
             chezmoi git commit -m "chore: update rclone config"
-            
+
             # Auto-push if only 1 commit ahead, otherwise warn user
             $aheadCount = chezmoi git -- rev-list --count "@{u}..HEAD" 2>$null
             if ($aheadCount -eq "1") {
