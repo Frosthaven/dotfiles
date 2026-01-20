@@ -30,7 +30,14 @@ symbol = " "
 untracked = ""
 
 [nodejs]
-format = "[ $version]($style) "
+format = "[ $version]($style) "
+detect_folders = []
+detect_files = [".node-version", ".nvmrc"]
+
+[bun]
+symbol = " "
+detect_folders = []
+detect_files = ["bun.lockb", "bunfig.toml"]
 
 [php]
 format = "[ $version]($style) "
