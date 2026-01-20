@@ -3,6 +3,10 @@ font-family = "JetBrainsMono Nerd Font"
 font-style = Medium
 font-size = 10.5
 
+# macOS font thickening for better visibility
+font-thicken = true
+font-thicken-strength = 150
+
 # Titlebar settings
 window-decoration = auto
 window-theme = ghostty
