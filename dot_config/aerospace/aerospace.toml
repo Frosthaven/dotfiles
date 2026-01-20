@@ -201,3 +201,14 @@ backspace = ['close-all-windows-but-current', 'mode main']
 3 = ['g246hl',             'built-in'                  ]
 4 = ['g246hl',             'built-in'                  ]
 
+# APP OVERRIDES ***************************************************************
+# *****************************************************************************
+
+# Ghostty - fix for extra tabs counting as windows
+#           this forces Ghostty to start as a floating window, which makes
+#           subsequent tabs not count as windows even after unfloating. You'll
+#           need to keep the originally floated tab open for this to work.
+[[on-window-detected]]
+if.app-id = "com.mitchellh.ghostty"
+check-further-callbacks = true
+run = ['layout floating']
