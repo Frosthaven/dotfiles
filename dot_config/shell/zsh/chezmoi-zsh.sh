@@ -7,6 +7,12 @@ export PATH="$HOME/.local/bin:$PATH"
 # add $HOME/.npm-global/bin (npm global packages)
 export PATH="$HOME/.npm-global/bin:$PATH"
 
+# CUDA toolkit
+if [[ -d "/opt/cuda/bin" ]]; then
+    export PATH="/opt/cuda/bin:$PATH"
+    export CUDA_HOME="/opt/cuda"
+fi
+
 # Add bun to PATH
 export PATH="$HOME/.bun/bin:$PATH"
 

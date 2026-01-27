@@ -17,6 +17,12 @@ set -gx PATH $PNPM_HOME $PATH
 # Add npm global bin to PATH
 set -gx PATH $HOME/.npm-global/bin $PATH
 
+# CUDA toolkit
+if test -d /opt/cuda/bin
+    set -gx PATH /opt/cuda/bin $PATH
+    set -gx CUDA_HOME /opt/cuda
+end
+
 # SSH Agent configuration for Arch-based distros with COSMIC desktop
 set -gx TERM "xterm-256color"
 if command -v pacman &>/dev/null; and test "$XDG_CURRENT_DESKTOP" = "COSMIC"

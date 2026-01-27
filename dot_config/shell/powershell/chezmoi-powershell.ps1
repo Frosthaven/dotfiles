@@ -102,6 +102,13 @@ $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
 # Add npm global bin to PATH
 $env:Path += ";$env:USERPROFILE\.npm-global\bin"
 
+# CUDA toolkit (Windows path - adjust if needed)
+if (Test-Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA") {
+    $cudaPath = Get-ChildItem "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" | Sort-Object Name -Descending | Select-Object -First 1
+    $env:Path += ";$($cudaPath.FullName)\bin"
+    $env:CUDA_HOME = $cudaPath.FullName
+}
+
 # Delamain (clawdbot passthrough)
 function delamain { clawdbot @args }
 

@@ -1,7 +1,5 @@
 # Delamain (clawdbot passthrough)
-def delamain [...args] {
-    clawdbot ...$args
-}
+alias delamain = clawdbot
 
 # Stop all Docker containers and power off DDEV
 def docker-off [] {
