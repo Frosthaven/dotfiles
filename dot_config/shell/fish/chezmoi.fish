@@ -14,6 +14,9 @@ set -gx PATH $HOME/.local/share/bob/nvim-bin $HOME/.local/share/bob/nightly/bin 
 set -gx PNPM_HOME $HOME/.local/share/pnpm
 set -gx PATH $PNPM_HOME $PATH
 
+# Add npm global bin to PATH
+set -gx PATH $HOME/.npm-global/bin $PATH
+
 # SSH Agent configuration for Arch-based distros with COSMIC desktop
 set -gx TERM "xterm-256color"
 if command -v pacman &>/dev/null; and test "$XDG_CURRENT_DESKTOP" = "COSMIC"
@@ -80,6 +83,9 @@ alias lga='eza --icons=always --group --header --group-directories-first --all -
 # Neovim aliases
 alias vim='nvim'
 alias vi='nvim'
+
+# Delamain (clawdbot passthrough)
+alias delamain='clawdbot'
 
 # Zoxide
 zoxide init fish | source

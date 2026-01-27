@@ -1,3 +1,8 @@
+# Delamain (clawdbot passthrough)
+def delamain [...args] {
+    clawdbot ...$args
+}
+
 # Stop all Docker containers and power off DDEV
 def docker-off [] {
     let os = (bash -c "uname" | str trim | str downcase)

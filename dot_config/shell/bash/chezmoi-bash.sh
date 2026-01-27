@@ -4,6 +4,9 @@ export PATH="/usr/local/bin:$PATH"
 # add $HOME/.local/bin binaries to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+# add $HOME/.npm-global/bin (npm global packages)
+export PATH="$HOME/.npm-global/bin:$PATH"
+
 # Add bun to PATH
 export PATH="$HOME/.bun/bin:$PATH"
 
@@ -82,6 +85,9 @@ alias lga='eza --icons=always --group --header --group-directories-first --all -
 # Neovim aliases
 alias vim='nvim'
 alias vi='nvim'
+
+# Delamain (clawdbot passthrough)
+alias delamain='clawdbot'
 
 # Zoxide
 eval "$(zoxide init bash)"

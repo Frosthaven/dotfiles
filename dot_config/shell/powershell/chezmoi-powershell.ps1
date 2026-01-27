@@ -99,6 +99,12 @@ $env:Path += ";$env:USERPROFILE\.bun\bin"
 $env:PNPM_HOME = "$env:USERPROFILE\.local\share\pnpm"
 $env:Path += ";$env:USERPROFILE\.local\share\pnpm"
 
+# Add npm global bin to PATH
+$env:Path += ";$env:USERPROFILE\.npm-global\bin"
+
+# Delamain (clawdbot passthrough)
+function delamain { clawdbot @args }
+
 # SSH AGENT + PROTON PASS *****************************************************
 # *****************************************************************************
 # Set PROTON_PASS_LOGGED_IN based on pass-cli status
