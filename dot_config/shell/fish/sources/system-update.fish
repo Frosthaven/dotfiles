@@ -65,6 +65,16 @@ function sysup
         uv tool upgrade --all
     end
 
+    # Bun
+    if command -q bun
+        echo ""
+        echo "🔄 Updating Bun -----------------------------------------------"
+        echo "---------------------------------------------------------------"
+        echo ""
+        echo "Updating Bun..."
+        bun upgrade
+    end
+
     # Node package managers
     set -l pkg_manager ""
     if command -q pnpm

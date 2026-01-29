@@ -70,6 +70,17 @@ def sysup [] {
         uv tool upgrade --all
     }
 
+    if (which bun | is-empty) {
+        # nothing
+    } else {
+        print ""
+        print "🔄 Updating Bun -----------------------------------------------"
+        print "---------------------------------------------------------------"
+        print ""
+        print "Updating Bun..."
+        bun upgrade
+    }
+
     let pkg_manager = if (which pnpm | default null) != null {
         "pnpm"
     } else if (which npm | default null) != null {

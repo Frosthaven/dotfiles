@@ -66,6 +66,16 @@ function sysup {
         uv tool upgrade --all
     }
 
+    # Bun
+    if (Get-Command bun -ErrorAction SilentlyContinue) {
+        Write-Host ""
+        Write-Host "🔄 Updating Bun -----------------------------------------------"
+        Write-Host "---------------------------------------------------------------"
+        Write-Host ""
+        Write-Host "Updating Bun..."
+        bun upgrade
+    }
+
     # Node package managers
     $pkgManager = $null
     if (Get-Command pnpm -ErrorAction SilentlyContinue) {

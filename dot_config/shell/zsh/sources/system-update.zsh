@@ -63,6 +63,16 @@ sysup() {
         uv tool upgrade --all
     fi
 
+    # Bun
+    if command -v bun &>/dev/null; then
+        echo ""
+        echo "🔄 Updating Bun -----------------------------------------------"
+        echo "---------------------------------------------------------------"
+        echo ""
+        echo "Updating Bun..."
+        bun upgrade
+    fi
+
     # Node package managers
     local pkg_manager=""
     if command -v pnpm &>/dev/null; then
