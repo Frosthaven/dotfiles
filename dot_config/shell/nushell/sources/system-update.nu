@@ -79,6 +79,9 @@ def sysup [] {
         print ""
         print "Updating Bun..."
         bun upgrade
+        print ""
+        print "Updating global Bun packages..."
+        bun update -g
     }
 
     let pkg_manager = if (which pnpm | default null) != null {

@@ -74,6 +74,9 @@ function sysup {
         Write-Host ""
         Write-Host "Updating Bun..."
         bun upgrade
+        Write-Host ""
+        Write-Host "Updating global Bun packages..."
+        bun update -g
     }
 
     # Node package managers

@@ -71,6 +71,9 @@ sysup() {
         echo ""
         echo "Updating Bun..."
         bun upgrade
+        echo ""
+        echo "Updating global Bun packages..."
+        bun update -g
     fi
 
     # Node package managers
