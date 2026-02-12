@@ -17,10 +17,11 @@ return {
                     --},
                 },
                 border = 'curved',
-                open_mapping = [[<leader>tt]],
                 hide_numbers = true,
                 shade_terminals = true,
             }
+
+            vim.keymap.set('n', '<leader>tt', '<cmd>ToggleTerm<CR>', { desc = '[T]oggle [T]erminal' })
         end,
     },
 }
