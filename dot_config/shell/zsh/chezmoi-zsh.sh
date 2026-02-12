@@ -7,6 +7,9 @@ export PATH="$HOME/.local/bin:$PATH"
 # add $HOME/.npm-global/bin (npm global packages)
 export PATH="$HOME/.npm-global/bin:$PATH"
 
+# Add Ruby gem executables to PATH
+export PATH="$HOME/.local/share/gem/ruby/3.4.0/bin:$PATH"
+
 # CUDA toolkit
 if [[ -d "/opt/cuda/bin" ]]; then
     export PATH="/opt/cuda/bin:$PATH"

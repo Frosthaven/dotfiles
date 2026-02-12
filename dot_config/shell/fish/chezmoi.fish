@@ -17,6 +17,9 @@ set -gx PATH $PNPM_HOME $PATH
 # Add npm global bin to PATH
 set -gx PATH $HOME/.npm-global/bin $PATH
 
+# Add Ruby gem executables to PATH
+set -gx PATH $HOME/.local/share/gem/ruby/3.4.0/bin $PATH
+
 # CUDA toolkit
 if test -d /opt/cuda/bin
     set -gx PATH /opt/cuda/bin $PATH
